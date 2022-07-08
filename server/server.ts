@@ -58,7 +58,6 @@ server.post('/create', async (req, res) => {
     });
   } else {
     const moderator = await users.findOne({ _id: new ObjectId(userId) });
-    console.log('moderator:', moderator);
     if (!moderator) {
       return res.setStatus(404).json({
         success: false,
@@ -76,8 +75,6 @@ server.post('/create', async (req, res) => {
     numberOfOptions,
     noVote,
   });
-
-  console.log('room:', room);
 
   res.json({
     roomCode: roomCode,
