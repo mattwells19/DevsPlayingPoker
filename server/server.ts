@@ -2,6 +2,7 @@ import { opine, json, config, MongoClient } from './deps.ts';
 import { RoomSchema, UserSchema } from './types/schemas.ts';
 import seedDB from './utils/seedDB.ts';
 import generateRoomCode from './utils/generateRoomCode.ts';
+import checkIfRoomExists from './utils/checkIfRoomExists.ts';
 config({ path: './.env' });
 
 // Types (TODO: extract)
@@ -72,6 +73,13 @@ server.get('/rooms/:roomCode', async (req, res) => {
     success: false,
     message: `Room with roomCode of ${req.params.roomCode} not found`,
   });
+});
+
+server.head('/rooms/:roomCode', async (req, res) => {
+  if (await checkIfRoomExists(req.params.roomCode, rooms)) {
+    return res.setStatus(200);
+  }
+  return res.setStatus(404);
 });
 
 server.listen(3000, () => console.log('server started on port 3000'));
