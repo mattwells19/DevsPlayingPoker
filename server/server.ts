@@ -2,7 +2,7 @@ import { opine, json, config, MongoClient } from './deps.ts';
 import { RoomSchema, UserSchema } from './types/schemas.ts';
 import seedDB from './utils/seedDB.ts';
 import generateRoomCode from './utils/generateRoomCode.ts';
-config({ path: './server/.env' });
+config({ path: './.env' });
 
 // Types (TODO: extract)
 interface CreateRoomRequest {
@@ -60,4 +60,4 @@ server.post('/create', async (req, res) => {
   }
 });
 
-server.listen(3000, () => console.log('server started on port 3000'));
+server.listen(1337, () => console.log('server started on port 1337'));
