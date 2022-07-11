@@ -60,4 +60,18 @@ server.post('/create', async (req, res) => {
   }
 });
 
-server.listen(1337, () => console.log('server started on port 1337'));
+server.get('/rooms/:roomCode', async (req, res) => {
+  const room = await rooms.findOne({ roomCode: req.params.roomCode });
+  if (room) {
+    return res.setStatus(200).json({
+      success: true,
+      room,
+    });
+  }
+  return res.setStatus(404).json({
+    success: false,
+    message: `Room with roomCode of ${req.params.roomCode} not found`,
+  });
+});
+
+server.listen(3000, () => console.log('server started on port 3000'));
