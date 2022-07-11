@@ -79,7 +79,7 @@ server.head('/rooms/:roomCode', async (req, res) => {
   if (await checkIfRoomExists(req.params.roomCode, rooms)) {
     return res.setStatus(200);
   }
-  return res.setStatus(404);
+  return res.setStatus(204);
 });
 
 server.listen(3000, () => console.log('server started on port 3000'));
