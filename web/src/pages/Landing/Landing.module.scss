@@ -1,8 +1,7 @@
-main {
+main.landing {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	// gap: 4rem;
 
 	height: 100vh;
 	max-width: 30rem;
@@ -12,10 +11,10 @@ main {
 div.seperator {
 	display: flex;
 	gap: 1rem;
-	margin: 1.5rem 0px;
+	margin: 2rem 0px;
 }
 
-section.roomcode-inputs {
+section.roomCodeInputs {
 	text-align: center;
 
 	form {
@@ -26,14 +25,14 @@ section.roomcode-inputs {
 
 		input {
 			padding: 1rem;
-			width: 1.2ch;
-			height: 1.2ch;
+			width: 3rem;
+			height: 3rem;
 			border-radius: 0.5rem;
 			text-transform: uppercase;
 		}
 	}
 
-	.error-msg {
+	.errorMsg {
 		height: 1rem;
 		display: grid;
 		place-items: center;

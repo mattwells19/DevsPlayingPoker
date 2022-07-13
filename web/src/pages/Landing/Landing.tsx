@@ -1,17 +1,29 @@
-import { Component, createEffect, createResource, createSignal, For, Show } from "solid-js";
+import {
+	Component,
+	createEffect,
+	createResource,
+	createSignal,
+	For,
+	Show,
+} from "solid-js";
 import { useNavigate } from "solid-app-router";
 import Button from "@/components/Button";
-import "./Landing.scss";
+import styles from "./Landing.module.scss";
 
 const Landing: Component = () => {
-	let roomCodeInputsRefs: Array<HTMLInputElement | null> = [null, null, null, null];
+	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
+		Array(4).fill(null);
 	const navigate = useNavigate();
 
 	const [roomCodeValue, setRoomCodeValue] = createSignal<string | null>(null);
 
 	// async call gets triggered when roomCodeValue is truthy
-	const [roomExists] = createResource<boolean, string>(roomCodeValue, (roomCode) =>
-		fetch(`/api/rooms/${roomCode}`, { method: "HEAD" }).then(({ status }) => status === 200),
+	const [roomExists] = createResource<boolean, string>(
+		roomCodeValue,
+		(roomCode) =>
+			fetch(`/api/rooms/${roomCode}`, { method: "HEAD" }).then(
+				({ status }) => status === 200,
+			),
 	);
 
 	const handleInputChange = (formElement: EventTarget & HTMLFormElement) => {
@@ -36,8 +48,8 @@ const Landing: Component = () => {
 	});
 
 	return (
-		<main>
-			<section class="roomcode-inputs">
+		<main class={styles.landing}>
+			<section class={styles.roomCodeInputs}>
 				<p>Already have a room code? Enter it here</p>
 				<form onInput={(e) => handleInputChange(e.currentTarget)}>
 					<For each={[0, 1, 2, 3]}>
@@ -70,19 +82,23 @@ const Landing: Component = () => {
 						)}
 					</For>
 				</form>
-				<div class="error-msg">
+				<div class={styles.errorMsg}>
 					<Show when={roomCodeValue() && roomExists() === false}>
-						<p aria-live="polite">A room does not exist with that code. Try again.</p>
+						<p aria-live="polite">
+							A room does not exist with that code. Try again.
+						</p>
 					</Show>
 				</div>
 			</section>
-			<div class="seperator">
+			<div class={styles.seperator}>
 				<hr />
 				<span>or</span>
 				<hr />
 			</div>
 			<section>
-				<Button href="/create-room">Start a new room</Button>
+				<Button class={styles.btnLink} href="/create-room">
+					Start a new room
+				</Button>
 			</section>
 		</main>
 	);
