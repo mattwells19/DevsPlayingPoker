@@ -1,0 +1,31 @@
+@mixin buttonStyles {
+	padding: 1rem 2rem;
+	border: 0;
+	border-radius: 0.5rem;
+	font-weight: bold;
+	font-weight: 700;
+	font-size: 1rem;
+
+	transition: background-color linear 100ms;
+
+	&.solid {
+		background-color: var(--primary-orange);
+
+		&:hover {
+			background-color: #e67c3e;
+		}
+		&:active {
+			background-color: #d1733c;
+		}
+	}
+}
+
+button {
+	@include buttonStyles();
+}
+
+a {
+	@include buttonStyles();
+	text-decoration: none;
+	color: var(--primary-text-color);
+}
