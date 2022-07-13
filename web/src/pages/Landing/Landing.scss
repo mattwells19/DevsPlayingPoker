@@ -1,0 +1,54 @@
+main {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	// gap: 4rem;
+
+	height: 100vh;
+	max-width: 30rem;
+	margin: auto;
+}
+
+div.seperator {
+	display: flex;
+	gap: 1rem;
+	margin: 1.5rem 0px;
+}
+
+section.roomcode-inputs {
+	text-align: center;
+
+	form {
+		display: flex;
+		gap: 0.25rem;
+		justify-content: center;
+		margin-top: 0.5rem;
+
+		input {
+			padding: 1rem;
+			width: 1.2ch;
+			height: 1.2ch;
+			border-radius: 0.5rem;
+			text-transform: uppercase;
+		}
+	}
+
+	.error-msg {
+		height: 1rem;
+		display: grid;
+		place-items: center;
+
+		p {
+			color: red;
+		}
+	}
+}
+
+a {
+	display: block;
+	margin: auto;
+	width: fit-content;
+
+	// extra margin to match input group with error message hidden
+	margin-top: 1rem;
+}
