@@ -5,7 +5,7 @@ export interface RoomSchema {
   roomCode: string;
   moderatorId: ObjectId;
   options: number[];
-  voters: string[];
+  voters: ObjectId[];
 }
 
 export interface UserSchema {

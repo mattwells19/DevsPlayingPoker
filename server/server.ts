@@ -13,8 +13,7 @@ interface CreateRoomRequest {
 }
 
 interface JoinRoomRequest {
-  name: string,
-  roomCode: string;
+  name: string;
 }
 
 // Start Server
@@ -67,11 +66,12 @@ server.post('/create', async (req, res) => {
   }
 });
 
-server.post("/join", async (req, res) => {
-  const { name, roomCode }: JoinRoomRequest = req.body;
+server.post("/rooms/:roomCode/join", async (req, res) => {
+  const { name }: JoinRoomRequest = req.body;
+  const { roomCode } = req.params
 
   try {
-    const room = await rooms.findOne({ roomCode });
+    const room = await checkIfRoomExists(roomCode, rooms)
     if (!room) {
       throw new Error(`Room with code ${roomCode} does not exist`);
     }

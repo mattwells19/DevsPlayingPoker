@@ -84,7 +84,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"roomCode\": {{roomCode}},\n    \"name\": \"Arnold\"\n}",
+							"raw": "{\n    \"name\": \"Luke Skywalker\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -92,13 +92,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:{{PORT}}/join",
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "{{PORT}}",
 							"path": [
+								"rooms",
+								"{{roomCode}}",
 								"join"
 							]
 						}
