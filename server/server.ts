@@ -3,6 +3,7 @@ import { RoomSchema, UserSchema } from './types/schemas.ts';
 import seedDB from './utils/seedDB.ts';
 import generateRoomCode from './utils/generateRoomCode.ts';
 import addUser from './utils/addUser.ts';
+import checkIfRoomExists from './utils/checkIfRoomExists.ts';
 config({ path: './.env' });
 
 // Types (TODO: extract)
@@ -96,4 +97,25 @@ server.post("/join", async (req, res) => {
   }
 });
 
-server.listen(1337, () => console.log('server started on port 1337'));
+server.get('/rooms/:roomCode', async (req, res) => {
+  const room = await rooms.findOne({ roomCode: req.params.roomCode });
+  if (room) {
+    return res.setStatus(200).json({
+      success: true,
+      room,
+    });
+  }
+  return res.setStatus(404).json({
+    success: false,
+    message: `Room with roomCode of ${req.params.roomCode} not found`,
+  });
+});
+
+server.head('/rooms/:roomCode', async (req, res) => {
+  if (await checkIfRoomExists(req.params.roomCode, rooms)) {
+    return res.setStatus(200);
+  }
+  return res.setStatus(204);
+});
+
+server.listen(3000, () => console.log('server started on port 3000'));
