@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "338b9f63-4f9d-48c4-90d8-6183d4f20197",
+		"name": "devs-playing-poker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18221629"
+	},
+	"item": [
+		{
+			"name": "Rooms",
+			"item": [
+				{
+					"name": "Room Exists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/api/v1/rooms/:roomCode/checkRoomExists",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								":roomCode",
+								"checkRoomExists"
+							],
+							"variable": [
+								{
+									"key": "roomCode",
+									"value": "AABA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Room by Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/api/v1/rooms/:roomCode",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								":roomCode"
+							],
+							"variable": [
+								{
+									"key": "roomCode",
+									"value": "AABA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"moderatorName\": \"DantheMan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/api/v1/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"api",
+								"v1",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Luke Skywalker\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"rooms",
+								"{{roomCode}}",
+								"join"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
