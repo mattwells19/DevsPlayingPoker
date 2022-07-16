@@ -6,8 +6,3 @@ export interface RoomSchema {
   moderatorId: ObjectId;
   options: number[];
 }
-
-export interface UserSchema {
-  _id: ObjectId;
-  name: string;
-}

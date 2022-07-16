@@ -1,14 +1,12 @@
-import { RoomSchema } from '../types/schemas.ts';
-import { Collection } from '../deps.ts';
+import { lookupRoom } from './db.ts';
 
-const generateRoomCode = async (rooms: Collection<RoomSchema>): Promise<string> => {
-  let currentRetries = 0;
+const generateRoomCode = async (): Promise<string> => {
   const maxRetries = 5;
   let duplicateCode;
   let roomCode: string | Promise<string> = getRandomCode();
 
-  for (let i = currentRetries; i < maxRetries; i++) {
-    duplicateCode = await rooms.findOne({ roomCode });
+  for (let i = 0; i < maxRetries; i++) {
+    duplicateCode = await lookupRoom(roomCode);
     if (!duplicateCode) return roomCode;
     console.debug(`Duplicate room code found, generating again. Retried ${i + 1} times.`);
     roomCode = getRandomCode();
