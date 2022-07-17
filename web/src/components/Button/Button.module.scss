@@ -11,11 +11,14 @@
 	&.solid {
 		background-color: var(--primary-orange);
 
-		&:hover {
+		&:hover:not(:disabled) {
 			background-color: #e67c3e;
 		}
-		&:active {
+		&:active:not(:disabled) {
 			background-color: #d1733c;
+		}
+		&:disabled {
+			background-color: #e67c3e;
 		}
 	}
 }

@@ -1,44 +1,57 @@
 import Button from "@/components/Button";
 import { useNavigate, useParams } from "solid-app-router";
-import {
-	Component,
-	createEffect,
-	createResource,
-	createSignal,
-} from "solid-js";
+import { Component, createSignal, Show } from "solid-js";
 import styles from "./JoinRoom.module.scss";
 
 const JoinRoom: Component = () => {
 	const navigate = useNavigate();
 	const { roomCode } = useParams();
 
-	const [voterName, setVoterName] = createSignal<string | null>(
-		localStorage.getItem("name") ?? null,
-	);
-	const [joinRoomResult] = createResource(voterName, (name) =>
+	const [loading, setLoading] = createSignal<boolean>(false);
+	const [errorMsg, setErrorMsg] = createSignal<string | null>(null);
+
+	function handleSubmit(form: HTMLFormElement) {
+		const formData = new FormData(form);
+		const name = formData.get("name")?.toString().trim();
+
+		if (!name || name.length === 0) {
+			setErrorMsg("Please enter a name.");
+			return;
+		}
+
+		localStorage.setItem("name", name);
+
+		setLoading(true);
 		fetch("/api/join", {
 			method: "POST",
 			body: JSON.stringify({ roomCode, name }),
-		}).then((res) => res.ok),
-	);
-
-	createEffect(() => {
-		if (joinRoomResult()) {
-			navigate(`/room/${roomCode}`);
-		}
-	});
+		})
+			.then(async (res) => {
+				if (res.ok) {
+					navigate(`/room/${roomCode}`);
+				} else {
+					try {
+						const errorBody = await res.json();
+						throw new Error(errorBody);
+					} catch {
+						throw new Error("An unexpected error occured.");
+					}
+				}
+			})
+			.catch((e) => {
+				setErrorMsg(e.message);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}
 
 	return (
 		<main class={styles.join}>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
-					const formData = new FormData(e.currentTarget);
-					const name = formData.get("name")?.toString().trim();
-					if (name && name.length > 0) {
-						localStorage.setItem("name", name);
-						setVoterName(name);
-					}
+					handleSubmit(e.currentTarget);
 				}}
 			>
 				<label for="name">Name</label>
@@ -49,9 +62,17 @@ const JoinRoom: Component = () => {
 					required
 					minLength="1"
 					autofocus
-					value={voterName() ?? ""}
+					value={localStorage.getItem("name") ?? ""}
+					onInput={() => setErrorMsg(null)}
+					aria-describedby="name-error-msg"
+					aria-invalid={Boolean(errorMsg())}
 				/>
-				<Button type="submit">Done</Button>
+				<Show when={errorMsg() !== null}>
+					<p id="name-error-msg">{errorMsg()}</p>
+				</Show>
+				<Button loading={loading()} type="submit">
+					Done
+				</Button>
 			</form>
 		</main>
 	);

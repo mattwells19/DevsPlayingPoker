@@ -7,7 +7,7 @@ import {
 	Show,
 } from "solid-js";
 import { useNavigate } from "solid-app-router";
-import Button from "@/components/Button";
+import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 
 const Landing: Component = () => {
@@ -96,9 +96,9 @@ const Landing: Component = () => {
 				<hr />
 			</div>
 			<section>
-				<Button class={styles.btnLink} href="/create-room">
+				<ButtonLink class={styles.btnLink} href="/create-room">
 					Start a new room
-				</Button>
+				</ButtonLink>
 			</section>
 		</main>
 	);
