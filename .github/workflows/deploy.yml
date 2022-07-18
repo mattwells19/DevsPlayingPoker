@@ -30,4 +30,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "devs-playing-poker"
-          entrypoint: "./server/server.ts"
+          root: server
+          entrypoint: "./server.ts"
