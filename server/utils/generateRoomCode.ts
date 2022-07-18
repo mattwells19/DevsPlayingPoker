@@ -16,7 +16,8 @@ const generateRoomCode = async (): Promise<string> => {
 
 const getRandomCode = () => {
   let text = '';
-  const possible = 'AB';
+  // const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const possible = 'AB'; // Reduced roomCode options for testing
   for (let i = 0; i < 4; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
