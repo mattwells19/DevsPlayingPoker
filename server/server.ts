@@ -49,6 +49,7 @@ server.post('/create', async (req, res) => {
       roomCode,
       moderatorId,
       options,
+      voters: []
     });
     console.debug(`Room created with _id of ${room} and roomCode of ${roomCode}`);
 
