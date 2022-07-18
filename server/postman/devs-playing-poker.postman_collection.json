@@ -111,7 +111,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
+							"raw": "http://localhost:{{PORT}}/rooms/:roomCode/join",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -119,8 +119,14 @@
 							"port": "{{PORT}}",
 							"path": [
 								"rooms",
-								"{{roomCode}}",
+								":roomCode",
 								"join"
+							],
+							"variable": [
+								{
+									"key": "roomCode",
+									"value": "BABB"
+								}
 							]
 						}
 					},
