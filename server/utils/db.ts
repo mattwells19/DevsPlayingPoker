@@ -19,6 +19,7 @@ const connectToDb = async () => {
 export const { rooms, users } = await connectToDb();
 
 export const lookupRoom = async (roomCode: string) => {
+  if (!roomCode) throw new Error(`lookupRoom requires a roomCode, but was passed ${roomCode}`);
   return await rooms.findOne({ roomCode });
 };
 

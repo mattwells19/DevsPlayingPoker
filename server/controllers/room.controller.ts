@@ -6,9 +6,9 @@ import generateRoomCode from '../utils/generateRoomCode.ts';
 
 export const createRoom = async (req: typeof request, res: typeof response) => {
   const { moderatorName, options }: CreateRoomRequest = req.body;
-  const moderatorId = await insertUser(moderatorName);
 
   try {
+    const moderatorId = await insertUser(moderatorName);
     const roomCode = await generateRoomCode();
     const room = await insertRoom(roomCode, moderatorId, options);
     console.debug(`Room created with _id of ${room} and roomCode of ${roomCode}`);
