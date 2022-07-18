@@ -1,9 +1,8 @@
-import { opine, json, config, MongoClient } from "./deps.ts";
+import { opine, json, MongoClient } from "./deps.ts";
 import { RoomSchema, UserSchema } from "./types/schemas.ts";
 import seedDB from "./utils/seedDB.ts";
 import generateRoomCode from "./utils/generateRoomCode.ts";
 import checkIfRoomExists from "./utils/checkIfRoomExists.ts";
-config({ path: "./.env" });
 
 // Types (TODO: extract)
 interface CreateRoomRequest {
