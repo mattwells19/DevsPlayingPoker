@@ -28,8 +28,8 @@ const rooms = db.collection<RoomSchema>("rooms");
 
 server.get(
   ["/", "/create-room", "/join", "/room/*", "/assets/*"],
-  (req, res) => {
-    const path = Deno.realPathSync(
+  async (req, res) => {
+    const path = await Deno.realPath(
       req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html"
     );
     return res.sendFile(path);
