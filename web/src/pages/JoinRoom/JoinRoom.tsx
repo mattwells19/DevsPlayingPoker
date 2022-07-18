@@ -22,24 +22,24 @@ const JoinRoom: Component = () => {
 		localStorage.setItem("name", name);
 
 		setLoading(true);
-		fetch("/api/join", {
+		fetch(`/api/rooms/${roomCode}/join`, {
 			method: "POST",
-			body: JSON.stringify({ roomCode, name }),
+			body: JSON.stringify({ name }),
 		})
 			.then(async (res) => {
 				if (res.ok) {
 					navigate(`/room/${roomCode}`);
 				} else {
-					try {
-						const errorBody = await res.json();
-						throw new Error(errorBody);
-					} catch {
-						throw new Error("An unexpected error occured.");
-					}
+					const errorBody = await res.json();
+					throw new Error(errorBody.message);
 				}
 			})
 			.catch((e) => {
-				setErrorMsg(e.message);
+				if (e instanceof Error) {
+					setErrorMsg(e.message);
+				} else {
+					setErrorMsg("An unexpected error occured.");
+				}
 			})
 			.finally(() => {
 				setLoading(false);
