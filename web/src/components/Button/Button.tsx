@@ -1,21 +1,42 @@
+import { Link } from "solid-app-router";
 import type { Component, JSX } from "solid-js";
 import styles from "./Button.module.scss";
 
-interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonLinkProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
 	variant?: "solid" | "outline";
-	href?: string;
+	href: string;
 }
 
-const Button: Component<ButtonProps> = ({ variant = "solid", href, children, ...btnProps }) => {
-	return href ? (
-		<a class={styles[variant]} href={href}>
+export const ButtonLink: Component<ButtonLinkProps> = ({
+	variant = "solid",
+	children,
+	...anchorProps
+}) => {
+	return (
+		<Link class={styles[variant]} {...anchorProps}>
 			{children}
-		</a>
-	) : (
-		<button class={styles[variant]} {...btnProps}>
-			{children}
-		</button>
+		</Link>
 	);
 };
 
-export default Button;
+interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+	variant?: "solid" | "outline";
+	loading?: boolean;
+}
+
+export const Button: Component<ButtonProps> = ({
+	variant = "solid",
+	loading = false,
+	children,
+	...btnProps
+}) => {
+	return (
+		<button
+			class={`${styles[variant]} ${loading ? "loading" : ""}`}
+			disabled={loading}
+			{...btnProps}
+		>
+			{loading ? "Loading..." : children}
+		</button>
+	);
+};

@@ -7,12 +7,12 @@ import checkIfRoomExists from "./utils/checkIfRoomExists.ts";
 
 // Types (TODO: extract)
 interface CreateRoomRequest {
-  moderatorName: string;
-  options: number[];
+	moderatorName: string;
+	options: number[];
 }
 
 interface JoinRoomRequest {
-  name: string;
+	name: string;
 }
 
 // Start Server
@@ -32,97 +32,97 @@ const rooms = db.collection<RoomSchema>("rooms");
 // seedDB(rooms, users);
 
 server.get(
-  ["/", "/create-room", "/join", "/room/*", "/assets/*"],
-  async (req, res) => {
-    const path = await Deno.realPath(
-      req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html"
-    );
-    return res.sendFile(path);
-  }
+	["/", "/create-room", "/join", "/room/*", "/assets/*"],
+	async (req, res) => {
+		const path = await Deno.realPath(
+			req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html",
+		);
+		return res.sendFile(path);
+	},
 );
 
 server.post("/create", async (req, res) => {
-  const { moderatorName, options }: CreateRoomRequest = req.body;
-  const moderatorId = await users.insertOne({
-    name: moderatorName,
-  });
+	const { moderatorName, options }: CreateRoomRequest = req.body;
+	const moderatorId = await users.insertOne({
+		name: moderatorName,
+	});
 
-  try {
-    const roomCode = await generateRoomCode(rooms);
-    const room = await rooms.insertOne({
-      roomCode,
-      moderatorId,
-      options,
-      voters: [],
-    });
-    console.debug(
-      `Room created with _id of ${room} and roomCode of ${roomCode}`
-    );
+	try {
+		const roomCode = await generateRoomCode(rooms);
+		const room = await rooms.insertOne({
+			roomCode,
+			moderatorId,
+			options,
+			voters: [],
+		});
+		console.debug(
+			`Room created with _id of ${room} and roomCode of ${roomCode}`,
+		);
 
-    res.setStatus(201).json({
-      success: true,
-      roomCode: roomCode,
-      userId: moderatorId,
-    });
-  } catch (err) {
-    console.error(`Error creating room: ${err}`);
-    res.setStatus(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
+		res.setStatus(201).json({
+			success: true,
+			roomCode: roomCode,
+			userId: moderatorId,
+		});
+	} catch (err) {
+		console.error(`Error creating room: ${err}`);
+		res.setStatus(500).json({
+			success: false,
+			message: err.message,
+		});
+	}
 });
 
 server.post("/rooms/:roomCode/join", async (req, res) => {
-  const { name }: JoinRoomRequest = req.body;
-  const { roomCode } = req.params;
+	const { name }: JoinRoomRequest = req.body;
+	const { roomCode } = req.params;
 
-  try {
-    const room = await checkIfRoomExists(roomCode, rooms);
-    if (!room) {
-      throw new Error(`Room with code ${roomCode} does not exist`);
-    }
-    const userId = await addUser(name, users);
+	try {
+		const room = await checkIfRoomExists(roomCode, rooms);
+		if (!room) {
+			throw new Error(`Room with code ${roomCode} does not exist`);
+		}
+		const userId = await addUser(name, users);
 
-    await rooms.updateOne(
-      { roomCode: { $eq: roomCode } },
-      { $push: { voters: userId } }
-    );
-    console.debug(
-      `Updated room: ${roomCode} to add voter with userId: ${userId}`
-    );
-    res.setStatus(200).json({
-      success: true,
-      userId,
-    });
-  } catch (err) {
-    console.error(`Error joining room: ${err}`);
-    res.setStatus(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
+		await rooms.updateOne(
+			{ roomCode: { $eq: roomCode } },
+			{ $push: { voters: userId } },
+		);
+		console.debug(
+			`Updated room: ${roomCode} to add voter with userId: ${userId}`,
+		);
+		res.setStatus(200).json({
+			success: true,
+			userId,
+		});
+	} catch (err) {
+		console.error(`Error joining room: ${err}`);
+		res.setStatus(500).json({
+			success: false,
+			message: err.message,
+		});
+	}
 });
 
 server.get("/rooms/:roomCode", async (req, res) => {
-  const room = await rooms.findOne({ roomCode: req.params.roomCode });
-  if (room) {
-    return res.setStatus(200).json({
-      success: true,
-      room,
-    });
-  }
-  return res.setStatus(404).json({
-    success: false,
-    message: `Room with roomCode of ${req.params.roomCode} not found`,
-  });
+	const room = await rooms.findOne({ roomCode: req.params.roomCode });
+	if (room) {
+		return res.setStatus(200).json({
+			success: true,
+			room,
+		});
+	}
+	return res.setStatus(404).json({
+		success: false,
+		message: `Room with roomCode of ${req.params.roomCode} not found`,
+	});
 });
 
 server.head("/rooms/:roomCode", async (req, res) => {
-  if (await checkIfRoomExists(req.params.roomCode, rooms)) {
-    return res.setStatus(200);
-  }
-  return res.setStatus(204);
+	if (await checkIfRoomExists(req.params.roomCode, rooms)) {
+		return res.setStatus(200);
+	}
+	return res.setStatus(204);
 });
 
 server.listen(3000, () => console.log("server started on port 3000"));
