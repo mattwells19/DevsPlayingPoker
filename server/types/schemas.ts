@@ -1,14 +1,27 @@
 import { ObjectId } from "../deps.ts";
 
-export interface RoomSchema {
-  _id: ObjectId;
-  roomCode: string;
-  moderatorId: ObjectId;
-  options: number[];
-  voters: ObjectId[];
+export interface User {
+  id: string;
+  name: string;
 }
 
-export interface UserSchema {
+export type Voter = User &
+  (
+    | {
+        confidence: 0 | 1 | 2;
+        selection: number;
+      }
+    | {
+        confidence: null;
+        selection: null;
+      }
+  );
+
+export interface RoomSchema {
   _id: ObjectId;
-  name: string;
+  state: "Voting" | "Results";
+  roomCode: string;
+  moderator: User | null;
+  options: number[];
+  voters: Voter[];
 }
