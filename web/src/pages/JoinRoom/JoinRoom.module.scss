@@ -1,0 +1,33 @@
+main.join {
+	max-width: 30rem;
+	margin: 5rem auto;
+
+	label {
+		display: block;
+		font-weight: 600;
+
+		&::after {
+			content: " *";
+			color: red;
+		}
+	}
+
+	input {
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		width: 100%;
+		margin: 0.5rem 0px 0.5rem 0px;
+	}
+
+	p {
+		color: red;
+		margin: 0px;
+	}
+
+	button {
+		display: block;
+		width: 100%;
+		margin: 2rem 0px 0px 0px;
+		padding: 0.75rem;
+	}
+}

@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "338b9f63-4f9d-48c4-90d8-6183d4f20197",
+		"_postman_id": "3dae4088-cf99-4083-b0ae-18dd297bf81f",
 		"name": "devs-playing-poker",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "18221629"
+		"_exporter_id": "17656661"
 	},
 	"item": [
 		{
@@ -12,56 +12,14 @@
 				{
 					"name": "Room Exists",
 					"request": {
-						"method": "GET",
+						"method": "HEAD",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:{{PORT}}/api/v1/rooms/:roomCode/checkRoomExists",
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"api",
-								"v1",
-								"rooms",
-								":roomCode",
-								"checkRoomExists"
-							],
-							"variable": [
-								{
-									"key": "roomCode",
-									"value": "AABA"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Room by Code",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:{{PORT}}/api/v1/rooms/:roomCode",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "{{PORT}}",
-							"path": [
-								"api",
-								"v1",
-								"rooms",
-								":roomCode"
-							],
-							"variable": [
-								{
-									"key": "roomCode",
-									"value": "AABA"
-								}
-							]
+							"path": ["rooms", "{{roomCode}}"]
 						}
 					},
 					"response": []
@@ -81,17 +39,26 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:{{PORT}}/api/v1/create",
+							"raw": "http://localhost:{{PORT}}/create",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"api",
-								"v1",
-								"create"
-							]
+							"path": ["create"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Room by Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "{{PORT}}",
+							"path": ["rooms", "{{roomCode}}"]
 						}
 					},
 					"response": []
@@ -111,23 +78,11 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:{{PORT}}/rooms/:roomCode/join",
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"rooms",
-								":roomCode",
-								"join"
-							],
-							"variable": [
-								{
-									"key": "roomCode",
-									"value": "BABB"
-								}
-							]
+							"path": ["rooms", "{{roomCode}}", "join"]
 						}
 					},
 					"response": []
