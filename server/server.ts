@@ -1,10 +1,9 @@
-import { opine, json, config, MongoClient } from "./deps.ts";
+import { opine, json, MongoClient } from "./deps.ts";
 import { RoomSchema, UserSchema } from "./types/schemas.ts";
 import seedDB from "./utils/seedDB.ts";
 import generateRoomCode from "./utils/generateRoomCode.ts";
 import addUser from "./utils/addUser.ts";
 import checkIfRoomExists from "./utils/checkIfRoomExists.ts";
-config({ path: "./.env" });
 
 // Types (TODO: extract)
 interface CreateRoomRequest {
@@ -32,10 +31,15 @@ const rooms = db.collection<RoomSchema>("rooms");
 // Seed DB - Currently just deletes all users and rooms
 // seedDB(rooms, users);
 
-// Routes (TODO: extract)
-server.get("/", (req, res) => {
-	res.send("Landing Page");
-});
+server.get(
+	["/", "/create-room", "/join", "/room/*", "/assets/*"],
+	async (req, res) => {
+		const path = await Deno.realPath(
+			req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html",
+		);
+		return res.sendFile(path);
+	},
+);
 
 server.post("/create", async (req, res) => {
 	const { moderatorName, options }: CreateRoomRequest = req.body;
@@ -121,4 +125,4 @@ server.head("/rooms/:roomCode", async (req, res) => {
 	return res.setStatus(204);
 });
 
-server.listen(1337, () => console.log("server started on port 1337"));
+server.listen(3000, () => console.log("server started on port 3000"));
