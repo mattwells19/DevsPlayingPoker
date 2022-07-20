@@ -1,4 +1,10 @@
-export { opine, json, Router, request, response } from 'https://deno.land/x/opine@2.2.0/mod.ts';
+export {
+  opine,
+  json,
+  Router,
+  type OpineRequest,
+  type OpineResponse,
+} from 'https://deno.land/x/opine@2.2.0/mod.ts';
 export { config } from 'https://deno.land/x/dotenv/mod.ts';
 export {
   MongoClient,

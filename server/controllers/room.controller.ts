@@ -1,10 +1,10 @@
-import { request, response } from '../deps.ts';
+import { OpineRequest, OpineResponse } from '../deps.ts';
 import { CreateRoomRequest } from '../types/requests.ts';
 import checkIfRoomExists from '../utils/checkIfRoomExists.ts';
 import { insertRoom, insertUser, lookupRoom } from '../utils/db.ts';
 import generateRoomCode from '../utils/generateRoomCode.ts';
 
-export const createRoom = async (req: typeof request, res: typeof response) => {
+export const createRoom = async (req: OpineRequest, res: OpineResponse) => {
   const { moderatorName, options }: CreateRoomRequest = req.body;
 
   try {
@@ -27,7 +27,7 @@ export const createRoom = async (req: typeof request, res: typeof response) => {
   }
 };
 
-export const getRoom = async (req: typeof request, res: typeof response) => {
+export const getRoom = async (req: OpineRequest, res: OpineResponse) => {
   const room = await lookupRoom(req.params.roomCode);
   if (room) {
     return res.setStatus(200).json({
@@ -41,7 +41,7 @@ export const getRoom = async (req: typeof request, res: typeof response) => {
   });
 };
 
-export const checkRoomExists = async (req: typeof request, res: typeof response) => {
+export const checkRoomExists = async (req: OpineRequest, res: OpineResponse) => {
   if (await checkIfRoomExists(req.params.roomCode)) {
     return res.setStatus(200).json({
       success: true,
