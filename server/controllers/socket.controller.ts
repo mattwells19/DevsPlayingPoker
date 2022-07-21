@@ -20,6 +20,9 @@ export const { rooms, users } = await connectToDb();
  */
 async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 	const roomData = await lookupRoom(data.roomCode);
+	if (!roomData) {
+		throw new Error(`No room with room code ${data.roomCode}.`);
+	}
 
 	const isModerator = !roomData.moderator;
 
