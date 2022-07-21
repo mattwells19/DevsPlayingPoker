@@ -50,7 +50,7 @@ const Landing: Component = () => {
 	return (
 		<main class={styles.landing}>
 			<section class={styles.roomCodeInputs}>
-				<p>YOLO</p>
+				<p>Already have a room code? Enter it here</p>
 				<form onInput={(e) => handleInputChange(e.currentTarget)}>
 					<For each={[0, 1, 2, 3]}>
 						{(index) => (
