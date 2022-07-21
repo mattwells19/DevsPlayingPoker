@@ -2,7 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches: [devops/deno_deploy, main]
+    branches: [main]
+  pull_request:
 
 jobs:
   deploy:
