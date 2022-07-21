@@ -7,8 +7,3 @@ export interface RoomSchema {
   options: number[];
   voters: ObjectId[];
 }
-
-export interface UserSchema {
-  _id: ObjectId;
-  name: string;
-}

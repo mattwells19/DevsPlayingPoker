@@ -17,14 +17,9 @@
 						"url": {
 							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"rooms",
-								"{{roomCode}}"
-							]
+							"path": ["rooms", "{{roomCode}}"]
 						}
 					},
 					"response": []
@@ -46,13 +41,9 @@
 						"url": {
 							"raw": "http://localhost:{{PORT}}/create",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"create"
-							]
+							"path": ["create"]
 						}
 					},
 					"response": []
@@ -65,14 +56,9 @@
 						"url": {
 							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"rooms",
-								"{{roomCode}}"
-							]
+							"path": ["rooms", "{{roomCode}}"]
 						}
 					},
 					"response": []
@@ -94,15 +80,9 @@
 						"url": {
 							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
 							"protocol": "http",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "{{PORT}}",
-							"path": [
-								"rooms",
-								"{{roomCode}}",
-								"join"
-							]
+							"path": ["rooms", "{{roomCode}}", "join"]
 						}
 					},
 					"response": []
