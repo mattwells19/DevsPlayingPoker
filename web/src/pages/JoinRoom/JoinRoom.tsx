@@ -7,7 +7,6 @@ const JoinRoom: Component = () => {
 	const navigate = useNavigate();
 	const { roomCode } = useParams();
 
-	const [loading, setLoading] = createSignal<boolean>(false);
 	const [errorMsg, setErrorMsg] = createSignal<string | null>(null);
 
 	function handleSubmit(form: HTMLFormElement) {
@@ -20,30 +19,7 @@ const JoinRoom: Component = () => {
 		}
 
 		localStorage.setItem("name", name);
-
-		setLoading(true);
-		fetch(`/api/rooms/${roomCode}/join`, {
-			method: "POST",
-			body: JSON.stringify({ name }),
-		})
-			.then(async (res) => {
-				if (res.ok) {
-					navigate(`/room/${roomCode}`);
-				} else {
-					const errorBody = await res.json();
-					throw new Error(errorBody.message);
-				}
-			})
-			.catch((e) => {
-				if (e instanceof Error) {
-					setErrorMsg(e.message);
-				} else {
-					setErrorMsg("An unexpected error occured.");
-				}
-			})
-			.finally(() => {
-				setLoading(false);
-			});
+		navigate(`/room/${roomCode}`);
 	}
 
 	return (
@@ -70,9 +46,7 @@ const JoinRoom: Component = () => {
 				<Show when={errorMsg() !== null}>
 					<p id="name-error-msg">{errorMsg()}</p>
 				</Show>
-				<Button loading={loading()} type="submit">
-					Done
-				</Button>
+				<Button type="submit">Done</Button>
 			</form>
 		</main>
 	);

@@ -1,4 +1,5 @@
 import { ObjectId } from "../deps.ts";
+import { Voter } from "../models/room.model.ts";
 import connectToDb from "./connectToDb.ts";
 
 export const { rooms, users } = await connectToDb();
@@ -11,14 +12,11 @@ export const lookupRoom = async (roomCode: string) => {
 	return await rooms.findOne({ roomCode });
 };
 
-export const insertRoom = async (
-	roomCode: string,
-	moderatorId: ObjectId,
-	options: number[],
-) => {
+export const insertRoom = async (roomCode: string, options: number[]) => {
 	return await rooms.insertOne({
 		roomCode,
-		moderatorId,
+		moderator: null,
+		state: "Results",
 		options,
 		voters: [],
 	});
@@ -28,7 +26,7 @@ export const updateRoom = async (
 	roomCode: string,
 	moderatorId: ObjectId,
 	options: number[],
-	voters: ObjectId[],
+	voters: Voter[],
 ) => {
 	return await rooms.updateOne(
 		{ roomCode: { $eq: roomCode } },
@@ -42,10 +40,10 @@ export const updateRoom = async (
 	);
 };
 
-export const addVoterToRoom = async (roomCode: string, voter: ObjectId) => {
+export const addVoterToRoom = async (roomCode: string, voter: Voter) => {
 	const resp = await rooms.updateOne(
 		{ roomCode: { $eq: roomCode } },
-		{ $push: { voters: voter } },
+		{ $push: { voters: { $each: [voter] } } },
 	);
 	if (resp.matchedCount < 1) {
 		throw new Error(`Room with code ${roomCode} does not exist`);
