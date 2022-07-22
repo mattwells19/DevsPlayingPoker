@@ -14,4 +14,4 @@ server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
 server.use("/", FeRoutes);
 
-server.listen(3000, () => console.log("server started on port 3000"));
+server.listen(1337, () => console.log("server started on port 1337"));
