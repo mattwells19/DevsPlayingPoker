@@ -3,7 +3,7 @@ import { OpineRequest, OpineResponse } from "../deps.ts";
 const router = Router();
 
 router.get(
-	["/", "/create-room", "/join", "/room/*", "/assets/*"],
+	["/", "/create-room", "/join/:roomCode", "/room/:roomCode", "/assets/*"],
 	async (req: OpineRequest, res: OpineResponse) => {
 		const path = await Deno.realPath(
 			req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html",

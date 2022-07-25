@@ -21,7 +21,7 @@ const Landing: Component = () => {
 	const [roomExists] = createResource<boolean, string>(
 		roomCodeValue,
 		(roomCode) =>
-			fetch(`/api/rooms/${roomCode}`, { method: "HEAD" }).then(
+			fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then(
 				({ status }) => status === 200,
 			),
 	);
