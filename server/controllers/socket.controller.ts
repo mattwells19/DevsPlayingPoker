@@ -77,7 +77,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 /**
  * Removes the user from the room and performs moderator migration if necessary
  * @param userId ID of the user leaving
- * @param isModerator Whether the user was a moderator
+ * @param roomCode 4-character code for the room
  * @returns void
  */
 async function handleLeave(userId: string, roomCode: string): Promise<void> {
@@ -142,6 +142,55 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	}
 }
 
+/**
+ * Begins voting, clearing previous votes
+ * @param roomCode 4-character code for the room
+ * @returns void
+ */
+async function handleStartVoting(roomCode: string): Promise<void> {
+	const roomData = await lookupRoom(roomCode);
+	if (!roomData) return;
+
+	const voters = roomData.voters.map((voter) => {
+		voter.selection = null;
+		voter.confidence = null;
+		return voter;
+	});
+
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$set: {
+					state: "Voting",
+					voters,
+					votingStartedAt: new Date(),
+				},
+			},
+		},
+	);
+
+	if (!updatedRoomData) return;
+
+	if (updatedRoomData.moderator) {
+		const moderatorSock = sockets.get(updatedRoomData.moderator.id);
+		const roomUpdate: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData: updatedRoomData,
+		};
+		moderatorSock?.send(JSON.stringify(roomUpdate));
+	}
+
+	for (const voter of updatedRoomData.voters) {
+		const voterSock = sockets.get(voter.id.toString());
+		const roomUpdate: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData: updatedRoomData,
+		};
+		voterSock?.send(JSON.stringify(roomUpdate));
+	}
+}
+
 // TODO: how to handle thrown errors?
 export const handleWs = (socket: WebSocket) => {
 	const userId: string = crypto.randomUUID();
@@ -175,6 +224,12 @@ export const handleWs = (socket: WebSocket) => {
 				case "Join": {
 					roomCode = data.roomCode;
 					await handleJoin(userId, data);
+					break;
+				}
+				case "StartVoting": {
+					roomCode = data.roomCode;
+					await handleStartVoting(roomCode);
+					break;
 				}
 			}
 		},
