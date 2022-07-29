@@ -147,15 +147,18 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
  * @param roomCode 4-character code for the room
  * @returns void
  */
-async function handleStartVoting(roomCode: string): Promise<void> {
+async function handleStartVoting(roomCode: string | null): Promise<void> {
+	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
+
 	const roomData = await lookupRoom(roomCode);
 	if (!roomData) return;
 
-	const voters = roomData.voters.map((voter) => {
-		voter.selection = null;
-		voter.confidence = null;
-		return voter;
-	});
+	const updatedVoters = roomData.voters.map((voter) => ({
+		id: voter.id,
+		name: voter.name,
+		selection: null,
+		confidence: null,
+	}));
 
 	const updatedRoomData = await rooms.findAndModify(
 		{ _id: roomData._id },
@@ -163,7 +166,7 @@ async function handleStartVoting(roomCode: string): Promise<void> {
 			update: {
 				$set: {
 					state: "Voting",
-					voters,
+					voters: updatedVoters,
 					votingStartedAt: new Date(),
 				},
 			},
@@ -227,7 +230,7 @@ export const handleWs = (socket: WebSocket) => {
 					break;
 				}
 				case "StartVoting": {
-					roomCode = data.roomCode;
+					// roomCode = data.roomCode;
 					await handleStartVoting(roomCode);
 					break;
 				}
