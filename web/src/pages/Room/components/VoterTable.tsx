@@ -1,5 +1,5 @@
 import { Component, For, Show } from "solid-js";
-import { RoomSchema } from "../../../../../server/models/room.model";
+import type { RoomSchema } from "@/shared-types";
 
 interface VoterTableProps {
 	voters: RoomSchema["voters"];
@@ -36,9 +36,7 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 			<tfoot>
 				<tr>
 					<Show when={roomState === "Results"}>
-						<td colspan="3">
-							<p>Waiting to start voting</p>
-						</td>
+						<td colspan="3">Waiting to start voting</td>
 					</Show>
 				</tr>
 			</tfoot>

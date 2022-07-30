@@ -41,11 +41,11 @@ main.room {
 		}
 
 		tfoot {
-			& > tr {
+			tr {
 				border-top: 1px solid var(--border-gray);
 			}
 
-			p {
+			td {
 				font-weight: bold;
 				text-align: center;
 			}
