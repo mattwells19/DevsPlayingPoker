@@ -24,4 +24,5 @@ export interface RoomSchema {
 	moderator: User | null;
 	options: number[];
 	voters: Voter[];
+	votingStartedAt: Date | null;
 }

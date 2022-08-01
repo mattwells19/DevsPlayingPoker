@@ -16,4 +16,12 @@ export interface JoinEvent {
 	name: string;
 }
 
-export type WebSocketEvent = ConnectEvent | JoinEvent | RoomUpdateEvent;
+export interface StartVotingEvent {
+	event: "StartVoting";
+}
+
+export type WebSocketEvent =
+	| ConnectEvent
+	| JoinEvent
+	| RoomUpdateEvent
+	| StartVotingEvent;

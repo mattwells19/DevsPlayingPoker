@@ -77,7 +77,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 /**
  * Removes the user from the room and performs moderator migration if necessary
  * @param userId ID of the user leaving
- * @param isModerator Whether the user was a moderator
+ * @param roomCode 4-character code for the room
  * @returns void
  */
 async function handleLeave(userId: string, roomCode: string): Promise<void> {
@@ -142,6 +142,58 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	}
 }
 
+/**
+ * Begins voting, clearing previous votes
+ * @param roomCode 4-character code for the room
+ * @returns void
+ */
+async function handleStartVoting(roomCode: string | null): Promise<void> {
+	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
+
+	const roomData = await lookupRoom(roomCode);
+	if (!roomData) return;
+
+	const updatedVoters = roomData.voters.map((voter) => ({
+		id: voter.id,
+		name: voter.name,
+		selection: null,
+		confidence: null,
+	}));
+
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$set: {
+					state: "Voting",
+					voters: updatedVoters,
+					votingStartedAt: new Date(),
+				},
+			},
+		},
+	);
+
+	if (!updatedRoomData) return;
+
+	if (updatedRoomData.moderator) {
+		const moderatorSock = sockets.get(updatedRoomData.moderator.id);
+		const roomUpdate: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData: updatedRoomData,
+		};
+		moderatorSock?.send(JSON.stringify(roomUpdate));
+	}
+
+	for (const voter of updatedRoomData.voters) {
+		const voterSock = sockets.get(voter.id.toString());
+		const roomUpdate: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData: updatedRoomData,
+		};
+		voterSock?.send(JSON.stringify(roomUpdate));
+	}
+}
+
 // TODO: how to handle thrown errors?
 export const handleWs = (socket: WebSocket) => {
 	const userId: string = crypto.randomUUID();
@@ -175,6 +227,11 @@ export const handleWs = (socket: WebSocket) => {
 				case "Join": {
 					roomCode = data.roomCode;
 					await handleJoin(userId, data);
+					break;
+				}
+				case "StartVoting": {
+					await handleStartVoting(roomCode);
+					break;
 				}
 			}
 		},
