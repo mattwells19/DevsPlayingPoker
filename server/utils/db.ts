@@ -19,6 +19,7 @@ export const insertRoom = async (roomCode: string, options: number[]) => {
 		state: "Results",
 		options,
 		voters: [],
+		votingStartedAt: null,
 	});
 };
 
