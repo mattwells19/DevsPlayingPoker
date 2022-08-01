@@ -230,7 +230,6 @@ export const handleWs = (socket: WebSocket) => {
 					break;
 				}
 				case "StartVoting": {
-					// roomCode = data.roomCode;
 					await handleStartVoting(roomCode);
 					break;
 				}

@@ -18,7 +18,6 @@ export interface JoinEvent {
 
 export interface StartVotingEvent {
 	event: "StartVoting";
-	roomCode: string;
 }
 
 export type WebSocketEvent =
