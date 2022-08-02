@@ -3,6 +3,7 @@ import {
 	Component,
 	createResource,
 	createSignal,
+	For,
 	Match,
 	onCleanup,
 	onMount,
@@ -13,6 +14,7 @@ import styles from "./Room.module.scss";
 import type { JoinEvent, WebSocketEvent, RoomSchema } from "@/shared-types";
 import VoterTable from "./components/VoterTable";
 import Button from "@/components/Button";
+import OptionCard from "@/components/OptionCard";
 
 const RoomCheckWrapper: Component = () => {
 	const navigate = useNavigate();
@@ -124,7 +126,24 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 							<VoterTable roomState={details.state} voters={details.voters} />
 						</Match>
 						<Match when={details.state === "Voting"}>
-							<div>TODO: card options go here</div>
+							<fieldset
+								onchange={(e) => {
+									const selection = e.target.hasAttribute("value")
+										? (e.target as HTMLInputElement).value
+										: null;
+									if (!selection) throw new Error("Didn't get a value");
+
+									dispatchEvent({
+										event: "OptionSelected",
+										selection,
+									});
+								}}
+							>
+								<legend>Make a selection</legend>
+								<For each={details.options}>
+									{(option) => <OptionCard value={option} />}
+								</For>
+							</fieldset>
 						</Match>
 					</Switch>
 				)}
