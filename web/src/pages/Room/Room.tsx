@@ -5,12 +5,14 @@ import {
 	createSignal,
 	Match,
 	onCleanup,
+	onMount,
 	Show,
 	Switch,
 } from "solid-js";
 import styles from "./Room.module.scss";
-import { JoinEvent, WebSocketEvent } from "../../../../server/types/socket";
-import { RoomSchema } from "../../../../server/models/room.model";
+import type { JoinEvent, WebSocketEvent, RoomSchema } from "@/shared-types";
+import VoterTable from "./components/VoterTable";
+import Button from "@/components/Button";
 
 const RoomCheckWrapper: Component = () => {
 	const navigate = useNavigate();
@@ -20,6 +22,7 @@ const RoomCheckWrapper: Component = () => {
 		fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then((res) => {
 			if (res.status !== 200) {
 				navigate("/");
+				return false;
 			}
 			return true;
 		}),
@@ -27,7 +30,7 @@ const RoomCheckWrapper: Component = () => {
 
 	return (
 		<Switch fallback={<h1>Loading...</h1>}>
-			<Match when={done()}>
+			<Match when={done() === true}>
 				<Room roomCode={roomCode} />
 			</Match>
 		</Switch>
@@ -41,6 +44,7 @@ interface RoomDetails {
 
 const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 	const navigate = useNavigate();
+	const [currentUserId, setCurrentUserId] = createSignal<string | null>(null);
 	const [roomDetails, setRoomDetails] = createSignal<RoomDetails | null>(null);
 
 	const userName = localStorage.getItem("name");
@@ -49,49 +53,81 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 		return;
 	}
 
-	const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
-	const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+	onMount(() => {
+		const wsProtocol = window.location.protocol.includes("https")
+			? "wss"
+			: "ws";
+		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
 
-	ws.addEventListener("open", () => {
-		const joinPayload: JoinEvent = {
-			event: "Join",
-			roomCode: roomCode,
-			name: userName,
-		};
+		ws.addEventListener("open", () => {
+			const joinPayload: JoinEvent = {
+				event: "Join",
+				roomCode: roomCode,
+				name: userName,
+			};
 
-		ws.send(JSON.stringify(joinPayload));
+			ws.send(JSON.stringify(joinPayload));
+		});
+
+		ws.addEventListener("message", (e) => {
+			const data = JSON.parse(e.data) as WebSocketEvent;
+
+			switch (data.event) {
+				case "RoomUpdate":
+					setRoomDetails({
+						roomDetails: data.roomData,
+						dispatchEvent: (e) => ws.send(JSON.stringify(e)),
+					});
+					break;
+				case "Connected":
+					sessionStorage.setItem("userId", data.userId);
+					setCurrentUserId(data.userId);
+				default:
+					return;
+			}
+		});
+
+		onCleanup(() => ws.close());
 	});
-
-	ws.addEventListener("message", (e) => {
-		if (e.data === "Connected") {
-			console.info("Connected");
-			return;
-		}
-		const data = JSON.parse(e.data) as WebSocketEvent;
-
-		switch (data.event) {
-			case "RoomUpdate":
-				setRoomDetails({
-					roomDetails: data.roomData,
-					dispatchEvent: (e) => ws.send(JSON.stringify(e)),
-				});
-				break;
-			case "Connected":
-				sessionStorage.setItem("userId", data.userId);
-			default:
-				return;
-		}
-	});
-
-	onCleanup(() => ws.close());
 
 	return (
 		<main class={styles.room}>
-			<h1>The room</h1>
 			<Show when={roomDetails()}>
-				<pre>
-					<code>{JSON.stringify(roomDetails(), null, 4)}</code>
-				</pre>
+				{({ roomDetails: details, dispatchEvent }) => (
+					<Switch>
+						{/* is the current user the moderator? */}
+						<Match when={details.moderator?.id === currentUserId()}>
+							<Switch>
+								<Match when={details.state === "Results"}>
+									<Button
+										onClick={() => dispatchEvent({ event: "StartVoting" })}
+										disabled={details.voters.length === 0}
+									>
+										{details.voters.some((voter) => voter.selection !== null)
+											? "Reset Votes & Start Voting"
+											: "Start Voting"}
+									</Button>
+								</Match>
+								<Match when={details.state === "Voting"}>
+									<Button
+										onClick={() => dispatchEvent({ event: "StopVoting" })}
+									>
+										Stop Voting
+									</Button>
+								</Match>
+							</Switch>
+							<VoterTable roomState={details.state} voters={details.voters} />
+						</Match>
+						{/* if not the moderator, determine which UI to show based on room state */}
+						<Match when={details.state === "Results"}>
+							<p>Waiting for {details.moderator?.name}...</p>
+							<VoterTable roomState={details.state} voters={details.voters} />
+						</Match>
+						<Match when={details.state === "Voting"}>
+							<div>TODO: card options go here</div>
+						</Match>
+					</Switch>
+				)}
 			</Show>
 		</main>
 	);

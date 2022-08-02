@@ -170,6 +170,7 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 					votingStartedAt: new Date(),
 				},
 			},
+			new: true,
 		},
 	);
 

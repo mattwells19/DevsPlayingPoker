@@ -78,6 +78,23 @@ const Landing: Component = () => {
 										}
 									}
 								}}
+								onPaste={(e) => {
+									const pastedData = e.clipboardData?.getData("text");
+
+									if (index === 0 && pastedData && pastedData.length === 4) {
+										pastedData.split("").forEach((letter, index) => {
+											const element = roomCodeInputsRefs[index];
+
+											if (element) {
+												element.value = letter;
+												// focus last input
+												if (index === pastedData.length - 1) {
+													element.focus();
+												}
+											}
+										});
+									}
+								}}
 							/>
 						)}
 					</For>
