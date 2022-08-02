@@ -5,10 +5,10 @@ const calculateConfidence = (timeStarted: Date): ConfidenceValue => {
 	const millisecondsElapsed = currentTime.getTime() - timeStarted.getTime();
 	const secondsElapsed = millisecondsElapsed / 1000;
 
-	if (secondsElapsed < 15) {
+	if (secondsElapsed < 5) {
 		return ConfidenceValue.high;
 	}
-	if (secondsElapsed < 45) {
+	if (secondsElapsed < 15) {
 		return ConfidenceValue.medium;
 	}
 	return ConfidenceValue.low;
