@@ -11,15 +11,21 @@ export default defineConfig({
 	},
 	server: {
 		proxy: {
-			"/api": {
+			"/api/v1": {
 				target: "http://localhost:1337",
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ""),
+			},
+			"/ws": {
+				target: "http://localhost:1337",
+				changeOrigin: true,
+				ws: true,
 			},
 		},
+		port: 5000,
 	},
 	build: {
 		target: "esnext",
 		polyfillDynamicImport: false,
+		outDir: "../server/www",
 	},
 });

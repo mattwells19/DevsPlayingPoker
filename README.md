@@ -2,13 +2,20 @@
 
 # Routes
 
-| Name        | Method | Path        | Description                         |
-| ----------- | ------ | ----------- | ----------------------------------- |
-| Landing     | GET    | /           | Load landing page                   |
-| New Room    | GET    | /create     | Show form to create new room        |
-| Create Room | POST   | /create     | Create room in DB                   |
-| Join Room   | GET    | /join       | Show form to join room (enter name) |
-| Show Room   | GET    | /room/:code | Show room                           |
+## User Routes
+
+| Name      | Method | Path    | Description                         |
+| --------- | ------ | ------- | ----------------------------------- |
+| Landing   | GET    | /       | Load landing page                   |
+| New Room  | GET    | /create | Show form to create new room        |
+| Join Room | GET    | /join   | Show form to join room (enter name) |
+
+## API Routes
+
+| Name        | Method | Path                    | Description       |
+| ----------- | ------ | ----------------------- | ----------------- |
+| Create Room | POST   | /api/v1/create          | Create room in DB |
+| Get Room    | GET    | /api/v1/rooms/:roomCode | Get room info     |
 
 # Mongo Schemas
 

@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "3dae4088-cf99-4083-b0ae-18dd297bf81f",
+		"name": "devs-playing-poker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17656661"
+	},
+	"item": [
+		{
+			"name": "Rooms",
+			"item": [
+				{
+					"name": "Room Exists",
+					"request": {
+						"method": "HEAD",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "{{PORT}}",
+							"path": ["rooms", "{{roomCode}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"moderatorName\": \"DantheMan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/create",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "{{PORT}}",
+							"path": ["create"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Room by Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "{{PORT}}",
+							"path": ["rooms", "{{roomCode}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Luke Skywalker\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/rooms/{{roomCode}}/join",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "{{PORT}}",
+							"path": ["rooms", "{{roomCode}}", "join"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
