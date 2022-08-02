@@ -1,6 +1,11 @@
 import { ConfidenceValue } from "../models/room.model.ts";
 
-const calculateConfidence = (timeStarted: Date): ConfidenceValue => {
+const calculateConfidence = (timeStarted: Date | null): ConfidenceValue => {
+	if (!timeStarted) {
+		throw new Error(
+			`Unable to calculate voting confidence.  No timeStarted found.`,
+		);
+	}
 	const currentTime = new Date();
 	const millisecondsElapsed = currentTime.getTime() - timeStarted.getTime();
 	const secondsElapsed = millisecondsElapsed / 1000;

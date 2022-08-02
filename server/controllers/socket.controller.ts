@@ -19,7 +19,7 @@ export const { rooms, users } = await connectToDb();
  * @param roomData
  * @returns void
  */
-const sendRoomData = (roomData: RoomSchema): void => {
+const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	if (!roomData) {
 		throw new Error(`Failed to send updatedRoomData.  No roomData found.`);
 	}
