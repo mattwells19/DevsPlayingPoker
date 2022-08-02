@@ -1,0 +1,110 @@
+import { Component, createSignal } from "solid-js";
+import Button from "@/components/Button";
+
+import "./CreateRoom.scss";
+
+const options = {
+	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
+	linear: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+	select: [],
+};
+
+const defaultNumberOfOptions = 5;
+
+const CreateRoom: Component = () => {
+	// maybe move to a store?
+	const [moderatorName, setModeratorName] = createSignal("");
+	const [selectedOptions, setSelectedOptions] = createSignal([]);
+	const [voterOptions, setVoterOptions] = createSignal([]);
+	const [numberOfOptions, setNumberOfOptions] = createSignal(defaultNumberOfOptions);
+
+	const onFormSubmit = async (e) => {
+		const postBody = {
+			moderatorName: moderatorName(),
+			options: selectedOptions(),
+		};
+
+		const requestOptions = {
+			method: "POST",
+			body: JSON.stringify(postBody),
+		};
+
+		const res = await fetch("/create", requestOptions);
+		const json = await res.json();
+
+		console.log(json);
+	};
+
+	const formOnInput = (e) => {
+		switch (e.target.name) {
+			case "moderatorName":
+				setModeratorName(e.target.value);
+				break;
+			case "voterOptions": {
+				const voterOptionsValue = e.target.value;
+				const currentOptions = options[voterOptionsValue];
+				const limitedOptions = currentOptions.slice(0, numberOfOptions());
+				setVoterOptions(voterOptionsValue);
+				setSelectedOptions(limitedOptions);
+				break;
+			}
+			case "numberOfOptions": {
+				const currentVoterOptions = options[voterOptions()];
+				const numberOfOptionsValue = e.target.value;
+				const limitedOptions = currentVoterOptions.slice(0, numberOfOptionsValue);
+				setNumberOfOptions(numberOfOptionsValue);
+				setSelectedOptions(limitedOptions);
+				break;
+			}
+			case "select":
+				setSelectedOptions([]);
+				break;
+			default:
+				break;
+		}
+	};
+
+	return (
+		<main>
+			<div class="create-room-form">
+				<label for="moderatorName">
+					Your name
+					<span class="required">*</span>
+				</label>
+				<input name="moderatorName" type="text" onInput={formOnInput} />
+
+				<label for="voterOptions">
+					What options would you like voters have to choose from?
+					<span class="required">*</span>
+				</label>
+				<select name="voterOptions" onInput={formOnInput}>
+					<option value="select">Select options</option>
+					<option value="fibonacci">Fibonacci</option>
+					<option value="linear">Linear</option>
+				</select>
+
+				<label for="numberOfOptions">Number of options</label>
+				<input
+					type="range"
+					name="numberOfOptions"
+					min="2"
+					max="15"
+					value={numberOfOptions()}
+					step="1"
+					onInput={formOnInput}
+				/>
+
+				{/* <p>Include no-vote option?</p>
+				<input type="radio" name="noVote" value="yes" onInput={formOnInput} />
+				<label for="noVote">Yes</label>
+
+				<input type="radio" name="noVote" value="no" checked onInput={formOnInput} />
+				<label for="noVote">No</label> */}
+				<div>final preview: {selectedOptions()}</div>
+				<Button onClick={onFormSubmit}>Done</Button>
+			</div>
+		</main>
+	);
+};
+
+export default CreateRoom;
