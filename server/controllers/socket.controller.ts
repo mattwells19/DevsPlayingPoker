@@ -20,13 +20,19 @@ export const { rooms, users } = await connectToDb();
  * @returns void
  */
 const sendRoomData = (roomData: RoomSchema): void => {
+	const roomUpdateEvent: RoomUpdateEvent = {
+		event: "RoomUpdate",
+		roomData: roomData,
+	};
+
+	if (roomData.moderator) {
+		const moderatorSock = sockets.get(roomData.moderator.id);
+		moderatorSock?.send(JSON.stringify(roomUpdateEvent));
+	}
+
 	for (const voter of roomData.voters) {
 		const voterSock = sockets.get(voter.id.toString());
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: roomData,
-		};
-		voterSock?.send(JSON.stringify(roomUpdate));
+		voterSock?.send(JSON.stringify(roomUpdateEvent));
 	}
 };
 
@@ -71,23 +77,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 		throw new Error(`Updating room failed for room code ${data.roomCode}.`);
 	}
 
-	if (updatedRoomData.moderator) {
-		const moderatorSock = sockets.get(updatedRoomData?.moderator?.id);
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		moderatorSock?.send(JSON.stringify(roomUpdate));
-	}
-
-	updatedRoomData?.voters.forEach(({ id: voterId }) => {
-		const voterSock = sockets.get(voterId);
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		voterSock?.send(JSON.stringify(roomUpdate));
-	});
+	sendRoomData(updatedRoomData);
 
 	return isModerator;
 }
@@ -141,15 +131,6 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 
 	if (!updatedRoomData) return;
 
-	if (updatedRoomData.moderator) {
-		const moderatorSock = sockets.get(updatedRoomData.moderator.id);
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		moderatorSock?.send(JSON.stringify(roomUpdate));
-	}
-
 	sendRoomData(updatedRoomData);
 }
 
@@ -186,23 +167,7 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 
 	if (!updatedRoomData) return;
 
-	if (updatedRoomData.moderator) {
-		const moderatorSock = sockets.get(updatedRoomData.moderator.id);
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		moderatorSock?.send(JSON.stringify(roomUpdate));
-	}
-
-	for (const voter of updatedRoomData.voters) {
-		const voterSock = sockets.get(voter.id.toString());
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		voterSock?.send(JSON.stringify(roomUpdate));
-	}
+	sendRoomData(updatedRoomData);
 }
 
 /**
@@ -244,6 +209,10 @@ async function handleOptionSelected(
 			new: true,
 		},
 	);
+
+	if (!updatedRoomData) {
+		throw new Error(`Updating voter selected failed for userId ${userId}`);
+	}
 
 	sendRoomData(updatedRoomData);
 }
