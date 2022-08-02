@@ -20,6 +20,9 @@ export const { rooms, users } = await connectToDb();
  * @returns void
  */
 const sendRoomData = (roomData: RoomSchema): void => {
+	if (!roomData) {
+		throw new Error(`Failed to send updatedRoomData.  No roomData found.`);
+	}
 	const roomUpdateEvent: RoomUpdateEvent = {
 		event: "RoomUpdate",
 		roomData: roomData,
@@ -73,10 +76,6 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 		},
 	);
 
-	if (!updatedRoomData) {
-		throw new Error(`Updating room failed for room code ${data.roomCode}.`);
-	}
-
 	sendRoomData(updatedRoomData);
 
 	return isModerator;
@@ -129,8 +128,6 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 		);
 	}
 
-	if (!updatedRoomData) return;
-
 	sendRoomData(updatedRoomData);
 }
 
@@ -164,8 +161,6 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 			},
 		},
 	);
-
-	if (!updatedRoomData) return;
 
 	sendRoomData(updatedRoomData);
 }
@@ -209,10 +204,6 @@ async function handleOptionSelected(
 			new: true,
 		},
 	);
-
-	if (!updatedRoomData) {
-		throw new Error(`Updating voter selected failed for userId ${userId}`);
-	}
 
 	sendRoomData(updatedRoomData);
 }
