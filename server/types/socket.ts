@@ -20,8 +20,14 @@ export interface StartVotingEvent {
 	event: "StartVoting";
 }
 
+export interface OptionSelectedEvent {
+	event: "OptionSelected";
+	selection: number;
+}
+
 export type WebSocketEvent =
 	| ConnectEvent
 	| JoinEvent
+	| OptionSelectedEvent
 	| RoomUpdateEvent
 	| StartVotingEvent;

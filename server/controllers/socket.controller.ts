@@ -5,12 +5,30 @@ import {
 	WebSocketEvent,
 	RoomUpdateEvent,
 	ConnectEvent,
+	OptionSelectedEvent,
 } from "../types/socket.ts";
+import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/connectToDb.ts";
 import { lookupRoom } from "../utils/db.ts";
 
 const sockets = new Map<string, WebSocket>();
 export const { rooms, users } = await connectToDb();
+
+/**
+ * Sends updated roomData to all voters in room
+ * @param roomData
+ * @returns void
+ */
+const sendRoomData = (roomData: RoomSchema): void => {
+	for (const voter of roomData.voters) {
+		const voterSock = sockets.get(voter.id.toString());
+		const roomUpdate: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData: roomData,
+		};
+		voterSock?.send(JSON.stringify(roomUpdate));
+	}
+};
 
 /**
  * Adds a player to the room specified either as a moderator or voter.
@@ -132,14 +150,7 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 		moderatorSock?.send(JSON.stringify(roomUpdate));
 	}
 
-	for (const voter of updatedRoomData.voters) {
-		const voterSock = sockets.get(voter.id.toString());
-		const roomUpdate: RoomUpdateEvent = {
-			event: "RoomUpdate",
-			roomData: updatedRoomData,
-		};
-		voterSock?.send(JSON.stringify(roomUpdate));
-	}
+	sendRoomData(updatedRoomData);
 }
 
 /**
@@ -194,6 +205,49 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 	}
 }
 
+/**
+ * Updates voter selection and confidence.  Sends updated roomdata
+ * @param userId
+ * @param roomCode 4-character code for the room
+ * @param data OptionSelectedEvent data
+ * @returns void
+ */
+async function handleOptionSelected(
+	userId: string,
+	roomCode: string | null,
+	data: OptionSelectedEvent,
+): Promise<void> {
+	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
+
+	const roomData = await lookupRoom(roomCode);
+	if (!roomData) return;
+
+	const updatedVoters = roomData.voters.map((voter) => {
+		if (voter.id === userId) {
+			return {
+				...voter,
+				selection: data.selection,
+				confidence: calculateConfidence(roomData.votingStartedAt),
+			};
+		}
+		return voter;
+	});
+
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$set: {
+					voters: updatedVoters,
+				},
+			},
+			new: true,
+		},
+	);
+
+	sendRoomData(updatedRoomData);
+}
+
 // TODO: how to handle thrown errors?
 export const handleWs = (socket: WebSocket) => {
 	const userId: string = crypto.randomUUID();
@@ -231,6 +285,10 @@ export const handleWs = (socket: WebSocket) => {
 				}
 				case "StartVoting": {
 					await handleStartVoting(roomCode);
+					break;
+				}
+				case "OptionSelected": {
+					await handleOptionSelected(userId, roomCode, data);
 					break;
 				}
 			}
