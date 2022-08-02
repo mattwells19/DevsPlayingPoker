@@ -15,7 +15,7 @@ const sockets = new Map<string, WebSocket>();
 export const { rooms, users } = await connectToDb();
 
 /**
- * Sends updated roomData to all voters in room
+ * Sends updated roomData to all voters and moderator in room
  * @param roomData
  * @returns void
  */
