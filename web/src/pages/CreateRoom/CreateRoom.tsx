@@ -1,7 +1,7 @@
 import { Component, createSignal } from "solid-js";
 import Button from "@/components/Button";
 
-import "./CreateRoom.scss";
+import styles from "./CreateRoom.module.scss";
 
 const options = {
 	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
@@ -16,7 +16,9 @@ const CreateRoom: Component = () => {
 	const [moderatorName, setModeratorName] = createSignal("");
 	const [selectedOptions, setSelectedOptions] = createSignal([]);
 	const [voterOptions, setVoterOptions] = createSignal([]);
-	const [numberOfOptions, setNumberOfOptions] = createSignal(defaultNumberOfOptions);
+	const [numberOfOptions, setNumberOfOptions] = createSignal(
+		defaultNumberOfOptions,
+	);
 
 	const onFormSubmit = async (e) => {
 		const postBody = {
@@ -29,10 +31,9 @@ const CreateRoom: Component = () => {
 			body: JSON.stringify(postBody),
 		};
 
-		const res = await fetch("/create", requestOptions);
-		const json = await res.json();
-
-		console.log(json);
+		// add error handling
+		// add state after room creation
+		await fetch("/api/v1/create", requestOptions);
 	};
 
 	const formOnInput = (e) => {
@@ -51,7 +52,10 @@ const CreateRoom: Component = () => {
 			case "numberOfOptions": {
 				const currentVoterOptions = options[voterOptions()];
 				const numberOfOptionsValue = e.target.value;
-				const limitedOptions = currentVoterOptions.slice(0, numberOfOptionsValue);
+				const limitedOptions = currentVoterOptions.slice(
+					0,
+					numberOfOptionsValue,
+				);
 				setNumberOfOptions(numberOfOptionsValue);
 				setSelectedOptions(limitedOptions);
 				break;
@@ -65,18 +69,24 @@ const CreateRoom: Component = () => {
 	};
 
 	return (
-		<main>
-			<div class="create-room-form">
+		<main class={styles.createRoom}>
+			<section class={styles.createRoomForm}>
 				<label for="moderatorName">
 					Your name
-					<span class="required">*</span>
+					<span class={styles.required}>*</span>
 				</label>
+
 				<input name="moderatorName" type="text" onInput={formOnInput} />
+
+				<div class={styles.seperator}>
+					<hr />
+				</div>
 
 				<label for="voterOptions">
 					What options would you like voters have to choose from?
-					<span class="required">*</span>
+					<span class={styles.required}>*</span>
 				</label>
+
 				<select name="voterOptions" onInput={formOnInput}>
 					<option value="select">Select options</option>
 					<option value="fibonacci">Fibonacci</option>
@@ -84,6 +94,7 @@ const CreateRoom: Component = () => {
 				</select>
 
 				<label for="numberOfOptions">Number of options</label>
+
 				<input
 					type="range"
 					name="numberOfOptions"
@@ -100,9 +111,18 @@ const CreateRoom: Component = () => {
 
 				<input type="radio" name="noVote" value="no" checked onInput={formOnInput} />
 				<label for="noVote">No</label> */}
-				<div>final preview: {selectedOptions()}</div>
+
+				<div class={styles.finalPreview}>
+					<p>Final preview</p>
+					<span>{selectedOptions().join(", ")}</span>
+				</div>
+
+				<div class={styles.seperator}>
+					<hr />
+				</div>
+
 				<Button onClick={onFormSubmit}>Done</Button>
-			</div>
+			</section>
 		</main>
 	);
 };

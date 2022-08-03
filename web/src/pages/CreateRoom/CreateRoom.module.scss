@@ -1,0 +1,140 @@
+main.createRoom {
+	height: 100vh;
+	max-width: 30rem;
+	margin: auto;
+}
+
+section.createRoomForm {
+	display: flex;
+  flex-direction: column;
+
+	label {
+		margin: 2rem 0 0.5rem 0;
+	}
+
+	input {
+		padding: 1rem;
+		width: 100%;
+		height: 2rem;
+		border-radius: 0.5rem;
+	}
+
+	/* Generated input range styles*/
+	/* http://danielstern.ca/range.css/#/ */
+	input[type=range] {
+		width: 100%;
+		margin: 5px 0;
+		background-color: transparent;
+		-webkit-appearance: none;
+	}
+	input[type=range]:focus {
+		outline: none;
+	}
+	input[type=range]::-webkit-slider-runnable-track {
+		background: #e67c3e;
+		border: 1px solid #e5e5e5;
+		border-radius: 23.4px;
+		width: 100%;
+		height: 10px;
+		cursor: pointer;
+	}
+	input[type=range]::-webkit-slider-thumb {
+		margin-top: -6px;
+		width: 20px;
+		height: 20px;
+		background: #ffffff;
+		border: 1px solid #e5e5e5;
+		border-radius: 20px;
+		cursor: pointer;
+		-webkit-appearance: none;
+	}
+	input[type=range]:focus::-webkit-slider-runnable-track {
+		background: #ec9b6b;
+	}
+	input[type=range]::-moz-range-track {
+		background: #e67c3e;
+		border: 1px solid #e5e5e5;
+		border-radius: 23.4px;
+		width: 100%;
+		height: 10px;
+		cursor: pointer;
+	}
+	input[type=range]::-moz-range-thumb {
+		width: 20px;
+		height: 20px;
+		background: #ffffff;
+		border: 1px solid #e5e5e5;
+		border-radius: 20px;
+		cursor: pointer;
+	}
+	input[type=range]::-ms-track {
+		background: transparent;
+		border-color: transparent;
+		border-width: 9px 0;
+		color: transparent;
+		width: 100%;
+		height: 10px;
+		cursor: pointer;
+	}
+	input[type=range]::-ms-fill-lower {
+		background: #d5601c;
+		border: 1px solid #e5e5e5;
+		border-radius: 46.8px;
+	}
+	input[type=range]::-ms-fill-upper {
+		background: #e67c3e;
+		border: 1px solid #e5e5e5;
+		border-radius: 46.8px;
+	}
+	input[type=range]::-ms-thumb {
+		width: 20px;
+		height: 20px;
+		background: #ffffff;
+		border: 1px solid #e5e5e5;
+		border-radius: 20px;
+		cursor: pointer;
+		margin-top: 0px;
+		/*Needed to keep the Edge thumb centred*/
+	}
+	input[type=range]:focus::-ms-fill-lower {
+		background: #e67c3e;
+	}
+	input[type=range]:focus::-ms-fill-upper {
+		background: #ec9b6b;
+	}
+	/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+	how to remove the virtical space around the range input in IE*/
+	@supports (-ms-ime-align:auto) {
+		/* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+		input[type=range] {
+			margin: 0;
+			/*Edge starts the margin from the thumb, not the track as other browsers do*/
+		}
+	}
+	/* Generated input range styles*/
+
+	select {
+		height: 2rem;
+		border-radius: 0.5rem;
+		border: 2px solid rgb(199, 199, 199);
+	}
+
+	.required {
+		color: red;
+	}
+
+	.finalPreview {
+		margin-top: 2rem;
+		span {
+			color: gray;
+		}
+	}
+
+	button {
+		margin-top: 2rem;
+	}
+}
+
+div.seperator {
+	margin: 2rem 0 0 0;
+}
