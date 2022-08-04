@@ -36,7 +36,7 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 							<td>
 								{roomState === "Results"
 									? voter.selection
-									: voter.selection
+									: voter.selection !== null
 									? "✅"
 									: "❌"}
 							</td>

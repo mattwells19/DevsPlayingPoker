@@ -149,7 +149,11 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 									});
 								}}
 							>
-								<legend>Make a selection</legend>
+								<legend>
+									{currentVoter()?.selection !== null
+										? "Got it! You can change your mind if you want. Otherwise sit tight."
+										: "Make a selection"}
+								</legend>
 								<For each={details.options}>
 									{(option) => (
 										<OptionCard
