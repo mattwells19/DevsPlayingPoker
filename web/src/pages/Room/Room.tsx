@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "solid-app-router";
 import {
 	Component,
+	createMemo,
 	createResource,
 	createSignal,
 	For,
@@ -92,6 +93,14 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 		onCleanup(() => ws.close());
 	});
 
+	// the user object of the current user if they're a voter. null if they're the moderator
+	const currentVoter = createMemo(
+		() =>
+			roomDetails()?.roomDetails.voters.find(
+				(voter) => voter.id === currentUserId(),
+			) ?? null,
+	);
+
 	return (
 		<main class={styles.room}>
 			<Show when={roomDetails()}>
@@ -128,10 +137,11 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 						<Match when={details.state === "Voting"}>
 							<fieldset
 								onchange={(e) => {
-									const selection = e.target.hasAttribute("value")
+									const selectionValue = e.target.hasAttribute("value")
 										? (e.target as HTMLInputElement).value
 										: null;
-									if (!selection) throw new Error("Didn't get a value");
+									if (!selectionValue) throw new Error("Didn't get a value");
+									const selection = parseInt(selectionValue, 10);
 
 									dispatchEvent({
 										event: "OptionSelected",
@@ -141,7 +151,12 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 							>
 								<legend>Make a selection</legend>
 								<For each={details.options}>
-									{(option) => <OptionCard value={option} />}
+									{(option) => (
+										<OptionCard
+											selected={option === currentVoter()?.selection}
+											value={option}
+										/>
+									)}
 								</For>
 							</fieldset>
 						</Match>

@@ -3,9 +3,10 @@ import styles from "./OptionCard.module.scss";
 
 interface OptionCardProps {
 	value: number;
+	selected: boolean;
 }
 
-const OptionCard: Component<OptionCardProps> = ({ value }) => {
+const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
 	return (
 		<span class={styles.optionContainer}>
 			<input
@@ -13,6 +14,7 @@ const OptionCard: Component<OptionCardProps> = ({ value }) => {
 				type="radio"
 				name="selection"
 				value={value}
+				checked={selected}
 			/>
 			<label for={`option-${value}`}>
 				<svg
