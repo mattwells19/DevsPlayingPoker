@@ -5,10 +5,16 @@ export interface User {
 	name: string;
 }
 
+export enum ConfidenceValue {
+	low = 0,
+	medium = 1,
+	high = 2,
+}
+
 export type Voter = User &
 	(
 		| {
-				confidence: 0 | 1 | 2;
+				confidence: ConfidenceValue;
 				selection: number;
 		  }
 		| {
