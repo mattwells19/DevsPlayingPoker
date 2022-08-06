@@ -167,6 +167,32 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 }
 
 /**
+ * Ends voting, transitioning to "Results" state
+ * @param roomCode 4-character code for the room
+ * @returns void
+ */
+async function handleStopVoting(roomCode: string | null): Promise<void> {
+	if (!roomCode) throw new Error("Unable to stop voting due to no room code.");
+
+	const roomData = await lookupRoom(roomCode);
+	if (!roomData) return;
+
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$set: {
+					state: "Results",
+				},
+			},
+			new: true,
+		},
+	);
+
+	sendRoomData(updatedRoomData);
+}
+
+/**
  * Updates voter selection and confidence.  Sends updated roomdata
  * @param userId
  * @param roomCode 4-character code for the room
@@ -246,6 +272,10 @@ export const handleWs = (socket: WebSocket) => {
 				}
 				case "StartVoting": {
 					await handleStartVoting(roomCode);
+					break;
+				}
+				case "StopVoting": {
+					await handleStopVoting(roomCode);
 					break;
 				}
 				case "OptionSelected": {

@@ -27,5 +27,6 @@ export default defineConfig({
 		target: "esnext",
 		polyfillDynamicImport: false,
 		outDir: "../server/www",
+		emptyOutDir: true,
 	},
 });
