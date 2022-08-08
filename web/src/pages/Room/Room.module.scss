@@ -64,8 +64,19 @@ main.room {
 			}
 
 			td {
-				font-weight: bold;
 				text-align: center;
+				font-weight: bold;
+			}
+
+			dt {
+				font-weight: normal;
+				font-size: small;
+				text-transform: uppercase;
+			}
+
+			dd {
+				margin: auto;
+				font-size: 2rem;
 			}
 		}
 	}
