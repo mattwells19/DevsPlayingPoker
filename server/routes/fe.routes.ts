@@ -16,7 +16,6 @@ router.get(
 				{ userId },
 				JWT_SECRET,
 			);
-			console.log(`JWT: ${jwt}`);
 			res.cookie({
 				name: "DPP_TOKEN",
 				value: jwt,
