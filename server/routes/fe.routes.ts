@@ -1,5 +1,5 @@
 import { Router } from "../deps.ts";
-import { OpineRequest, OpineResponse, getCookies, setCookie } from "../deps.ts";
+import { OpineRequest, OpineResponse, getCookies } from "../deps.ts";
 const router = Router();
 
 router.get(
@@ -9,9 +9,10 @@ router.get(
 		if (!Object.hasOwn(cookies, "DPP_USER_ID")) {
 			console.debug("No userId in cookie, creating new");
 			const userId = crypto.randomUUID();
-			setCookie(res.headers!, {
+			res.cookie({
 				name: "DPP_USER_ID",
 				value: userId,
+				path: "/",
 			});
 		} else {
 			console.debug(`Found userID in cookie: ${cookies["DPP_USER_ID"]}`);
