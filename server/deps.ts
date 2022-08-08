@@ -18,4 +18,7 @@ export {
 	Collection,
 	Database,
 } from "https://deno.land/x/mongo@v0.30.1/mod.ts";
-export { create, decode } from "https://deno.land/x/djwt@v2.2/mod.ts";
+export {
+	create as createJWT,
+	verify as verifyJWT,
+} from "https://deno.land/x/djwt@v2.2/mod.ts";

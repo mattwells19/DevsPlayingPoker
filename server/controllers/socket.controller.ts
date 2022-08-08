@@ -1,5 +1,5 @@
 import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
-import { getCookies } from "../deps.ts";
+import { getCookies, verifyJWT } from "../deps.ts";
 import type { RoomSchema } from "../models/room.model.ts";
 import {
 	JoinEvent,
@@ -11,6 +11,7 @@ import {
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/connectToDb.ts";
 import { lookupRoom } from "../utils/db.ts";
+const JWT_SECRET = Deno.env.get("JWT_SECRET");
 
 const sockets = new Map<string, WebSocket>();
 export const { rooms, users } = await connectToDb();
@@ -294,8 +295,17 @@ export async function establishSocketConnection(
 	next: NextFunction,
 ) {
 	if (req.headers.get("upgrade") === "websocket") {
+		if (!JWT_SECRET) throw new Error("Error importing JWT_SECRET from .env");
 		const cookies = getCookies(req.headers);
-		const userId = cookies["DPP_USER_ID"];
+		let userId;
+		if (cookies["DPP_TOKEN"]) {
+			const decoded = await verifyJWT(
+				cookies["DPP_TOKEN"],
+				JWT_SECRET,
+				"HS512",
+			);
+			userId = decoded.userId as string;
+		}
 		if (!userId) throw new Error("userId not found in cookies.");
 		const sock = req.upgrade();
 		await handleWs(sock, userId);
