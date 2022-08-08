@@ -1,4 +1,5 @@
 import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
+import { getCookies } from "../deps.ts";
 import type { RoomSchema } from "../models/room.model.ts";
 import {
 	JoinEvent,
@@ -236,8 +237,8 @@ async function handleOptionSelected(
 }
 
 // TODO: how to handle thrown errors?
-export const handleWs = (socket: WebSocket) => {
-	const userId: string = crypto.randomUUID();
+export const handleWs = (socket: WebSocket, userId: string) => {
+	console.debug(`Handling WS with the following data: userId: ${userId}`);
 	sockets.set(userId, socket);
 	let roomCode: string | null = null;
 
@@ -293,8 +294,11 @@ export async function establishSocketConnection(
 	next: NextFunction,
 ) {
 	if (req.headers.get("upgrade") === "websocket") {
+		const cookies = getCookies(req.headers);
+		const userId = cookies["DPP_USER_ID"];
+		if (!userId) throw new Error("userId not found in cookies.");
 		const sock = req.upgrade();
-		await handleWs(sock);
+		await handleWs(sock, userId);
 	} else {
 		res.send("You've gotta set the magic header...");
 	}
