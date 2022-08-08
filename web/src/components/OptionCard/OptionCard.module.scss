@@ -1,0 +1,29 @@
+.optionContainer {
+	position: relative;
+
+	label {
+		position: relative;
+
+		&:hover rect:last-of-type,
+		&:focus rect:last-of-type {
+			stroke: var(--primary-orange);
+			stroke-opacity: 1;
+			stroke-width: 3;
+		}
+	}
+
+	input:checked + label rect:last-of-type {
+		fill: var(--primary-orange);
+		fill-opacity: 0.1;
+
+		stroke: var(--primary-orange);
+		stroke-opacity: 1;
+	}
+
+	input {
+		appearance: none;
+		position: absolute;
+		opacity: 0;
+		inset: 0;
+	}
+}
