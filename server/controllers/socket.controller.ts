@@ -7,6 +7,7 @@ import {
 	RoomUpdateEvent,
 	ConnectEvent,
 	OptionSelectedEvent,
+	Timeout,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/connectToDb.ts";
@@ -14,6 +15,7 @@ import { lookupRoom } from "../utils/db.ts";
 const JWT_SECRET = Deno.env.get("JWT_SECRET");
 
 const sockets = new Map<string, WebSocket>();
+const timeouts: Timeout[] = [];
 export const { rooms, users } = await connectToDb();
 
 /**
@@ -52,34 +54,43 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 	if (!roomData) {
 		throw new Error(`No room with room code ${data.roomCode}.`);
 	}
-
+	let updatedRoomData;
 	const isModerator = !roomData.moderator;
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: !isModerator
-				? {
-						$push: {
-							voters: {
-								$each: [
-									{
-										id: userId,
-										name: data.name,
-										confidence: null,
-										selection: null,
-									},
-								],
+	const timeoutIndex = timeouts.findIndex((item) => item.userId === userId);
+	if (timeoutIndex > -1) {
+		console.debug(
+			`User ${userId} rejoined room, cancelling deletion with timeoutId of ${timeouts[timeoutIndex].timeoutId}`,
+		);
+		clearTimeout(timeouts[timeoutIndex].timeoutId);
+		timeouts.splice(timeoutIndex, 1);
+		updatedRoomData = await rooms.findOne({ _id: roomData._id });
+	} else {
+		updatedRoomData = await rooms.findAndModify(
+			{ _id: roomData._id },
+			{
+				update: !isModerator
+					? {
+							$push: {
+								voters: {
+									$each: [
+										{
+											id: userId,
+											name: data.name,
+											confidence: null,
+											selection: null,
+										},
+									],
+								},
 							},
-						},
-				  }
-				: { $set: { moderator: { id: userId, name: data.name } } },
-			new: true,
-		},
-	);
+					  }
+					: { $set: { moderator: { id: userId, name: data.name } } },
+				new: true,
+			},
+		);
+	}
 
 	sendRoomData(updatedRoomData);
-
 	return isModerator;
 }
 
@@ -90,6 +101,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
  * @returns void
  */
 async function handleLeave(userId: string, roomCode: string): Promise<void> {
+	console.debug(`Deleting user ${userId} from room ${roomCode}...`);
 	let updatedRoomData: RoomSchema | undefined;
 
 	const roomData = await lookupRoom(roomCode);
@@ -131,6 +143,7 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	}
 
 	sendRoomData(updatedRoomData);
+	console.debug("Deleted!");
 }
 
 /**
@@ -252,12 +265,24 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 	});
 
 	// TODO: how to handle refreshes?
-	socket.addEventListener("close", async () => {
+	socket.addEventListener("close", () => {
 		// remove voter from room
 		sockets.delete(userId);
 
 		if (roomCode) {
-			await handleLeave(userId, roomCode);
+			console.debug(
+				`User ${userId} left room ${roomCode}, deleting in 10 seconds.`,
+			);
+
+			const timeoutId = setTimeout(async () => {
+				await handleLeave(userId, roomCode!);
+			}, 10000);
+
+			timeouts.push({
+				userId,
+				timeoutId,
+			});
+			console.log("timeouts:", timeouts);
 		}
 	});
 

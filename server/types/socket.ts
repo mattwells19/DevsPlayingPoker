@@ -1,5 +1,10 @@
 import type { RoomSchema } from "../models/room.model.ts";
 
+export interface Timeout {
+	userId: string;
+	timeoutId: number;
+}
+
 export interface ConnectEvent {
 	event: "Connected";
 	userId: string;
