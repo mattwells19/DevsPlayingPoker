@@ -276,7 +276,7 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 
 			const timeoutId = setTimeout(async () => {
 				await handleLeave(userId, roomCode!);
-			}, 10000);
+			}, 3000);
 
 			timeouts.push({
 				userId,
