@@ -20,21 +20,18 @@ router.get(
 				name: "DPP_TOKEN",
 				value: jwt,
 				path: "/",
+				secure: true,
 			});
 		} else {
 			console.debug("DPP_TOKEN cookie found, not creating new.");
 		}
-		const path = await Deno.realPath(
-			req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html",
-		);
+		const path = await Deno.realPath("./www/index.html");
 		return res.sendFile(path);
 	},
 );
 
 router.get("/assets/*", async (req: OpineRequest, res: OpineResponse) => {
-	const path = await Deno.realPath(
-		req.url.includes("/assets/") ? `./www${req.url}` : "./www/index.html",
-	);
+	const path = await Deno.realPath(`./www${req.url}`);
 	return res.sendFile(path);
 });
 
