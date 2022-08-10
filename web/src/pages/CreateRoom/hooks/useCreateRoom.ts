@@ -87,9 +87,8 @@ const useCreateRoom = () => {
 				postBody.options = [0, ...fields.selectedOptions];
 			}
 
-			// const response = await post("/api/v1/create", postBody);
-			// navigate(`/room/${response.roomCode}`);
-			console.log(postBody);
+			const response = await post("/api/v1/create", postBody);
+			navigate(`/room/${response.roomCode}`);
 		} catch (err) {
 			setFields({ error: err });
 		}

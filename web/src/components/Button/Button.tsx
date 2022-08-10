@@ -14,7 +14,7 @@ export const ButtonLink: Component<ButtonLinkProps> = ({
 	...anchorProps
 }) => {
 	return (
-		<Link class={styles[variant]} {...anchorProps}>
+		<Link class={`${styles.button} ${styles[variant]}`} {...anchorProps}>
 			{children}
 		</Link>
 	);
@@ -38,7 +38,9 @@ export const Button: Component<ButtonProps> = (props) => {
 
 	return (
 		<button
-			class={`${styles[merged.variant]} ${merged.loading ? "loading" : ""}`}
+			class={`${styles.button} ${styles[merged.variant]} ${
+				merged.loading ? "loading" : ""
+			}`}
 			disabled={merged.disabled || merged.loading}
 			{...merged}
 		>

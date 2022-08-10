@@ -1,0 +1,42 @@
+.optionContainer {
+	position: relative;
+
+	label {
+		position: relative;
+
+		text {
+			fill: var(--primary-text-color);
+		}
+
+		rect:first-of-type {
+			fill: var(--elevated-background);
+		}
+
+		rect:last-of-type {
+			stroke: var(--border-gray);
+			stroke-opacity: 0.25;
+			stroke-width: 3;
+		}
+
+		&:hover rect:last-of-type,
+		&:focus rect:last-of-type {
+			stroke: var(--primary-orange);
+			stroke-opacity: 1;
+		}
+	}
+
+	input:checked + label rect:last-of-type {
+		fill: var(--primary-orange);
+		fill-opacity: 0.1;
+
+		stroke: var(--primary-orange);
+		stroke-opacity: 1;
+	}
+
+	input {
+		appearance: none;
+		position: absolute;
+		opacity: 0;
+		inset: 0;
+	}
+}

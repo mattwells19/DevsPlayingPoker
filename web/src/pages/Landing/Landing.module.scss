@@ -28,7 +28,11 @@ section.roomCodeInputs {
 			width: 3rem;
 			height: 3rem;
 			border-radius: 0.5rem;
+			border-style: solid;
 			text-transform: uppercase;
+
+			background-color: inherit;
+			color: var(--primary-text-color);
 		}
 	}
 
@@ -38,7 +42,7 @@ section.roomCodeInputs {
 		place-items: center;
 
 		p {
-			color: red;
+			color: var(--error-text-color);
 		}
 	}
 }
