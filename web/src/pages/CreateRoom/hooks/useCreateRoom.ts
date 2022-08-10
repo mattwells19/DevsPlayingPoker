@@ -1,4 +1,6 @@
+import { createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
+import { useNavigate } from "solid-app-router";
 
 import post from "../../../services/post";
 
@@ -8,6 +10,7 @@ type CreateRoomFields = {
 	voterOptions: Number[];
 	numberOfOptions: Number;
 	error: string | null;
+	disabledFields: boolean;
 };
 
 const defaultStoreData = {
@@ -16,6 +19,7 @@ const defaultStoreData = {
 	voterOptions: [],
 	numberOfOptions: 5,
 	error: null,
+	disabledFields: true,
 };
 
 const options = {
@@ -26,6 +30,7 @@ const options = {
 
 const useCreateRoom = () => {
 	const [fields, setFields] = createStore<CreateRoomFields>(defaultStoreData);
+	const navigate = useNavigate();
 
 	const updateField = (event: Event) => {
 		const { name, value } = event.currentTarget as HTMLInputElement;
@@ -41,6 +46,7 @@ const useCreateRoom = () => {
 				setFields({
 					voterOptions: value,
 					selectedOptions: limitedOptions,
+					disabledFields: false,
 				});
 				break;
 			}
@@ -54,8 +60,25 @@ const useCreateRoom = () => {
 				});
 				break;
 			}
+			case "noVote": {
+				if (value === "yes") {
+					setFields({
+						selectedOptions: [0, ...fields.selectedOptions],
+					});
+					break;
+				}
+
+				if (value === "no" && fields.selectedOptions[0] === 0) {
+					setFields({
+						selectedOptions: fields.selectedOptions.slice(1),
+					});
+					break;
+				}
+
+				break;
+			}
 			case "select":
-				setFields({ selectedOptions: [] });
+				setFields({ selectedOptions: [], disabledFields: true });
 				break;
 			default:
 				break;
@@ -69,9 +92,9 @@ const useCreateRoom = () => {
 				options: fields.selectedOptions,
 			};
 
-			await post("/api/v1/create", postBody);
+			const response = await post("/api/v1/create", postBody);
+			navigate(`/room/${response.roomCode}`);
 		} catch (err) {
-			console.log("ett erro", err);
 			setFields({ error: err });
 		}
 	};

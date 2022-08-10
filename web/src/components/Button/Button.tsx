@@ -22,18 +22,20 @@ export const ButtonLink: Component<ButtonLinkProps> = ({
 interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
 	variant?: "solid" | "outline";
 	loading?: boolean;
+	disabled?: boolean;
 }
 
 export const Button: Component<ButtonProps> = ({
 	variant = "solid",
 	loading = false,
+	disabled = false,
 	children,
 	...btnProps
 }) => {
 	return (
 		<button
 			class={`${styles[variant]} ${loading ? "loading" : ""}`}
-			disabled={loading}
+			disabled={disabled || loading}
 			{...btnProps}
 		>
 			{loading ? "Loading..." : children}

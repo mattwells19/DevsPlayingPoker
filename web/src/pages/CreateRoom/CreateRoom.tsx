@@ -48,8 +48,33 @@ const CreateRoom: Component = () => {
 					max="15"
 					value={fields.numberOfOptions}
 					step="1"
+					disabled={fields.disabledFields}
 					onInput={updateField}
 				/>
+
+				<label for="noVote">Include no-vote option?</label>
+
+				<label class={styles.radio} for="noVote">
+					<input
+						type="radio"
+						name="noVote"
+						value="yes"
+						onInput={updateField}
+						disabled={fields.disabledFields}
+					/>
+					Yes
+				</label>
+
+				<label class={styles.radio} for="noVote">
+					<input
+						type="radio"
+						name="noVote"
+						value="no"
+						onInput={updateField}
+						disabled={fields.disabledFields}
+					/>
+					No
+				</label>
 
 				<div class={styles.finalPreview}>
 					<p>Final preview</p>
@@ -61,10 +86,12 @@ const CreateRoom: Component = () => {
 				</div>
 
 				<Show when={fields.error !== null}>
-					<p class={styles.error}>Error: {field.error}</p>
+					<p class={styles.error}>Error: {fields.error}</p>
 				</Show>
 
-				<Button type="submit">Done</Button>
+				<Button type="submit" disabled={fields.disabledFields}>
+					Done
+				</Button>
 			</form>
 		</main>
 	);
