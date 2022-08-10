@@ -1,5 +1,6 @@
-import { Component, For, Show } from "solid-js";
+import { Component, For, Match, Switch } from "solid-js";
 import { RoomSchema, ConfidenceValue } from "@/shared-types";
+import Metric from "./Metric";
 
 interface VoterTableProps {
 	voters: RoomSchema["voters"];
@@ -18,12 +19,55 @@ const ConfidenceTextMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.low]: "Low confidence",
 };
 
+function formatSelection(selection: number | null): string | number {
+	if (selection === null || selection === 0) {
+		return "☕";
+	}
+
+	return selection;
+}
+
 const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
+	let high = -1,
+		low = Infinity,
+		mode = -1,
+		voterCount = 0,
+		avgConfidence: ConfidenceValue = 0;
+	const modeCounter = new Map<number, number>();
+
+	voters.forEach(({ selection, confidence }) => {
+		if (selection === null || selection === 0) return;
+		voterCount++;
+
+		const currCount = modeCounter.get(selection) ?? 0;
+		const newCount = currCount + 1;
+
+		const currModeCount = modeCounter.get(mode) ?? -1;
+		if (
+			newCount > currModeCount ||
+			(newCount === currModeCount && selection > mode)
+		) {
+			mode = selection;
+		}
+
+		modeCounter.set(selection, newCount);
+
+		if (selection > high) {
+			high = selection;
+		}
+		if (selection < low) {
+			low = selection;
+		}
+
+		avgConfidence += confidence;
+	});
+	avgConfidence = Math.round(avgConfidence / voterCount);
+
 	return (
 		<table>
 			<thead>
 				<tr>
-					<th>Voters</th>
+					<th colspan="2">Voters</th>
 					<th>Voted</th>
 					<th>Confidence</th>
 				</tr>
@@ -32,10 +76,10 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 				<For each={voters}>
 					{(voter) => (
 						<tr>
-							<td>{voter.name}</td>
+							<td colspan="2">{voter.name}</td>
 							<td>
 								{roomState === "Results"
-									? voter.selection
+									? formatSelection(voter.selection)
 									: voter.selection !== null
 									? "✅"
 									: "❌"}
@@ -57,9 +101,26 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 			</tbody>
 			<tfoot>
 				<tr>
-					<Show when={roomState === "Results"}>
-						<td colspan="3">Waiting to start voting</td>
-					</Show>
+					<Switch>
+						<Match
+							when={
+								roomState === "Results" &&
+								voters.every((voter) => voter.selection === null)
+							}
+						>
+							<td colspan="4">Waiting to start voting</td>
+						</Match>
+						<Match when={roomState === "Results"}>
+							<Metric label="Low" value={low} />
+							<Metric label="High" value={high} />
+							<Metric label="Mode" value={mode} />
+							<Metric
+								label="Confidence"
+								value={ConfidenceEmojiMap[avgConfidence]}
+								title={ConfidenceTextMap[avgConfidence]}
+							/>
+						</Match>
+					</Switch>
 				</tr>
 			</tfoot>
 		</table>
