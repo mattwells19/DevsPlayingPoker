@@ -4,7 +4,7 @@ import Button from "@/components/Button";
 import styles from "./CreateRoom.module.scss";
 import useCreateRoom from "./hooks/useCreateRoom";
 
-const defaultNumberOfOptions = 5;
+const prohibitedEmojiHex = "0x1F6AB";
 
 const CreateRoom: Component = () => {
 	const { fields, updateField, submit } = useCreateRoom();
@@ -22,7 +22,12 @@ const CreateRoom: Component = () => {
 					<span class={styles.required}>*</span>
 				</label>
 
-				<input name="moderatorName" type="text" onInput={updateField} />
+				<input
+					name="moderatorName"
+					required
+					type="text"
+					onInput={updateField}
+				/>
 
 				<div class={styles.seperator}>
 					<hr />
@@ -33,8 +38,8 @@ const CreateRoom: Component = () => {
 					<span class={styles.required}>*</span>
 				</label>
 
-				<select name="voterOptions" onInput={updateField}>
-					<option value="select">Select options</option>
+				<select name="voterOptions" required onInput={updateField}>
+					<option value="">Select options</option>
 					<option value="fibonacci">Fibonacci</option>
 					<option value="linear">Linear</option>
 				</select>
@@ -70,6 +75,7 @@ const CreateRoom: Component = () => {
 						type="radio"
 						name="noVote"
 						value="no"
+						checked
 						onInput={updateField}
 						disabled={fields.disabled}
 					/>
@@ -78,6 +84,9 @@ const CreateRoom: Component = () => {
 
 				<div class={styles.finalPreview}>
 					<p>Final preview</p>
+					{fields.includeNoVote && (
+						<span>{String.fromCodePoint(prohibitedEmojiHex)} </span>
+					)}
 					<span>{fields.selectedOptions.join(", ")}</span>
 				</div>
 

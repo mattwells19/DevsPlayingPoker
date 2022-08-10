@@ -9,6 +9,7 @@ type CreateRoomFields = {
 	selectedOptions: Number[];
 	voterOptions: Number[];
 	numberOfOptions: Number;
+	includeNoVote: boolean;
 	error: string | null;
 	disabled: boolean;
 };
@@ -18,6 +19,7 @@ const defaultStoreData = {
 	selectedOptions: [],
 	voterOptions: [],
 	numberOfOptions: 5,
+	includeNoVote: false,
 	error: null,
 	disabled: true,
 };
@@ -61,23 +63,12 @@ const useCreateRoom = () => {
 				break;
 			}
 			case "noVote": {
-				if (value === "yes") {
-					setFields({
-						selectedOptions: [0, ...fields.selectedOptions],
-					});
-					break;
-				}
-
-				if (value === "no" && fields.selectedOptions[0] === 0) {
-					setFields({
-						selectedOptions: fields.selectedOptions.slice(1),
-					});
-					break;
-				}
-
+				setFields({
+					includeNoVote: value === "yes",
+				});
 				break;
 			}
-			case "select":
+			case "":
 				setFields({ selectedOptions: [], disabledFields: true });
 				break;
 			default:
@@ -92,8 +83,13 @@ const useCreateRoom = () => {
 				options: fields.selectedOptions,
 			};
 
-			const response = await post("/api/v1/create", postBody);
-			navigate(`/room/${response.roomCode}`);
+			if (fields.includeNoVote) {
+				postBody.options = [0, ...fields.selectedOptions];
+			}
+
+			// const response = await post("/api/v1/create", postBody);
+			// navigate(`/room/${response.roomCode}`);
+			console.log(postBody);
 		} catch (err) {
 			setFields({ error: err });
 		}
