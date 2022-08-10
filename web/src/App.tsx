@@ -6,13 +6,28 @@ import Room from "./pages/Room";
 
 const App: Component = () => {
 	return (
-		<Routes>
-			<Route path="/" component={Landing} />
-			<Route path="/create-room" component={() => <p>Create room</p>} />
-			<Route path="/join/:roomCode" component={JoinRoom} />
-			<Route path="/room/:roomCode" component={Room} />
-			<Route path="*" element={<Navigate href="/" />} />
-		</Routes>
+		<>
+			<header>
+				<button
+					onClick={() => {
+						document.body.classList.toggle("dark");
+						localStorage.setItem(
+							"theme",
+							document.body.classList.contains("dark") ? "dark" : "light",
+						);
+					}}
+				>
+					Toggle Theme
+				</button>
+			</header>
+			<Routes>
+				<Route path="/" component={Landing} />
+				<Route path="/create-room" component={() => <p>Create room</p>} />
+				<Route path="/join/:roomCode" component={JoinRoom} />
+				<Route path="/room/:roomCode" component={Room} />
+				<Route path="*" element={<Navigate href="/" />} />
+			</Routes>
+		</>
 	);
 };
 

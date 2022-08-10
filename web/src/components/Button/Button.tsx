@@ -13,7 +13,7 @@ export const ButtonLink: Component<ButtonLinkProps> = ({
 	...anchorProps
 }) => {
 	return (
-		<Link class={styles[variant]} {...anchorProps}>
+		<Link class={`${styles.button} ${styles[variant]}`} {...anchorProps}>
 			{children}
 		</Link>
 	);
@@ -32,7 +32,7 @@ export const Button: Component<ButtonProps> = ({
 }) => {
 	return (
 		<button
-			class={`${styles[variant]} ${loading ? "loading" : ""}`}
+			class={`${styles.button} ${styles[variant]} ${loading ? "loading" : ""}`}
 			disabled={loading}
 			{...btnProps}
 		>

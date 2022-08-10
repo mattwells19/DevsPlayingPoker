@@ -26,16 +26,7 @@ const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
 					xmlns="http://www.w3.org/2000/svg"
 				>
 					<rect width="158" height="221" rx="8" fill="white" />
-					<rect
-						x="1"
-						y="1"
-						width="156"
-						height="219"
-						rx="7"
-						stroke="black"
-						stroke-opacity="0.25"
-						stroke-width="2"
-					/>
+					<rect x="1" y="1" width="156" height="219" rx="7" />
 					<text x="15" y="208" fill="black" text-anchor="start">
 						{value > 0 ? value : "No-vote"}
 					</text>
@@ -66,7 +57,7 @@ const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
 						>
 							<path
 								d="M23.5349 18.9717L81.612 77.0488M94 50C94 74.3005 74.3005 94 50 94C25.6995 94 6 74.3005 6 50C6 25.6995 25.6995 6 50 6C74.3005 6 94 25.6995 94 50Z"
-								stroke="black"
+								stroke="currentColor"
 								stroke-width="11"
 							/>
 						</svg>

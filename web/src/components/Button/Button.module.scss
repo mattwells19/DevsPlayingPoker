@@ -23,12 +23,12 @@
 	}
 }
 
-button {
+button.button {
 	@include buttonStyles();
 }
 
-a {
+a.button {
 	@include buttonStyles();
 	text-decoration: none;
-	color: var(--primary-text-color);
+	color: black;
 }
