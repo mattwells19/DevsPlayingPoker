@@ -10,7 +10,7 @@ type CreateRoomFields = {
 	voterOptions: Number[];
 	numberOfOptions: Number;
 	error: string | null;
-	disabledFields: boolean;
+	disabled: boolean;
 };
 
 const defaultStoreData = {
@@ -19,7 +19,7 @@ const defaultStoreData = {
 	voterOptions: [],
 	numberOfOptions: 5,
 	error: null,
-	disabledFields: true,
+	disabled: true,
 };
 
 const options = {
@@ -46,7 +46,7 @@ const useCreateRoom = () => {
 				setFields({
 					voterOptions: value,
 					selectedOptions: limitedOptions,
-					disabledFields: false,
+					disabled: false,
 				});
 				break;
 			}

@@ -48,7 +48,7 @@ const CreateRoom: Component = () => {
 					max="15"
 					value={fields.numberOfOptions}
 					step="1"
-					disabled={fields.disabledFields}
+					disabled={fields.disabled}
 					onInput={updateField}
 				/>
 
@@ -60,7 +60,7 @@ const CreateRoom: Component = () => {
 						name="noVote"
 						value="yes"
 						onInput={updateField}
-						disabled={fields.disabledFields}
+						disabled={fields.disabled}
 					/>
 					Yes
 				</label>
@@ -71,7 +71,7 @@ const CreateRoom: Component = () => {
 						name="noVote"
 						value="no"
 						onInput={updateField}
-						disabled={fields.disabledFields}
+						disabled={fields.disabled}
 					/>
 					No
 				</label>
@@ -89,7 +89,7 @@ const CreateRoom: Component = () => {
 					<p class={styles.error}>Error: {fields.error}</p>
 				</Show>
 
-				<Button type="submit" disabled={fields.disabledFields}>
+				<Button type="submit" disabled={fields.disabled}>
 					Done
 				</Button>
 			</form>
