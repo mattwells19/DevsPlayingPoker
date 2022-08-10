@@ -1,3 +1,19 @@
+button.roomCodeBtn {
+	display: flex;
+	align-items: center;
+
+	margin: auto;
+	padding: 0;
+	border: none;
+	background: none;
+
+	color: var(--primary-text-color);
+
+	h1 {
+		font-size: 2rem;
+	}
+}
+
 main.room {
 	max-width: 30rem;
 	margin: 5rem auto auto auto;
