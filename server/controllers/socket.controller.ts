@@ -7,7 +7,6 @@ import {
 	RoomUpdateEvent,
 	ConnectEvent,
 	OptionSelectedEvent,
-	Timeout,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/connectToDb.ts";
@@ -15,7 +14,7 @@ import { lookupRoom } from "../utils/db.ts";
 const JWT_SECRET = Deno.env.get("JWT_SECRET");
 
 const sockets = new Map<string, WebSocket>();
-const timeouts: Timeout[] = [];
+const timeouts = new Map<string, number>();
 export const { rooms, users } = await connectToDb();
 
 /**
@@ -57,13 +56,13 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 	let updatedRoomData;
 	const isModerator = !roomData.moderator;
 
-	const timeoutIndex = timeouts.findIndex((item) => item.userId === userId);
-	if (timeoutIndex > -1) {
+	const timeout = timeouts.get(userId);
+	if (timeout) {
 		console.debug(
-			`User ${userId} rejoined room, cancelling deletion with timeoutId of ${timeouts[timeoutIndex].timeoutId}`,
+			`User ${userId} rejoined room, cancelling deletion with timeoutId of ${timeout}`,
 		);
-		clearTimeout(timeouts[timeoutIndex].timeoutId);
-		timeouts.splice(timeoutIndex, 1);
+		clearTimeout(timeout);
+		timeouts.delete(userId);
 		updatedRoomData = await rooms.findOne({ _id: roomData._id });
 	} else {
 		updatedRoomData = await rooms.findAndModify(
@@ -143,7 +142,6 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	}
 
 	sendRoomData(updatedRoomData);
-	console.debug("Deleted!");
 }
 
 /**
@@ -271,18 +269,14 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 
 		if (roomCode) {
 			console.debug(
-				`User ${userId} left room ${roomCode}, deleting in 10 seconds.`,
+				`User ${userId} left room ${roomCode}, deleting in 3 seconds.`,
 			);
 
 			const timeoutId = setTimeout(async () => {
 				await handleLeave(userId, roomCode!);
 			}, 3000);
 
-			timeouts.push({
-				userId,
-				timeoutId,
-			});
-			console.log("timeouts:", timeouts);
+			timeouts.set(userId, timeoutId);
 		}
 	});
 
