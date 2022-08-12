@@ -63,7 +63,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 		);
 		clearTimeout(timeout);
 		timeouts.delete(userId);
-		updatedRoomData = await rooms.findOne({ _id: roomData._id });
+		updatedRoomData = roomData;
 	} else {
 		updatedRoomData = await rooms.findAndModify(
 			{ _id: roomData._id },
