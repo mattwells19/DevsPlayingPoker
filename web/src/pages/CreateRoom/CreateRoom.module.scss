@@ -21,11 +21,11 @@ form.createRoomForm {
 	select {
 		height: 2rem;
 		border-radius: 0.5rem;
-		border: 2px solid rgb(199, 199, 199);
+		border: 2px solid var(--border-gray);
 	}
 
 	.required {
-		color: red;
+		color: var(--error-text-color);
 	}
 
 	.radio {
@@ -35,18 +35,18 @@ form.createRoomForm {
 	}
 
 	input[type=radio] {
-		accent-color: #F48241;
+		accent-color: var(--primary-orange);
 	}
 
 	.finalPreview {
 		margin-top: 2rem;
 		span {
-			color: gray;
+			color: var(--secondary-text-color);
 		}
 	}
 
 	.error {
-		color: red;
+		color: var(--error-text-color);
 	}
 
 	button {
@@ -70,8 +70,8 @@ div.seperator {
 		outline: none;
 	}
 	input[type=range]::-webkit-slider-runnable-track {
-		background: #e67c3e;
-		border: 1px solid #e5e5e5;
+		background: var(--primary-orange);
+		border: 1px solid var(--border-gray);
 		border-radius: 23.4px;
 		width: 100%;
 		height: 10px;
@@ -81,18 +81,18 @@ div.seperator {
 		margin-top: -6px;
 		width: 20px;
 		height: 20px;
-		background: #ffffff;
-		border: 1px solid #e5e5e5;
+		background: var(--elevated-background);
+		border: 1px solid var(--border-gray);
 		border-radius: 20px;
 		cursor: pointer;
 		-webkit-appearance: none;
 	}
 	input[type=range]:focus::-webkit-slider-runnable-track {
-		background: #ec9b6b;
+		background: var(--primary-orange);
 	}
 	input[type=range]::-moz-range-track {
-		background: #e67c3e;
-		border: 1px solid #e5e5e5;
+		background: var(--primary-orange);
+		border: 1px solid var(--border-gray);
 		border-radius: 23.4px;
 		width: 100%;
 		height: 10px;
@@ -101,8 +101,8 @@ div.seperator {
 	input[type=range]::-moz-range-thumb {
 		width: 20px;
 		height: 20px;
-		background: #ffffff;
-		border: 1px solid #e5e5e5;
+		background: var(--elevated-background);
+		border: 1px solid var(--border-gray);
 		border-radius: 20px;
 		cursor: pointer;
 	}
@@ -116,30 +116,30 @@ div.seperator {
 		cursor: pointer;
 	}
 	input[type=range]::-ms-fill-lower {
-		background: #d5601c;
-		border: 1px solid #e5e5e5;
+		background: var(--primary-orange);
+		border: 1px solid var(--border-gray);
 		border-radius: 46.8px;
 	}
 	input[type=range]::-ms-fill-upper {
-		background: #e67c3e;
-		border: 1px solid #e5e5e5;
+		background: var(--primary-orange);
+		border: 1px solid var(--border-gray);
 		border-radius: 46.8px;
 	}
 	input[type=range]::-ms-thumb {
 		width: 20px;
 		height: 20px;
-		background: #ffffff;
-		border: 1px solid #e5e5e5;
+		background: var(--elevated-background);
+		border: 1px solid var(--border-gray);
 		border-radius: 20px;
 		cursor: pointer;
 		margin-top: 0px;
 		/*Needed to keep the Edge thumb centred*/
 	}
 	input[type=range]:focus::-ms-fill-lower {
-		background: #e67c3e;
+		background: var(--primary-orange);
 	}
 	input[type=range]:focus::-ms-fill-upper {
-		background: #ec9b6b;
+		background: var(--primary-orange);
 	}
 
 	/* Generated input range styles*/

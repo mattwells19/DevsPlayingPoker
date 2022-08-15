@@ -59,9 +59,10 @@ const CreateRoom: Component = () => {
 
 				<label for="noVote">Include no-vote option?</label>
 
-				<label class={styles.radio} for="noVote">
+				<label class={styles.radio} for="noVoteYes">
 					<input
 						type="radio"
+						id="noVoteYes"
 						name="noVote"
 						value="yes"
 						onInput={updateField}
@@ -70,9 +71,10 @@ const CreateRoom: Component = () => {
 					Yes
 				</label>
 
-				<label class={styles.radio} for="noVote">
+				<label class={styles.radio} for="noVoteNo">
 					<input
 						type="radio"
+						id="noVoteNo"
 						name="noVote"
 						value="no"
 						checked

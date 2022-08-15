@@ -88,6 +88,7 @@ const useCreateRoom = () => {
 			}
 
 			const response = await post("/api/v1/create", postBody);
+			localStorage.setItem("name", fields.moderatorName);
 			navigate(`/room/${response.roomCode}`);
 		} catch (err) {
 			setFields({ error: err });
