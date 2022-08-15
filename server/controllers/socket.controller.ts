@@ -330,7 +330,7 @@ export const handleWs = (socket: WebSocket) => {
 					break;
 				}
 				case "ModeratorChange": {
-					await handleModeratorChange(userId, roomCode, data);
+					await handleModeratorChange(roomCode, data);
 					break;
 				}
 			}
