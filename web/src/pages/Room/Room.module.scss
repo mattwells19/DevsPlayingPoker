@@ -1,6 +1,9 @@
 button.roomCodeBtn {
 	display: flex;
 	align-items: center;
+	position: relative;
+	z-index: 1;
+	cursor: copy;
 
 	margin: auto;
 	padding: 0;
