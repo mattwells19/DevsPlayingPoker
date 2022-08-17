@@ -34,7 +34,7 @@ const CreateRoom: Component = () => {
 				</div>
 
 				<label for="voterOptions">
-					What options would you like voters have to choose from?
+					What options would you like voters to have to choose from?
 					<span class={styles.required}>*</span>
 				</label>
 
