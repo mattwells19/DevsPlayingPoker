@@ -35,6 +35,7 @@ export interface OptionSelectedEvent {
 }
 
 export type WebSocketEvent =
+	| ModeratorChangeEvent
 	| ConnectEvent
 	| JoinEvent
 	| OptionSelectedEvent

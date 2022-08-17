@@ -1,5 +1,5 @@
 import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
-import type { RoomSchema } from "../models/room.model.ts";
+import type { RoomSchema, User, Voter } from "../models/room.model.ts";
 import {
 	JoinEvent,
 	WebSocketEvent,
@@ -248,12 +248,15 @@ async function handleModeratorChange(
 ): Promise<void> {
 	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
 	const roomData = await lookupRoom(roomCode);
-	if (!roomData) return;
+	if (!roomData || !roomData.moderator || !roomData.voters)
+		throw new Error(
+			"Room does not contain data, moderator, or voters. Unable to handle moderatorChange",
+		);
 
 	const votersWithoutNewModerator = roomData.voters.filter(
 		(voter) => voter.id !== data.newModeratorId,
 	);
-	const newVoter = {
+	const newVoter: Voter = {
 		id: roomData.moderator.id,
 		name: roomData.moderator.name,
 		confidence: null,
@@ -261,10 +264,17 @@ async function handleModeratorChange(
 	};
 	const updatedVoters = [...votersWithoutNewModerator, newVoter];
 
-	const newModeratorName = roomData.voters.find(
-		(voter) => voter.id === data.newModeratorId,
-	).name;
-	const updatedModerator = { id: data.newModeratorId, name: newModeratorName };
+	const newModerator = roomData.voters.find(
+		(voter) => voter.id === data?.newModeratorId,
+	);
+
+	if (!newModerator) {
+		throw new Error("Unable to find new moderator information");
+	}
+	const updatedModerator: User = {
+		id: data.newModeratorId,
+		name: newModerator.name,
+	};
 
 	const updatedRoomData = await rooms.findAndModify(
 		{ _id: roomData._id },
