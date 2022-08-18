@@ -1,7 +1,6 @@
 main.landing {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 
 	height: 100vh;
 	max-width: 30rem;
@@ -12,6 +11,24 @@ div.seperator {
 	display: flex;
 	gap: 1rem;
 	margin: 2rem 0px;
+}
+
+section.copy {
+	text-align: center;
+	margin: 2rem 0px;
+	padding: 0px 0.5rem;
+
+	h1 {
+		font-size: 3rem;
+	}
+
+	p {
+		font-size: 1.25rem;
+	}
+}
+
+div.roomOps {
+	margin-top: 3rem;
 }
 
 section.roomCodeInputs {
