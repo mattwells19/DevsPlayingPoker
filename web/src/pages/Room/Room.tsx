@@ -61,6 +61,7 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 			? "wss"
 			: "ws";
 		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+		let timeout: number | null = null;
 
 		ws.addEventListener("open", () => {
 			const joinPayload: JoinEvent = {
@@ -68,6 +69,14 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 				roomCode: roomCode,
 				name: userName,
 			};
+
+			timeout = setInterval(() => {
+				if (ws.OPEN) {
+					ws.send(JSON.stringify({ event: "Ping" }));
+				} else if (ws.CLOSED) {
+					ws.send(JSON.stringify(joinPayload));
+				}
+			}, 15000);
 
 			ws.send(JSON.stringify(joinPayload));
 		});
@@ -90,7 +99,12 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 			}
 		});
 
-		onCleanup(() => ws.close());
+		onCleanup(() => {
+			if (timeout) {
+				clearInterval(timeout);
+			}
+			ws.close();
+		});
 	});
 
 	// the user object of the current user if they're a voter. null if they're the moderator

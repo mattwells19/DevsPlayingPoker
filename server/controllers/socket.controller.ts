@@ -282,6 +282,15 @@ export const handleWs = (socket: WebSocket) => {
 					await handleOptionSelected(userId, roomCode, data);
 					break;
 				}
+				case "Ping": {
+					const roomData = await lookupRoom(roomCode);
+					const roomUpdateEvent: RoomUpdateEvent = {
+						event: "RoomUpdate",
+						roomData: roomData,
+					};
+					socket.send(JSON.stringify(roomUpdateEvent));
+					break;
+				}
 			}
 		},
 	);
