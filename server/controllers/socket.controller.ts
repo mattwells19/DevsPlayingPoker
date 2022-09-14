@@ -283,7 +283,9 @@ export const handleWs = (socket: WebSocket) => {
 					break;
 				}
 				case "Ping": {
+					if (!roomCode) break;
 					const roomData = await lookupRoom(roomCode);
+					if (!roomData) break;
 					const roomUpdateEvent: RoomUpdateEvent = {
 						event: "RoomUpdate",
 						roomData: roomData,
