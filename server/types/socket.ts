@@ -16,6 +16,11 @@ export interface JoinEvent {
 	name: string;
 }
 
+export interface ModeratorChangeEvent {
+	event: "ModeratorChange";
+	newModeratorId: string;
+}
+
 export interface StartVotingEvent {
 	event: "StartVoting";
 }
@@ -34,6 +39,7 @@ export interface PingEvent {
 }
 
 export type WebSocketEvent =
+	| ModeratorChangeEvent
 	| ConnectEvent
 	| JoinEvent
 	| OptionSelectedEvent

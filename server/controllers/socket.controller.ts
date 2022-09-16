@@ -1,11 +1,12 @@
 import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
-import type { RoomSchema } from "../models/room.model.ts";
+import type { RoomSchema, User, Voter } from "../models/room.model.ts";
 import {
 	JoinEvent,
 	WebSocketEvent,
 	RoomUpdateEvent,
 	ConnectEvent,
 	OptionSelectedEvent,
+	ModeratorChangeEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/connectToDb.ts";
@@ -235,6 +236,62 @@ async function handleOptionSelected(
 	sendRoomData(updatedRoomData);
 }
 
+/**
+ * Updates moderator to existing voter.  Adds former moderator to list of voters.
+ * @param roomCode 4-character code for the room
+ * @param data ModeratorChangeEvent data including new moderatorId
+ * @returns void
+ */
+async function handleModeratorChange(
+	roomCode: string | null,
+	data: ModeratorChangeEvent,
+): Promise<void> {
+	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
+	const roomData = await lookupRoom(roomCode);
+	if (!roomData || !roomData.moderator || !roomData.voters)
+		throw new Error(
+			"Room does not contain data, moderator, or voters. Unable to handle moderatorChange",
+		);
+
+	const votersWithoutNewModerator = roomData.voters.filter(
+		(voter) => voter.id !== data.newModeratorId,
+	);
+	const newVoter: Voter = {
+		id: roomData.moderator.id,
+		name: roomData.moderator.name,
+		confidence: null,
+		selection: null,
+	};
+	const updatedVoters = [...votersWithoutNewModerator, newVoter];
+
+	const newModerator = roomData.voters.find(
+		(voter) => voter.id === data?.newModeratorId,
+	);
+
+	if (!newModerator) {
+		throw new Error("Unable to find new moderator information");
+	}
+	const updatedModerator: User = {
+		id: data.newModeratorId,
+		name: newModerator.name,
+	};
+
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$set: {
+					voters: updatedVoters,
+					moderator: updatedModerator,
+				},
+			},
+			new: true,
+		},
+	);
+
+	sendRoomData(updatedRoomData);
+}
+
 // TODO: how to handle thrown errors?
 export const handleWs = (socket: WebSocket) => {
 	const userId: string = crypto.randomUUID();
@@ -280,6 +337,10 @@ export const handleWs = (socket: WebSocket) => {
 				}
 				case "OptionSelected": {
 					await handleOptionSelected(userId, roomCode, data);
+					break;
+				}
+				case "ModeratorChange": {
+					await handleModeratorChange(roomCode, data);
 					break;
 				}
 				case "Ping": {
