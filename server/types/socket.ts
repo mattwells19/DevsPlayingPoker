@@ -29,10 +29,15 @@ export interface OptionSelectedEvent {
 	selection: number;
 }
 
+export interface PingEvent {
+	event: "Ping";
+}
+
 export type WebSocketEvent =
 	| ConnectEvent
 	| JoinEvent
 	| OptionSelectedEvent
 	| RoomUpdateEvent
 	| StartVotingEvent
-	| StopVotingEvent;
+	| StopVotingEvent
+	| PingEvent;
