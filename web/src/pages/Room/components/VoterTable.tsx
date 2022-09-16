@@ -1,10 +1,11 @@
 import { Component, For, Match, Switch } from "solid-js";
-import { RoomSchema, ConfidenceValue } from "@/shared-types";
+import { RoomSchema, ConfidenceValue, Voter } from "@/shared-types";
 import Metric from "./Metric";
 
 interface VoterTableProps {
 	voters: RoomSchema["voters"];
 	roomState: RoomSchema["state"];
+	onVoterClick?: (voter: Voter) => void;
 }
 
 const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
@@ -27,7 +28,11 @@ function formatSelection(selection: number | null): string | number {
 	return selection;
 }
 
-const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
+const VoterTable: Component<VoterTableProps> = ({
+	roomState,
+	voters,
+	onVoterClick,
+}) => {
 	let high = -1,
 		low = Infinity,
 		mode = -1,
@@ -76,7 +81,15 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 				<For each={voters}>
 					{(voter) => (
 						<tr>
-							<td colspan="2">{voter.name}</td>
+							<td colspan="2">
+								{onVoterClick ? (
+									<button onClick={() => onVoterClick(voter)}>
+										{voter.name}
+									</button>
+								) : (
+									voter.name
+								)}
+							</td>
 							<td>
 								{roomState === "Results"
 									? formatSelection(voter.selection)

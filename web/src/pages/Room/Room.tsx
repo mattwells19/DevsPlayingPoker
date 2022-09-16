@@ -12,7 +12,12 @@ import {
 	Switch,
 } from "solid-js";
 import styles from "./Room.module.scss";
-import type { JoinEvent, WebSocketEvent, RoomSchema } from "@/shared-types";
+import type {
+	JoinEvent,
+	WebSocketEvent,
+	RoomSchema,
+	Voter,
+} from "@/shared-types";
 import VoterTable from "./components/VoterTable";
 import Button from "@/components/Button";
 import OptionCard from "@/components/OptionCard";
@@ -107,6 +112,18 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 		});
 	});
 
+	function handleVoterClick(voter: Voter) {
+		const confirmed = confirm(
+			`Are you sure you want to make ${voter.name} the new moderator?`,
+		);
+		if (confirmed) {
+			roomDetails()?.dispatchEvent({
+				event: "ModeratorChange",
+				newModeratorId: voter.id,
+			});
+		}
+	}
+
 	// the user object of the current user if they're a voter. null if they're the moderator
 	const currentVoter = createMemo(
 		() =>
@@ -149,7 +166,11 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 										</Button>
 									</Match>
 								</Switch>
-								<VoterTable roomState={details.state} voters={details.voters} />
+								<VoterTable
+									roomState={details.state}
+									voters={details.voters}
+									onVoterClick={handleVoterClick}
+								/>
 							</Match>
 							{/* if not the moderator, determine which UI to show based on room state */}
 							<Match when={details.state === "Results"}>
