@@ -31,7 +31,7 @@ const CreateRoom: Component = () => {
 	const [error, setError] = createSignal<string | null>(null);
 	const navigate = useNavigate();
 
-	const defaultName = localStorage.getItem("name") ?? undefined;
+	const defaultName = localStorage.getItem("name") ?? "";
 	const rawSavedFormValues = localStorage.getItem("newRoomFields");
 	const defaultFormValues = (
 		rawSavedFormValues ? JSON.parse(rawSavedFormValues) : undefined
@@ -39,7 +39,6 @@ const CreateRoom: Component = () => {
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
-		const moderatorName = formData.moderatorName;
 		let fieldOptions: Array<number> = [];
 
 		if (!formData.voterOptions) {
@@ -55,7 +54,7 @@ const CreateRoom: Component = () => {
 			fieldOptions = [0, ...fieldOptions];
 		}
 
-		post("/api/v1/create", { moderatorName, options: fieldOptions })
+		post("/api/v1/create", { options: fieldOptions })
 			.then((res) => {
 				localStorage.setItem("newRoomFields", JSON.stringify(formData));
 				localStorage.setItem("name", formData.moderatorName);
