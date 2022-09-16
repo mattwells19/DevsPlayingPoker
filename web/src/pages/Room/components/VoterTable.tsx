@@ -110,6 +110,14 @@ const VoterTable: Component<VoterTableProps> = ({ roomState, voters }) => {
 						>
 							<td colspan="4">Waiting to start voting</td>
 						</Match>
+						<Match
+							when={
+								roomState === "Results" &&
+								voters.every((voter) => voter.selection === 0)
+							}
+						>
+							<td colspan="4">No votes were cast.</td>
+						</Match>
 						<Match when={roomState === "Results"}>
 							<Metric label="Low" value={low} />
 							<Metric label="High" value={high} />

@@ -34,6 +34,10 @@ export interface OptionSelectedEvent {
 	selection: number;
 }
 
+export interface PingEvent {
+	event: "Ping";
+}
+
 export type WebSocketEvent =
 	| ModeratorChangeEvent
 	| ConnectEvent
@@ -41,4 +45,5 @@ export type WebSocketEvent =
 	| OptionSelectedEvent
 	| RoomUpdateEvent
 	| StartVotingEvent
-	| StopVotingEvent;
+	| StopVotingEvent
+	| PingEvent;

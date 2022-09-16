@@ -61,6 +61,7 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 			? "wss"
 			: "ws";
 		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+		let timeout: number | null = null;
 
 		ws.addEventListener("open", () => {
 			const joinPayload: JoinEvent = {
@@ -68,6 +69,14 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 				roomCode: roomCode,
 				name: userName,
 			};
+
+			timeout = setInterval(() => {
+				if (ws.OPEN) {
+					ws.send(JSON.stringify({ event: "Ping" }));
+				} else if (ws.CLOSED) {
+					ws.send(JSON.stringify(joinPayload));
+				}
+			}, 15000);
 
 			ws.send(JSON.stringify(joinPayload));
 		});
@@ -90,7 +99,12 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 			}
 		});
 
-		onCleanup(() => ws.close());
+		onCleanup(() => {
+			if (timeout) {
+				clearInterval(timeout);
+			}
+			ws.close();
+		});
 	});
 
 	// the user object of the current user if they're a voter. null if they're the moderator
@@ -102,72 +116,81 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 	);
 
 	return (
-		<main class={styles.room}>
-			<Show when={roomDetails()}>
-				{({ roomDetails: details, dispatchEvent }) => (
-					<Switch>
-						{/* is the current user the moderator? */}
-						<Match when={details.moderator?.id === currentUserId()}>
-							<Switch>
-								<Match when={details.state === "Results"}>
-									<Button
-										onClick={() => dispatchEvent({ event: "StartVoting" })}
-										disabled={details.voters.length === 0}
-									>
-										{details.voters.some((voter) => voter.selection !== null)
-											? "Reset Votes & Start Voting"
-											: "Start Voting"}
-									</Button>
-								</Match>
-								<Match when={details.state === "Voting"}>
-									<Button
-										onClick={() => dispatchEvent({ event: "StopVoting" })}
-									>
-										Stop Voting
-									</Button>
-								</Match>
-							</Switch>
-							<VoterTable roomState={details.state} voters={details.voters} />
-						</Match>
-						{/* if not the moderator, determine which UI to show based on room state */}
-						<Match when={details.state === "Results"}>
-							<p>Waiting for {details.moderator?.name}...</p>
-							<VoterTable roomState={details.state} voters={details.voters} />
-						</Match>
-						<Match when={details.state === "Voting"}>
-							<fieldset
-								onchange={(e) => {
-									const selectionValue = e.target.hasAttribute("value")
-										? (e.target as HTMLInputElement).value
-										: null;
-									if (!selectionValue) throw new Error("Didn't get a value");
-									const selection = parseInt(selectionValue, 10);
+		<>
+			<button
+				class={styles.roomCodeBtn}
+				onClick={() => navigator.clipboard.writeText(roomCode)}
+				title="Click to copy code."
+			>
+				<h1>{roomCode}</h1>
+			</button>
+			<main class={styles.room}>
+				<Show when={roomDetails()}>
+					{({ roomDetails: details, dispatchEvent }) => (
+						<Switch>
+							{/* is the current user the moderator? */}
+							<Match when={details.moderator?.id === currentUserId()}>
+								<Switch>
+									<Match when={details.state === "Results"}>
+										<Button
+											onClick={() => dispatchEvent({ event: "StartVoting" })}
+											disabled={details.voters.length === 0}
+										>
+											{details.voters.some((voter) => voter.selection !== null)
+												? "Reset Votes & Start Voting"
+												: "Start Voting"}
+										</Button>
+									</Match>
+									<Match when={details.state === "Voting"}>
+										<Button
+											onClick={() => dispatchEvent({ event: "StopVoting" })}
+										>
+											Stop Voting
+										</Button>
+									</Match>
+								</Switch>
+								<VoterTable roomState={details.state} voters={details.voters} />
+							</Match>
+							{/* if not the moderator, determine which UI to show based on room state */}
+							<Match when={details.state === "Results"}>
+								<p>Waiting for {details.moderator?.name}...</p>
+								<VoterTable roomState={details.state} voters={details.voters} />
+							</Match>
+							<Match when={details.state === "Voting"}>
+								<fieldset
+									onchange={(e) => {
+										const selectionValue = e.target.hasAttribute("value")
+											? (e.target as HTMLInputElement).value
+											: null;
+										if (!selectionValue) throw new Error("Didn't get a value");
+										const selection = parseInt(selectionValue, 10);
 
-									dispatchEvent({
-										event: "OptionSelected",
-										selection,
-									});
-								}}
-							>
-								<legend>
-									{currentVoter()?.selection !== null
-										? "Got it! You can change your mind if you want. Otherwise sit tight."
-										: "Make a selection"}
-								</legend>
-								<For each={details.options}>
-									{(option) => (
-										<OptionCard
-											selected={option === currentVoter()?.selection}
-											value={option}
-										/>
-									)}
-								</For>
-							</fieldset>
-						</Match>
-					</Switch>
-				)}
-			</Show>
-		</main>
+										dispatchEvent({
+											event: "OptionSelected",
+											selection,
+										});
+									}}
+								>
+									<legend>
+										{currentVoter()?.selection !== null
+											? "Got it! You can change your mind if you want. Otherwise sit tight."
+											: "Make a selection"}
+									</legend>
+									<For each={details.options}>
+										{(option) => (
+											<OptionCard
+												selected={option === currentVoter()?.selection}
+												value={option}
+											/>
+										)}
+									</For>
+								</fieldset>
+							</Match>
+						</Switch>
+					)}
+				</Show>
+			</main>
+		</>
 	);
 };
 

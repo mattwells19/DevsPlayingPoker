@@ -343,6 +343,17 @@ export const handleWs = (socket: WebSocket) => {
 					await handleModeratorChange(roomCode, data);
 					break;
 				}
+				case "Ping": {
+					if (!roomCode) break;
+					const roomData = await lookupRoom(roomCode);
+					if (!roomData) break;
+					const roomUpdateEvent: RoomUpdateEvent = {
+						event: "RoomUpdate",
+						roomData: roomData,
+					};
+					socket.send(JSON.stringify(roomUpdateEvent));
+					break;
+				}
 			}
 		},
 	);
