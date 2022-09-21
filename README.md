@@ -1,52 +1,20 @@
-# DevsPlayingPoker
+<h1 align="center">🃏 Devs Playing Poker</h1>
+<h4 align="center">The fastest way for your dev team to effort tickets.</h4>
+<br>
 
-# Routes
+![Production Deployment](https://github.com/lvl-mattwells/DevsPlayingPoker/workflows/Production%20Deployment/badge.svg)
 
-## User Routes
+## Purpose
+Our teams at Levvel/Endava grew frustrated with existing efforting platforms. All we wanted was a simple, fast way to effort tickets and reduce meeting time. With the introduction of the Innovation Project Competition within Endava, we four developers banded together to set out to build a better efforting/ponting system for our teams to use. Thus, DevsPlayingPoker was born.
 
-| Name      | Method | Path    | Description                         |
-| --------- | ------ | ------- | ----------------------------------- |
-| Landing   | GET    | /       | Load landing page                   |
-| New Room  | GET    | /create | Show form to create new room        |
-| Join Room | GET    | /join   | Show form to join room (enter name) |
+## Tech
+### Backend
+The backend is built using [Deno](https://deno.land) (with TypeScript of course) and uses MongoDb for data persistence. We chose Deno because it's first class WebScoket support, top-level async/await support, and simply because most of us hadn't ever used it before.
 
-## API Routes
+### Frontend
+The frontend is built using [SolidJS](https://solidjs.com) and styled by hand using [Sass](https://sass-lang.com/). We chose to go with SolidJS because of it's claims for incredible speed/performance, familiar JSX syntax, and again because none of us had used it before.
 
-| Name        | Method | Path                    | Description       |
-| ----------- | ------ | ----------------------- | ----------------- |
-| Create Room | POST   | /api/v1/create          | Create room in DB |
-| Get Room    | GET    | /api/v1/rooms/:roomCode | Get room info     |
+### Deployment
+PRs are deployed as preview builds to [Deno Deploy](https://deno.com/deploy) and production builds are deployed to [fly.io](https://fly.io).
 
-# Mongo Schemas
-
-## User
-
-```javascript
-{
-  name: {
-    type: String,
-    required: true,
-  },
-  moderator: [String],  // Room codes of which they are moderator
-  voter: [String],  // Room codes in which they are voter
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-}
-```
-
-## Room
-
-```javascript
-{
-  name: String,  // So users can give fun names for persistent rooms
-  code: Number,  // 4-digit code used for joining the room
-  moderator: String,  // _id of moderator
-  voters: [String],  // _ids of voters
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-}
-```
+We originally had production deployments also going to Deno Deploy, but we noticed some sync issues within the rooms for some users. We discovered that Deno Deploy's edge deployment strategy was causing issues with how we track WebSocket connections for users in the rooms. To solve this issue, we decided to move to fly.io where we could control which regions our app was deployed to. We've limited deployments to a single region to ensure that all WebSocket connections are tracked on the same server allowing for much more stable updates to all users in the rooms.
