@@ -18,3 +18,24 @@ The frontend is built using [SolidJS](https://solidjs.com) and styled by hand us
 PRs are deployed as preview builds to [Deno Deploy](https://deno.com/deploy) and production builds are deployed to [fly.io](https://fly.io).
 
 We originally had production deployments also going to Deno Deploy, but we noticed some sync issues within the rooms for some users. We discovered that Deno Deploy's edge deployment strategy was causing issues with how we track WebSocket connections for users in the rooms. To solve this issue, we decided to move to fly.io where we could control which regions our app was deployed to. We've limited deployments to a single region to ensure that all WebSocket connections are tracked on the same server allowing for much more stable updates to all users in the rooms.
+
+## Getting Started
+### Backend
+1. Install Deno: https://deno.land/manual@v1.25.3/getting_started/installation
+2. `cd` into the `server/` folder.
+3. Create a `.env` file in the `server/` directory with the contents: `export DB_URL=[mongo url here]`
+   - I recommend running a [MongoDb Docker container](https://hub.docker.com/_/mongo) locally and using that for development.
+4. Run the app using: `deno run --allow-net --allow-env --allow-read server.ts`
+5. You should be up and running!
+
+### Frontend
+1. Install Node (v16) if you haven't already: https://nodejs.org/en/
+2. `cd` into the `web/` directory
+3. Run `npm install`
+4. Run `npm start`
+5. You should be good to go!
+
+### Nuance
+ - We're using Vite to proxy requests to your locally running BE. You can see this in `web/vite.config.ts`.
+ - You probably want to install the Deno extension (assuming you're using VSCode): https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno
+   - This will help for BE development, but will clash with the FE code. As of writing you can't limit the extension to a specific folder. To get around this, I just disable the extension when working in the FE and re-enable when I'm in the BE. It's annoying, but I just haven't found a better solution yet.
