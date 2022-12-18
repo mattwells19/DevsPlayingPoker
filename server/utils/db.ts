@@ -1,59 +1,29 @@
-import { ObjectId } from "../deps.ts";
-import { Voter } from "../models/room.model.ts";
-import connectToDb from "./connectToDb.ts";
+import { Database, MongoClient } from "../deps.ts";
+import { RoomSchema, SessionSchema } from "../types/schemas.ts";
 
-export const { rooms, users } = await connectToDb();
+let mongo_db: Database | null = null;
 
-export const lookupRoom = async (roomCode: string) => {
-	if (!roomCode)
-		throw new Error(
-			`lookupRoom requires a roomCode, but was passed ${roomCode}`,
-		);
-	return await rooms.findOne({ roomCode });
+const connectToDb = async () => {
+	const db = await (async () => {
+		if (mongo_db) return Promise.resolve(mongo_db);
+
+		const DB_URL = Deno.env.get("DB_URL");
+		if (!DB_URL) throw new Error("Problem importing from .env");
+		const client = new MongoClient();
+		mongo_db = await client.connect(DB_URL);
+		return mongo_db;
+	})();
+
+	const collectionList = await db.listCollectionNames();
+
+	const rooms = collectionList.includes("rooms")
+		? db.collection<RoomSchema>("rooms")
+		: await db.createCollection<RoomSchema>("rooms");
+	const sessions = collectionList.includes("rooms")
+		? db.collection<SessionSchema>("sessions")
+		: await db.createCollection<SessionSchema>("sessions");
+
+	return { rooms, sessions };
 };
 
-export const insertRoom = async (roomCode: string, options: number[]) => {
-	return await rooms.insertOne({
-		roomCode,
-		moderator: null,
-		state: "Results",
-		options,
-		voters: [],
-		votingStartedAt: null,
-	});
-};
-
-export const updateRoom = async (
-	roomCode: string,
-	moderatorId: ObjectId,
-	options: number[],
-	voters: Voter[],
-) => {
-	return await rooms.updateOne(
-		{ roomCode: { $eq: roomCode } },
-		{
-			$set: {
-				moderatorId,
-				options,
-				voters,
-			},
-		},
-	);
-};
-
-export const addVoterToRoom = async (roomCode: string, voter: Voter) => {
-	const resp = await rooms.updateOne(
-		{ roomCode: { $eq: roomCode } },
-		{ $push: { voters: { $each: [voter] } } },
-	);
-	if (resp.matchedCount < 1) {
-		throw new Error(`Room with code ${roomCode} does not exist`);
-	}
-	return resp;
-};
-
-export const insertUser = async (moderatorName: string) => {
-	return await users.insertOne({
-		name: moderatorName,
-	});
-};
+export default connectToDb;

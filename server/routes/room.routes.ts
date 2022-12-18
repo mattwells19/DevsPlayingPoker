@@ -4,11 +4,19 @@ import {
 	getRoom,
 	checkRoomExists,
 } from "../controllers/room.controller.ts";
+import {
+	validateNewRoom,
+	validateRoomCode,
+} from "../middlewares/validators.ts";
 
 const router = Router();
 
-router.post("/create", createRoom);
-router.get("/rooms/:roomCode", getRoom);
-router.get("/rooms/:roomCode/checkRoomExists", checkRoomExists);
+router.post("/create", validateNewRoom, createRoom);
+router.get("/rooms/:roomCode", validateRoomCode, getRoom);
+router.get(
+	"/rooms/:roomCode/checkRoomExists",
+	validateRoomCode,
+	checkRoomExists,
+);
 
 export default router;

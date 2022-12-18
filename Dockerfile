@@ -10,7 +10,7 @@ RUN npm install && npm run build
 
 FROM denoland/deno:1.25.2 AS run
 
-EXPOSE 1337
+EXPOSE 5555
 
 COPY --from=build /usr/app/server /usr/app
 

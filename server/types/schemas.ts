@@ -32,3 +32,8 @@ export interface RoomSchema {
 	voters: Voter[];
 	votingStartedAt: Date | null;
 }
+
+export interface SessionSchema {
+	_id: ObjectId;
+	maxAge: number;
+}

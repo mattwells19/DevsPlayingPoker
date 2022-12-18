@@ -1,4 +1,4 @@
-import type { RoomSchema } from "../models/room.model.ts";
+import type { RoomSchema } from "./schemas.ts";
 
 export interface ConnectEvent {
 	event: "Connected";

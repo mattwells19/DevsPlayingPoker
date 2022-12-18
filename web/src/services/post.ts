@@ -1,4 +1,4 @@
-const post = async (url, body) => {
+const post = async (url: string | URL, body: any) => {
 	const options = {
 		method: "POST",
 		headers: {
