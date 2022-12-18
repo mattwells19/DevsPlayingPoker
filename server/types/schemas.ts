@@ -36,4 +36,5 @@ export interface RoomSchema {
 export interface SessionSchema {
 	_id: ObjectId;
 	maxAge: number;
+	environment: "local" | "test" | "prod";
 }

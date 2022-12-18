@@ -23,7 +23,9 @@ const sockets = new Map<string, WebSocket>();
 
 // update/prune user sessions
 setInterval(async () => {
-	const allSessions = await sessions.find().toArray();
+	const allSessions = await sessions
+		.find({ environment: constants.environment })
+		.toArray();
 	const promises = [];
 
 	for (const sess of allSessions) {

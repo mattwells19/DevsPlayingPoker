@@ -18,7 +18,10 @@ server.use(async (req, res, next) => {
 	const sessionId = cookies["session"];
 
 	if (sessionId) {
-		const session = await sessions.findOne({ _id: new ObjectId(sessionId) });
+		const session = await sessions.findOne({
+			_id: new ObjectId(sessionId),
+			environment: constants.environment,
+		});
 		if (session && session.maxAge > Date.now()) {
 			return next();
 		}
@@ -28,6 +31,7 @@ server.use(async (req, res, next) => {
 	await sessions
 		.insertOne({
 			maxAge,
+			environment: constants.environment,
 		})
 		.then((newSession) => {
 			if (!res.headers) {
@@ -39,6 +43,9 @@ server.use(async (req, res, next) => {
 				value: newSession.toString(),
 				maxAge,
 				path: "/",
+				sameSite: "Strict",
+				secure: constants.environment !== "local",
+				httpOnly: true,
 			});
 
 			next();
