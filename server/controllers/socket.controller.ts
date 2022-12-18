@@ -1,5 +1,10 @@
-import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
-import type { RoomSchema, User, Voter } from "../models/room.model.ts";
+import {
+	NextFunction,
+	OpineRequest,
+	OpineResponse,
+	getCookies,
+} from "../deps.ts";
+import type { RoomSchema, User, Voter } from "../types/schemas.ts";
 import {
 	JoinEvent,
 	WebSocketEvent,
@@ -9,11 +14,46 @@ import {
 	ModeratorChangeEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
-import connectToDb from "../utils/connectToDb.ts";
-import { lookupRoom } from "../utils/db.ts";
+import connectToDb from "../utils/db.ts";
+import constants from "../utils/constants.ts";
+
+const { rooms, sessions } = await connectToDb();
 
 const sockets = new Map<string, WebSocket>();
-export const { rooms, users } = await connectToDb();
+
+// update/prune user sessions
+setInterval(async () => {
+	const allSessions = await sessions
+		.find({ environment: constants.environment })
+		.toArray();
+	const promises = [];
+
+	for (const sess of allSessions) {
+		const sessionExpired = sess.maxAge < Date.now();
+
+		if (sessionExpired) {
+			let updatePromise = null;
+
+			if (sockets.has(sess._id.toString())) {
+				// revalidate session since socket is still alive
+				updatePromise = sessions.updateOne(
+					{ _id: sess._id },
+					{
+						$set: {
+							maxAge: Date.now() + constants.sessionTimeout,
+						},
+					},
+				);
+			} else {
+				updatePromise = sessions.deleteOne({ _id: sess._id });
+			}
+
+			promises.push(updatePromise);
+		}
+	}
+
+	await Promise.all(promises);
+}, 60 * 1000);
 
 /**
  * Sends updated roomData to all voters and moderator in room
@@ -22,7 +62,7 @@ export const { rooms, users } = await connectToDb();
  */
 const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	if (!roomData) {
-		throw new Error(`Failed to send updatedRoomData.  No roomData found.`);
+		throw new Error(`Failed to send updatedRoomData. No roomData found.`);
 	}
 	const roomUpdateEvent: RoomUpdateEvent = {
 		event: "RoomUpdate",
@@ -47,7 +87,7 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
  * @returns Whether the person who joined is the moderator of the room
  */
 async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
-	const roomData = await lookupRoom(data.roomCode);
+	const roomData = await rooms.findOne({ roomCode: data.roomCode });
 	if (!roomData) {
 		throw new Error(`No room with room code ${data.roomCode}.`);
 	}
@@ -91,7 +131,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	let updatedRoomData: RoomSchema | undefined;
 
-	const roomData = await lookupRoom(roomCode);
+	const roomData = await rooms.findOne({ roomCode });
 	if (!roomData) return;
 
 	if (roomData.moderator && roomData.moderator.id === userId) {
@@ -140,7 +180,7 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 async function handleStartVoting(roomCode: string | null): Promise<void> {
 	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
 
-	const roomData = await lookupRoom(roomCode);
+	const roomData = await rooms.findOne({ roomCode });
 	if (!roomData) return;
 
 	const updatedVoters = roomData.voters.map((voter) => ({
@@ -175,7 +215,7 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 async function handleStopVoting(roomCode: string | null): Promise<void> {
 	if (!roomCode) throw new Error("Unable to stop voting due to no room code.");
 
-	const roomData = await lookupRoom(roomCode);
+	const roomData = await rooms.findOne({ roomCode });
 	if (!roomData) return;
 
 	const updatedRoomData = await rooms.findAndModify(
@@ -207,7 +247,7 @@ async function handleOptionSelected(
 ): Promise<void> {
 	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
 
-	const roomData = await lookupRoom(roomCode);
+	const roomData = await rooms.findOne({ roomCode });
 	if (!roomData) return;
 
 	const updatedVoters = roomData.voters.map((voter) => {
@@ -247,7 +287,7 @@ async function handleModeratorChange(
 	data: ModeratorChangeEvent,
 ): Promise<void> {
 	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
-	const roomData = await lookupRoom(roomCode);
+	const roomData = await rooms.findOne({ roomCode });
 	if (!roomData || !roomData.moderator || !roomData.voters)
 		throw new Error(
 			"Room does not contain data, moderator, or voters. Unable to handle moderatorChange",
@@ -293,8 +333,8 @@ async function handleModeratorChange(
 }
 
 // TODO: how to handle thrown errors?
-export const handleWs = (socket: WebSocket) => {
-	const userId: string = crypto.randomUUID();
+export const handleWs = (socket: WebSocket, userId: string) => {
+	const userAlreadyExists = sockets.has(userId);
 	sockets.set(userId, socket);
 	let roomCode: string | null = null;
 
@@ -306,14 +346,24 @@ export const handleWs = (socket: WebSocket) => {
 		socket.send(JSON.stringify(connectEvent));
 	});
 
-	// TODO: how to handle refreshes?
-	socket.addEventListener("close", async () => {
-		// remove voter from room
-		sockets.delete(userId);
+	socket.addEventListener("close", () => {
+		const preSocket = sockets.get(userId);
+		setTimeout(async () => {
+			const postSocket = sockets.get(userId);
 
-		if (roomCode) {
-			await handleLeave(userId, roomCode);
-		}
+			// same userId but different socket object means they reconnected
+			if (preSocket !== postSocket) {
+				return;
+			}
+
+			// remove voter from room
+			sockets.delete(userId);
+
+			if (roomCode) {
+				await handleLeave(userId, roomCode);
+			}
+			// socket is left alive for 3 seconds to allow user to rejoin
+		}, 3000);
 	});
 
 	socket.addEventListener(
@@ -324,7 +374,14 @@ export const handleWs = (socket: WebSocket) => {
 			switch (data.event) {
 				case "Join": {
 					roomCode = data.roomCode;
-					await handleJoin(userId, data);
+
+					if (userAlreadyExists) {
+						const roomData = await rooms.findOne({ roomCode });
+						sendRoomData(roomData);
+					} else {
+						await handleJoin(userId, data);
+					}
+
 					break;
 				}
 				case "StartVoting": {
@@ -345,12 +402,14 @@ export const handleWs = (socket: WebSocket) => {
 				}
 				case "Ping": {
 					if (!roomCode) break;
-					const roomData = await lookupRoom(roomCode);
+					const roomData = await rooms.findOne({ roomCode });
+
 					if (!roomData) break;
 					const roomUpdateEvent: RoomUpdateEvent = {
 						event: "RoomUpdate",
 						roomData: roomData,
 					};
+
 					socket.send(JSON.stringify(roomUpdateEvent));
 					break;
 				}
@@ -366,7 +425,8 @@ export async function establishSocketConnection(
 ) {
 	if (req.headers.get("upgrade") === "websocket") {
 		const sock = req.upgrade();
-		await handleWs(sock);
+		const sessionId = getCookies(req.headers)["session"];
+		await handleWs(sock, sessionId);
 	} else {
 		res.send("You've gotta set the magic header...");
 	}

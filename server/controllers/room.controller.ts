@@ -1,34 +1,51 @@
 import { OpineRequest, OpineResponse } from "../deps.ts";
-import { CreateRoomRequest } from "../types/requests.ts";
-import checkIfRoomExists from "../utils/checkIfRoomExists.ts";
-import { insertRoom, lookupRoom } from "../utils/db.ts";
+import connectToDb from "../utils/db.ts";
 import generateRoomCode from "../utils/generateRoomCode.ts";
 
-export const createRoom = async (req: OpineRequest, res: OpineResponse) => {
+type OpineController<ResBody = any> = (
+	req: OpineRequest,
+	res: OpineResponse,
+) => Promise<OpineResponse<ResBody>>;
+
+const { rooms } = await connectToDb();
+
+export interface CreateRoomRequest {
+	moderatorName: string;
+	options: number[];
+}
+
+export const createRoom: OpineController = async (req, res) => {
 	const { options }: CreateRoomRequest = req.body;
 
 	try {
 		const roomCode = await generateRoomCode();
-		const room = await insertRoom(roomCode, options);
+		const room = await rooms.insertOne({
+			roomCode,
+			moderator: null,
+			state: "Results",
+			options,
+			voters: [],
+			votingStartedAt: null,
+		});
 		console.debug(
 			`Room created with _id of ${room} and roomCode of ${roomCode}`,
 		);
 
-		res.setStatus(201).json({
+		return res.setStatus(201).json({
 			success: true,
 			roomCode: roomCode,
 		});
 	} catch (err) {
 		console.error(`Error creating room: ${err}`);
-		res.setStatus(500).json({
+		return res.setStatus(500).json({
 			success: false,
 			message: err.message,
 		});
 	}
 };
 
-export const getRoom = async (req: OpineRequest, res: OpineResponse) => {
-	const room = await lookupRoom(req.params.roomCode);
+export const getRoom: OpineController = async (req, res) => {
+	const room = await rooms.findOne({ roomCode: req.params.roomCode });
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
@@ -41,11 +58,9 @@ export const getRoom = async (req: OpineRequest, res: OpineResponse) => {
 	});
 };
 
-export const checkRoomExists = async (
-	req: OpineRequest,
-	res: OpineResponse,
-) => {
-	if (await checkIfRoomExists(req.params.roomCode)) {
+export const checkRoomExists: OpineController = async (req, res) => {
+	const room = await rooms.findOne({ roomCode: req.params.roomCode });
+	if (room) {
 		return res.setStatus(200).json({
 			success: true,
 			message: `Room with roomCode of ${req.params.roomCode} exists.`,
@@ -53,6 +68,6 @@ export const checkRoomExists = async (
 	}
 	return res.setStatus(204).json({
 		success: true,
-		message: `Room with roomCode of ${req.params.roomCode} does not exists.`,
+		message: `Room with roomCode of ${req.params.roomCode} does not exist.`,
 	});
 };
