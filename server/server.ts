@@ -44,7 +44,7 @@ server.use(async (req, res, next) => {
 				maxAge,
 				path: "/",
 				sameSite: "Strict",
-				secure: constants.environment !== "local",
+				// secure: constants.environment !== "local",
 				httpOnly: true,
 			});
 
