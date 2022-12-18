@@ -19,7 +19,7 @@ const connectToDb = async () => {
 	const rooms = collectionList.includes("rooms")
 		? db.collection<RoomSchema>("rooms")
 		: await db.createCollection<RoomSchema>("rooms");
-	const sessions = collectionList.includes("rooms")
+	const sessions = collectionList.includes("sessions")
 		? db.collection<SessionSchema>("sessions")
 		: await db.createCollection<SessionSchema>("sessions");
 
