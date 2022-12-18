@@ -10,7 +10,7 @@ const connectToDb = async () => {
 		const DB_URL = Deno.env.get("DB_URL");
 		if (!DB_URL) throw new Error("Problem importing from .env");
 		const client = new MongoClient();
-		mongo_db = await client.connect(DB_URL);
+		mongo_db = await client.connect(`${DB_URL}/devs_playing_poker`);
 		return mongo_db;
 	})();
 
