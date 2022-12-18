@@ -1,4 +1,4 @@
-import { ConfidenceValue } from "../models/room.model.ts";
+import { ConfidenceValue } from "../types/schemas.ts";
 
 const calculateConfidence = (timeStarted: Date | null): ConfidenceValue => {
 	if (!timeStarted) {
