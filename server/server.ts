@@ -17,14 +17,11 @@ server.use(async (req, res, next) => {
 	const cookies = getCookies(req.headers);
 	const sessionId = cookies["session"];
 
-	console.debug("sessionId", sessionId, "environment", constants.environment);
-
 	if (sessionId) {
 		const session = await sessions.findOne({
 			_id: new ObjectId(sessionId),
 			environment: constants.environment,
 		});
-		console.debug("session", session);
 		if (session && session.maxAge > Date.now()) {
 			return next();
 		}
