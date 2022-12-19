@@ -1,0 +1,21 @@
+fieldset.voterChoices {
+	border: none;
+	margin: 0 auto;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	justify-content: center;
+
+	legend {
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin-bottom: 1rem;
+		text-align: center;
+		width: 100%;
+	}
+}
+
+p.infoText {
+	font-weight: 600;
+}

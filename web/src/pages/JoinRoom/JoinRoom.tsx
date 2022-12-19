@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import Header from "@/components/Header";
 import { useNavigate, useParams } from "solid-app-router";
 import { Component, createSignal, Show } from "solid-js";
 import styles from "./JoinRoom.module.scss";
@@ -23,32 +24,35 @@ const JoinRoom: Component = () => {
 	}
 
 	return (
-		<main class={styles.join}>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					handleSubmit(e.currentTarget);
-				}}
-			>
-				<label for="name">Name</label>
-				<input
-					id="name"
-					name="name"
-					type="text"
-					required
-					minLength="1"
-					autofocus
-					value={localStorage.getItem("name") ?? ""}
-					onInput={() => setErrorMsg(null)}
-					aria-describedby="name-error-msg"
-					aria-invalid={Boolean(errorMsg())}
-				/>
-				<Show when={errorMsg() !== null}>
-					<p id="name-error-msg">{errorMsg()}</p>
-				</Show>
-				<Button type="submit">Done</Button>
-			</form>
-		</main>
+		<>
+			<Header />
+			<main class={styles.join}>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						handleSubmit(e.currentTarget);
+					}}
+				>
+					<label for="name">Name</label>
+					<input
+						id="name"
+						name="name"
+						type="text"
+						required
+						minLength="1"
+						autofocus
+						value={localStorage.getItem("name") ?? ""}
+						onInput={() => setErrorMsg(null)}
+						aria-describedby="name-error-msg"
+						aria-invalid={Boolean(errorMsg())}
+					/>
+					<Show when={errorMsg() !== null}>
+						<p id="name-error-msg">{errorMsg()}</p>
+					</Show>
+					<Button type="submit">Done</Button>
+				</form>
+			</main>
+		</>
 	);
 };
 

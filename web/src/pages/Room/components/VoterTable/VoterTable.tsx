@@ -1,6 +1,7 @@
 import { Component, For, Match, Switch } from "solid-js";
 import { RoomSchema, ConfidenceValue, Voter } from "@/shared-types";
-import Metric from "./Metric";
+import Metric from "../Metric";
+import styles from "./VoterTable.module.scss";
 
 interface VoterTableProps {
 	voters: RoomSchema["voters"];
@@ -69,7 +70,7 @@ const VoterTable: Component<VoterTableProps> = ({
 	avgConfidence = Math.round(avgConfidence / voterCount);
 
 	return (
-		<table>
+		<table class={styles.voterTable}>
 			<thead>
 				<tr>
 					<th colspan="2">Voters</th>

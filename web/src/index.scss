@@ -26,17 +26,20 @@ body {
 		--error-text-color: #f87272;
 		--main-background: #333333;
 		--elevated-background: #494949;
+		color-scheme: dark;
 	}
 
 	background-color: var(--main-background);
 	color: var(--primary-text-color);
+
+	padding: 1rem;
 }
 
 * {
 	box-sizing: border-box;
 	font-size: 100%;
 	border-color: var(--border-gray);
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+	font-family: "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont, "Oxygen",
 		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
 		sans-serif;
 }
@@ -49,25 +52,4 @@ hr {
 	border-style: solid;
 	border-bottom-width: 1px;
 	overflow: visible;
-}
-
-header {
-	position: absolute;
-	top: 0;
-	width: 100%;
-
-	& > button {
-		display: block;
-		width: fit-content;
-
-		margin: 1rem 1rem auto auto;
-		padding: 0.25rem 0.5rem;
-
-		border-radius: 5px;
-		border: 1px solid var(--border-gray);
-
-		background-color: var(--elevated-background);
-		color: var(--primary-text-color);
-		font-size: small;
-	}
 }

@@ -71,12 +71,18 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 
 	if (roomData.moderator) {
 		const moderatorSock = sockets.get(roomData.moderator.id);
-		moderatorSock?.send(JSON.stringify(roomUpdateEvent));
+
+		if (moderatorSock && moderatorSock.readyState === WebSocket.OPEN) {
+			moderatorSock.send(JSON.stringify(roomUpdateEvent));
+		}
 	}
 
 	for (const voter of roomData.voters) {
 		const voterSock = sockets.get(voter.id.toString());
-		voterSock?.send(JSON.stringify(roomUpdateEvent));
+
+		if (voterSock && voterSock.readyState === WebSocket.OPEN) {
+			voterSock.send(JSON.stringify(roomUpdateEvent));
+		}
 	}
 };
 

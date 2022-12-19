@@ -10,13 +10,13 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"sass": "^1.53.0",
-		"typescript": "^4.6.4",
-		"vite": "^2.9.9",
-		"vite-plugin-solid": "^2.2.6"
+		"sass": "^1.57.0",
+		"typescript": "^4.9.4",
+		"vite": "^4.0.2",
+		"vite-plugin-solid": "^2.5.0"
 	},
 	"dependencies": {
-		"solid-app-router": "^0.4.1",
-		"solid-js": "^1.4.2"
+		"solid-app-router": "^0.4.2",
+		"solid-js": "^1.6.5"
 	}
 }

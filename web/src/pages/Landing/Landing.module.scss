@@ -2,73 +2,72 @@ main.landing {
 	display: flex;
 	flex-direction: column;
 
-	height: 100vh;
 	max-width: 30rem;
 	margin: auto;
-}
 
-div.seperator {
-	display: flex;
-	gap: 1rem;
-	margin: 2rem 0px;
-}
-
-section.copy {
-	text-align: center;
-	margin: 2rem 0px;
-	padding: 0px 0.5rem;
-
-	h1 {
-		font-size: 3rem;
-	}
-
-	p {
-		font-size: 1.25rem;
-	}
-}
-
-div.roomOps {
-	margin-top: 3rem;
-}
-
-section.roomCodeInputs {
-	text-align: center;
-
-	form {
+	div.seperator {
 		display: flex;
-		gap: 0.25rem;
-		justify-content: center;
-		margin-top: 0.5rem;
-
-		input {
-			padding: 1rem;
-			width: 3rem;
-			height: 3rem;
-			border-radius: 0.5rem;
-			border-style: solid;
-			text-transform: uppercase;
-
-			background-color: inherit;
-			color: var(--primary-text-color);
-		}
+		gap: 1rem;
+		margin: 2rem 0px;
 	}
 
-	.errorMsg {
-		height: 1rem;
-		display: grid;
-		place-items: center;
+	section.copy {
+		text-align: center;
+		margin: 2rem 0px;
+		padding: 0px 0.5rem;
+
+		h1 {
+			font-size: 3rem;
+		}
 
 		p {
-			color: var(--error-text-color);
+			font-size: 1.25rem;
 		}
 	}
-}
 
-a {
-	display: block;
-	margin: auto;
-	width: fit-content;
+	div.roomOps {
+		margin-top: 3rem;
+	}
 
-	// extra margin to match input group with error message hidden
-	margin-top: 1rem;
+	section.roomCodeInputs {
+		text-align: center;
+
+		form {
+			display: flex;
+			gap: 0.25rem;
+			justify-content: center;
+			margin-top: 0.5rem;
+
+			input {
+				padding: 1rem;
+				width: 3rem;
+				height: 3rem;
+				border-radius: 0.5rem;
+				border-style: solid;
+				text-transform: uppercase;
+
+				background-color: inherit;
+				color: var(--primary-text-color);
+			}
+		}
+
+		.errorMsg {
+			height: 1rem;
+			display: grid;
+			place-items: center;
+
+			p {
+				color: var(--error-text-color);
+			}
+		}
+	}
+
+	a {
+		display: block;
+		margin: auto;
+		width: fit-content;
+
+		// extra margin to match input group with error message hidden
+		margin-top: 1rem;
+	}
 }

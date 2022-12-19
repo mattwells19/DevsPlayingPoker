@@ -1,0 +1,52 @@
+table.voterTable {
+	border: 1px solid var(--border-gray);
+	border-radius: 4px;
+	border-collapse: collapse;
+	table-layout: fixed;
+	width: 100%;
+
+	thead > tr {
+		border-bottom: 1px solid var(--border-gray);
+
+		th {
+			width: 5rem;
+
+			&:first-of-type {
+				text-align: left;
+				width: 10rem;
+			}
+		}
+	}
+
+	td,
+	th {
+		padding: 0.75rem 1rem;
+	}
+
+	td:not(:first-of-type) {
+		text-align: center;
+	}
+
+	td > button {
+		background-color: transparent;
+		text-decoration: underline;
+		border: none;
+		color: inherit;
+		text-align: inherit;
+		width: fit-content;
+		margin: 0;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	tfoot {
+		tr {
+			border-top: 1px solid var(--border-gray);
+		}
+
+		td {
+			text-align: center;
+			font-weight: 600;
+		}
+	}
+}

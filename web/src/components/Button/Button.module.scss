@@ -2,9 +2,12 @@
 	padding: 1rem 2rem;
 	border: 0;
 	border-radius: 0.5rem;
-	font-weight: bold;
-	font-weight: 700;
+	font-weight: 600;
 	font-size: 1rem;
+	color: black;
+	font-family: inherit;
+
+	cursor: pointer;
 
 	transition: background-color linear 100ms;
 
@@ -30,5 +33,4 @@ button.button {
 a.button {
 	@include buttonStyles();
 	text-decoration: none;
-	color: black;
 }

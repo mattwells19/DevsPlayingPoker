@@ -38,10 +38,10 @@ export const Button: Component<ButtonProps> = (props) => {
 
 	return (
 		<button
-			class={`${styles.button} ${styles[merged.variant]} ${
-				merged.loading ? "loading" : ""
-			}`}
 			{...merged}
+			class={`${styles.button} ${styles[merged.variant]} ${props.class ?? ""} ${
+				merged.loading ? "loading" : ""
+			}`.trim()}
 			disabled={merged.disabled || merged.loading}
 		>
 			{merged.loading ? "Loading..." : merged.children}

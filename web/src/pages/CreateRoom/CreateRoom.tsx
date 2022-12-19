@@ -3,6 +3,7 @@ import { useNavigate } from "solid-app-router";
 import post from "@/services/post";
 import Button from "@/components/Button";
 import styles from "./CreateRoom.module.scss";
+import Header from "@/components/Header";
 
 const options = {
 	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
@@ -107,103 +108,106 @@ const CreateRoom: Component = () => {
 	});
 
 	return (
-		<main class={styles.createRoom}>
-			<form
-				class={styles.createRoomForm}
-				onInput={(e) => handleChange(e.currentTarget)}
-				onSubmit={(e) => {
-					e.preventDefault();
-					handleSubmit(e.currentTarget);
-				}}
-			>
-				<div>
-					<label for="moderatorName">
-						Your name
-						<span class={styles.required}>*</span>
-					</label>
-					<input
-						autofocus
-						name="moderatorName"
-						required
-						type="text"
-						value={defaultName}
-					/>
-				</div>
-
-				<div class={styles.seperator}>
-					<hr />
-				</div>
-
-				<div>
-					<label for="voterOptions">
-						What options would you like voters to have to choose from?
-						<span class={styles.required}>*</span>
-					</label>
-					<select
-						name="voterOptions"
-						required
-						value={defaultFormValues?.voterOptions ?? ""}
-					>
-						<option value="">Select options</option>
-						<option value="fibonacci">Fibonacci</option>
-						<option value="linear">Linear</option>
-					</select>
-				</div>
-
-				<div>
-					<label for="numberOfOptions">
-						Number of options (min: 2, max: 15)
-					</label>
-					<input
-						type="range"
-						name="numberOfOptions"
-						min="2"
-						max="15"
-						step="1"
-						value={defaultFormValues?.numberOfOptions}
-					/>
-				</div>
-
-				<fieldset>
-					<legend>Include no-vote option?</legend>
-
-					<label class={styles.radio}>
+		<>
+			<Header />
+			<main class={styles.createRoom}>
+				<form
+					class={styles.createRoomForm}
+					onInput={(e) => handleChange(e.currentTarget)}
+					onSubmit={(e) => {
+						e.preventDefault();
+						handleSubmit(e.currentTarget);
+					}}
+				>
+					<div>
+						<label for="moderatorName">
+							Your name
+							<span class={styles.required}>*</span>
+						</label>
 						<input
-							type="radio"
-							name="noVote"
-							value="yes"
-							checked={defaultFormValues && defaultFormValues.noVote}
+							autofocus
+							name="moderatorName"
+							required
+							type="text"
+							value={defaultName}
 						/>
-						Yes
-					</label>
+					</div>
 
-					<label class={styles.radio}>
+					<div class={styles.seperator}>
+						<hr />
+					</div>
+
+					<div>
+						<label for="voterOptions">
+							What options would you like voters to have to choose from?
+							<span class={styles.required}>*</span>
+						</label>
+						<select
+							name="voterOptions"
+							required
+							value={defaultFormValues?.voterOptions ?? ""}
+						>
+							<option value="">Select options</option>
+							<option value="fibonacci">Fibonacci</option>
+							<option value="linear">Linear</option>
+						</select>
+					</div>
+
+					<div>
+						<label for="numberOfOptions">
+							Number of options (min: 2, max: 15)
+						</label>
 						<input
-							type="radio"
-							name="noVote"
-							value="no"
-							checked={!defaultFormValues || !defaultFormValues.noVote}
+							type="range"
+							name="numberOfOptions"
+							min="2"
+							max="15"
+							step="1"
+							value={defaultFormValues?.numberOfOptions}
 						/>
-						No
-					</label>
-				</fieldset>
+					</div>
 
-				<div class={styles.finalPreview}>
-					<dt>Final preview</dt>
-					<dd>{list}</dd>
-				</div>
+					<fieldset>
+						<legend>Include no-vote option?</legend>
 
-				<div class={styles.seperator}>
-					<hr />
-				</div>
+						<label class={styles.radio}>
+							<input
+								type="radio"
+								name="noVote"
+								value="yes"
+								checked={defaultFormValues && defaultFormValues.noVote}
+							/>
+							Yes
+						</label>
 
-				<Show when={error()}>
-					{(errorMsg) => <p class={styles.error}>Error: {errorMsg}</p>}
-				</Show>
+						<label class={styles.radio}>
+							<input
+								type="radio"
+								name="noVote"
+								value="no"
+								checked={!defaultFormValues || !defaultFormValues.noVote}
+							/>
+							No
+						</label>
+					</fieldset>
 
-				<Button type="submit">Done</Button>
-			</form>
-		</main>
+					<div class={styles.finalPreview}>
+						<dt>Final preview</dt>
+						<dd>{list}</dd>
+					</div>
+
+					<div class={styles.seperator}>
+						<hr />
+					</div>
+
+					<Show when={error()} keyed>
+						{(errorMsg) => <p class={styles.error}>Error: {errorMsg}</p>}
+					</Show>
+
+					<Button type="submit">Done</Button>
+				</form>
+			</main>
+		</>
 	);
 };
 

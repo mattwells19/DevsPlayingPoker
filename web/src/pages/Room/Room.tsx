@@ -1,30 +1,28 @@
-import { useNavigate, useParams } from "solid-app-router";
+import { Link, useNavigate, useParams } from "solid-app-router";
 import {
 	Component,
-	createMemo,
 	createResource,
 	createSignal,
-	For,
-	Match,
 	onCleanup,
 	onMount,
 	Show,
-	Switch,
 } from "solid-js";
+import { createStore } from "solid-js/store";
 import styles from "./Room.module.scss";
-import type {
-	JoinEvent,
-	WebSocketEvent,
-	RoomSchema,
-	Voter,
-} from "@/shared-types";
-import VoterTable from "./components/VoterTable";
-import Button from "@/components/Button";
-import OptionCard from "@/components/OptionCard";
+import type { WebSocketEvent, RoomSchema } from "@/shared-types";
+import ModeratorView from "./views/moderator";
+import VoterView from "./views/voter/VoterView";
+import Header from "@/components/Header";
 
 const RoomCheckWrapper: Component = () => {
 	const navigate = useNavigate();
 	const { roomCode } = useParams();
+	const [manualShow, setManualShow] = createSignal(true);
+
+	const handleReset = () => {
+		setManualShow(true);
+		setManualShow(false);
+	};
 
 	const [done] = createResource(roomCode, () =>
 		fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then((res) => {
@@ -37,23 +35,52 @@ const RoomCheckWrapper: Component = () => {
 	);
 
 	return (
-		<Switch fallback={<h1>Loading...</h1>}>
-			<Match when={done() === true}>
-				<Room roomCode={roomCode} />
-			</Match>
-		</Switch>
+		<>
+			<Header className={styles.header}>
+				<div class={styles.homeLinkContainer}>
+					<Link href="/">Home</Link>
+				</div>
+				<button
+					class={styles.roomCodeBtn}
+					onClick={() => navigator.clipboard.writeText(roomCode)}
+					title="Click to copy code."
+				>
+					<h1>{roomCode}</h1>
+				</button>
+			</Header>
+			<Show when={done() && manualShow()} fallback={<h1>Checking room...</h1>}>
+				<Room roomCode={roomCode} resetConnection={handleReset} />
+			</Show>
+		</>
 	);
 };
 
 interface RoomDetails {
-	roomDetails: RoomSchema;
+	currentUserId: string;
+	roomData: RoomSchema;
 	dispatchEvent: (event: WebSocketEvent) => void;
 }
 
-const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
+interface EmptyRoomDetails {
+	currentUserId: "";
+	roomData: null;
+	dispatchEvent: () => void;
+}
+
+interface RoomProps {
+	roomCode: string;
+	resetConnection: () => void;
+}
+
+const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 	const navigate = useNavigate();
-	const [currentUserId, setCurrentUserId] = createSignal<string | null>(null);
-	const [roomDetails, setRoomDetails] = createSignal<RoomDetails | null>(null);
+	const [roomDetails, setRoomDetails] = createStore<
+		RoomDetails | EmptyRoomDetails
+	>({
+		currentUserId: "",
+		dispatchEvent: () => null,
+		roomData: null,
+	});
 
 	const userName = localStorage.getItem("name");
 	if (!userName) {
@@ -66,153 +93,120 @@ const Room: Component<{ roomCode: string }> = ({ roomCode }) => {
 			? "wss"
 			: "ws";
 		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
-		let timeout: number | null = null;
 
 		ws.addEventListener("open", () => {
-			const joinPayload: JoinEvent = {
-				event: "Join",
-				roomCode: roomCode,
-				name: userName,
-			};
-
-			timeout = setInterval(() => {
-				if (ws.OPEN) {
-					ws.send(JSON.stringify({ event: "Ping" }));
-				} else if (ws.CLOSED) {
-					ws.send(JSON.stringify(joinPayload));
-				}
-			}, 15000);
-
-			ws.send(JSON.stringify(joinPayload));
+			ws.send(
+				JSON.stringify({
+					event: "Join",
+					roomCode: roomCode,
+					name: userName,
+				}),
+			);
 		});
 
-		ws.addEventListener("message", (e) => {
-			const data = JSON.parse(e.data) as WebSocketEvent;
+		ws.addEventListener("message", (messageEvent) => {
+			const data = JSON.parse(messageEvent.data) as WebSocketEvent;
 
 			switch (data.event) {
 				case "RoomUpdate":
 					setRoomDetails({
-						roomDetails: data.roomData,
+						roomData: data.roomData,
 						dispatchEvent: (e) => ws.send(JSON.stringify(e)),
 					});
 					break;
 				case "Connected":
 					sessionStorage.setItem("userId", data.userId);
-					setCurrentUserId(data.userId);
+					setRoomDetails({ currentUserId: data.userId });
 				default:
 					return;
 			}
 		});
 
-		onCleanup(() => {
-			if (timeout) {
-				clearInterval(timeout);
+		ws.addEventListener("close", (closeEvent) => {
+			// 1000 means closed normally
+			if (closeEvent.code !== 1000) {
+				resetConnection();
+			} else {
+				console.error(closeEvent.reason);
 			}
+		});
+
+		onCleanup(() => {
 			ws.close();
 		});
 	});
 
-	function handleVoterClick(voter: Voter) {
-		const confirmed = confirm(
-			`Are you sure you want to make ${voter.name} the new moderator?`,
-		);
-		if (confirmed) {
-			roomDetails()?.dispatchEvent({
-				event: "ModeratorChange",
-				newModeratorId: voter.id,
-			});
-		}
-	}
-
-	// the user object of the current user if they're a voter. null if they're the moderator
-	const currentVoter = createMemo(
-		() =>
-			roomDetails()?.roomDetails.voters.find(
-				(voter) => voter.id === currentUserId(),
-			) ?? null,
-	);
-
 	return (
-		<>
-			<button
-				class={styles.roomCodeBtn}
-				onClick={() => navigator.clipboard.writeText(roomCode)}
-				title="Click to copy code."
+		<main class={styles.room}>
+			<Show
+				when={
+					roomDetails.currentUserId && roomDetails.roomData
+						? ([
+								roomDetails.currentUserId,
+								roomDetails.roomData,
+								roomDetails.dispatchEvent,
+						  ] as const)
+						: null
+				}
+				fallback={<p>Connecting...</p>}
+				keyed
 			>
-				<h1>{roomCode}</h1>
-			</button>
-			<main class={styles.room}>
-				<Show when={roomDetails()}>
-					{({ roomDetails: details, dispatchEvent }) => (
-						<Switch>
-							{/* is the current user the moderator? */}
-							<Match when={details.moderator?.id === currentUserId()}>
-								<Switch>
-									<Match when={details.state === "Results"}>
-										<Button
-											onClick={() => dispatchEvent({ event: "StartVoting" })}
-											disabled={details.voters.length === 0}
-										>
-											{details.voters.some((voter) => voter.selection !== null)
-												? "Reset Votes & Start Voting"
-												: "Start Voting"}
-										</Button>
-									</Match>
-									<Match when={details.state === "Voting"}>
-										<Button
-											onClick={() => dispatchEvent({ event: "StopVoting" })}
-										>
-											Stop Voting
-										</Button>
-									</Match>
-								</Switch>
-								<VoterTable
-									roomState={details.state}
-									voters={details.voters}
-									onVoterClick={handleVoterClick}
-								/>
-							</Match>
-							{/* if not the moderator, determine which UI to show based on room state */}
-							<Match when={details.state === "Results"}>
-								<p>Waiting for {details.moderator?.name}...</p>
-								<VoterTable roomState={details.state} voters={details.voters} />
-							</Match>
-							<Match when={details.state === "Voting"}>
-								<fieldset
-									onchange={(e) => {
-										const selectionValue = e.target.hasAttribute("value")
-											? (e.target as HTMLInputElement).value
-											: null;
-										if (!selectionValue) throw new Error("Didn't get a value");
-										const selection = parseInt(selectionValue, 10);
-
-										dispatchEvent({
-											event: "OptionSelected",
-											selection,
-										});
-									}}
-								>
-									<legend>
-										{currentVoter()?.selection !== null
-											? "Got it! You can change your mind if you want. Otherwise sit tight."
-											: "Make a selection"}
-									</legend>
-									<For each={details.options}>
-										{(option) => (
-											<OptionCard
-												selected={option === currentVoter()?.selection}
-												value={option}
-											/>
-										)}
-									</For>
-								</fieldset>
-							</Match>
-						</Switch>
-					)}
-				</Show>
-			</main>
-		</>
+				{([currentUserId, roomData, dispatchEvent]) => (
+					<Show
+						// is the current user the moderator?
+						when={roomData.moderator?.id === currentUserId}
+						fallback={
+							<VoterView
+								roomDetails={roomData}
+								dispatchEvent={dispatchEvent}
+								currentUserId={currentUserId}
+							/>
+						}
+					>
+						<ModeratorView
+							state={roomData.state}
+							voters={roomData.voters}
+							dispatchEvent={dispatchEvent}
+						/>
+					</Show>
+				)}
+			</Show>
+		</main>
 	);
 };
 
 export default RoomCheckWrapper;
+
+{
+	/* <main class={styles.room}>
+<Show
+	when={roomDetails.currentUserId}
+	fallback={<p>Connecting...</p>}
+	keyed
+>
+	{(currentUserId) => (
+		<Show when={roomDetails.roomData} keyed>
+			{(roomData) => (
+				<Show
+					// is the current user the moderator?
+					when={roomData.moderator?.id === currentUserId}
+					fallback={
+						<VoterView
+							roomDetails={roomData}
+							dispatchEvent={roomDetails.dispatchEvent}
+							currentUserId={currentUserId}
+						/>
+					}
+				>
+					<ModeratorView
+						state={roomData.state}
+						voters={roomData.voters}
+						dispatchEvent={roomDetails.dispatchEvent}
+					/>
+				</Show>
+			)}
+		</Show>
+	)}
+</Show>
+</main> */
+}
