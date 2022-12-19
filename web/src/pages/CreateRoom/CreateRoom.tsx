@@ -1,6 +1,6 @@
 import { Component, createSignal, onMount, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
-import post from "@/services/post";
+import post from "@/utils/post";
 import Button from "@/components/Button";
 import styles from "./CreateRoom.module.scss";
 import Header from "@/components/Header";

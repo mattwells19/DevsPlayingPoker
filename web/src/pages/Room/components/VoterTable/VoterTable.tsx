@@ -70,82 +70,91 @@ const VoterTable: Component<VoterTableProps> = ({
 	avgConfidence = Math.round(avgConfidence / voterCount);
 
 	return (
-		<table class={styles.voterTable}>
-			<thead>
-				<tr>
-					<th colspan="2">Voters</th>
-					<th>Voted</th>
-					<th>Confidence</th>
-				</tr>
-			</thead>
-			<tbody>
-				<For each={voters}>
-					{(voter) => (
-						<tr>
-							<td colspan="2">
-								{onVoterClick ? (
-									<button onClick={() => onVoterClick(voter)}>
-										{voter.name}
-									</button>
-								) : (
-									voter.name
-								)}
-							</td>
-							<td>
-								{roomState === "Results"
-									? formatSelection(voter.selection)
-									: voter.selection !== null
-									? "✅"
-									: "❌"}
-							</td>
-							<td
-								title={
-									voter.confidence !== null
-										? ConfidenceTextMap[voter.confidence]
-										: "Waiting for selection."
+		<div class={styles.tableContainer}>
+			<table class={styles.voterTable}>
+				<thead>
+					<tr>
+						<th colspan="2">Voters</th>
+						<th>Voted</th>
+						<th>Confidence</th>
+					</tr>
+				</thead>
+				<tbody>
+					<For each={voters}>
+						{(voter) => (
+							<tr>
+								<td colspan="2">
+									{onVoterClick ? (
+										<button onClick={() => onVoterClick(voter)}>
+											{voter.name}
+										</button>
+									) : (
+										voter.name
+									)}
+								</td>
+								<td>
+									{roomState === "Results"
+										? formatSelection(voter.selection)
+										: voter.selection !== null
+										? "✅"
+										: "❌"}
+								</td>
+								<td
+									title={
+										voter.confidence !== null
+											? ConfidenceTextMap[voter.confidence]
+											: "Waiting for selection."
+									}
+								>
+									{voter.confidence !== null
+										? ConfidenceEmojiMap[voter.confidence]
+										: "❓"}
+								</td>
+							</tr>
+						)}
+					</For>
+				</tbody>
+				<tfoot>
+					<tr>
+						<Switch>
+							<Match when={roomState === "Voting"}>
+								<td colspan="4">Voting in progress</td>
+							</Match>
+							<Match
+								when={
+									roomState === "Results" &&
+									voters.every((voter) => voter.selection === null)
 								}
 							>
-								{voter.confidence !== null
-									? ConfidenceEmojiMap[voter.confidence]
-									: "❓"}
-							</td>
-						</tr>
-					)}
-				</For>
-			</tbody>
-			<tfoot>
-				<tr>
-					<Switch>
-						<Match
-							when={
-								roomState === "Results" &&
-								voters.every((voter) => voter.selection === null)
-							}
-						>
-							<td colspan="4">Waiting to start voting</td>
-						</Match>
-						<Match
-							when={
-								roomState === "Results" &&
-								voters.every((voter) => voter.selection === 0)
-							}
-						>
-							<td colspan="4">No votes were cast.</td>
-						</Match>
-						<Match when={roomState === "Results"}>
-							<Metric label="Low" value={low} />
-							<Metric label="High" value={high} />
-							<Metric label="Mode" value={mode} />
-							<Metric
-								label="Confidence"
-								value={ConfidenceEmojiMap[avgConfidence]}
-								title={ConfidenceTextMap[avgConfidence]}
-							/>
-						</Match>
-					</Switch>
-				</tr>
-			</tfoot>
-		</table>
+								<td colspan="4">
+									{voters.length > 0
+										? "Waiting to start voting"
+										: "Waiting for people to join"}
+								</td>
+							</Match>
+							<Match
+								when={
+									roomState === "Results" &&
+									voters.every((voter) => voter.selection === 0)
+								}
+							>
+								<td colspan="4">No votes were cast.</td>
+							</Match>
+							<Match when={roomState === "Results"}>
+								<Metric label="Low" value={low} />
+								<Metric label="High" value={high} />
+								<Metric label="Mode" value={mode} />
+								<Metric
+									label="Confidence"
+									value={ConfidenceEmojiMap[avgConfidence]}
+									title={ConfidenceTextMap[avgConfidence]}
+								/>
+							</Match>
+						</Switch>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
 	);
 };
 

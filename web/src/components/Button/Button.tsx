@@ -1,3 +1,4 @@
+import mergeClassNames from "@/utils/mergeClassNames";
 import { Link } from "solid-app-router";
 import type { Component, JSX } from "solid-js";
 import { mergeProps } from "solid-js";
@@ -11,10 +12,14 @@ interface ButtonLinkProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
 export const ButtonLink: Component<ButtonLinkProps> = ({
 	variant = "solid",
 	children,
+	class: className,
 	...anchorProps
 }) => {
 	return (
-		<Link class={`${styles.button} ${styles[variant]}`} {...anchorProps}>
+		<Link
+			class={mergeClassNames(styles.button, styles[variant], className)}
+			{...anchorProps}
+		>
 			{children}
 		</Link>
 	);
@@ -39,9 +44,12 @@ export const Button: Component<ButtonProps> = (props) => {
 	return (
 		<button
 			{...merged}
-			class={`${styles.button} ${styles[merged.variant]} ${props.class ?? ""} ${
-				merged.loading ? "loading" : ""
-			}`.trim()}
+			class={mergeClassNames(
+				styles.button,
+				styles[merged.variant],
+				props.class,
+				merged.loading ? "loading" : undefined,
+			)}
 			disabled={merged.disabled || merged.loading}
 		>
 			{merged.loading ? "Loading..." : merged.children}

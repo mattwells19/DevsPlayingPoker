@@ -7,8 +7,6 @@
 	color: black;
 	font-family: inherit;
 
-	cursor: pointer;
-
 	transition: background-color linear 100ms;
 
 	&.solid {
@@ -16,12 +14,14 @@
 
 		&:hover:not(:disabled) {
 			background-color: #e67c3e;
+			cursor: pointer;
 		}
 		&:active:not(:disabled) {
 			background-color: #d1733c;
 		}
 		&:disabled {
-			background-color: #e67c3e;
+			background-color: #ce6c33c8;
+			cursor: not-allowed;
 		}
 	}
 }

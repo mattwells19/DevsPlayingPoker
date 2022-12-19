@@ -1,3 +1,4 @@
+import mergeClassNames from "@/utils/mergeClassNames";
 import { Component, JSXElement } from "solid-js";
 import styles from "./Header.module.scss";
 
@@ -8,7 +9,7 @@ interface HeaderProps {
 
 const Header: Component<HeaderProps> = ({ children, className = "" }) => {
 	return (
-		<header class={`${styles.header} ${className}`.trim()}>
+		<header class={mergeClassNames(styles.header, className)}>
 			{children}
 			<button
 				class={styles.themeBtn}

@@ -1,5 +1,9 @@
-table.voterTable {
+.tableContainer {
 	border: 1px solid var(--border-gray);
+	border-radius: 0.5rem;
+}
+
+table.voterTable {
 	border-radius: 4px;
 	border-collapse: collapse;
 	table-layout: fixed;
