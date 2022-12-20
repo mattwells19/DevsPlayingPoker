@@ -85,11 +85,14 @@ const VoterTable: Component<VoterTableProps> = ({
 							<tr>
 								<td colspan="2">
 									{onVoterClick ? (
-										<button onClick={() => onVoterClick(voter)}>
+										<button
+											class={styles.voterName}
+											onClick={() => onVoterClick(voter)}
+										>
 											{voter.name}
 										</button>
 									) : (
-										voter.name
+										<p class={styles.voterName}>{voter.name}</p>
 									)}
 								</td>
 								<td>

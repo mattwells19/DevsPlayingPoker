@@ -12,23 +12,25 @@ table.voterTable {
 	thead > tr {
 		border-bottom: 1px solid var(--border-gray);
 
-		th {
-			width: 5rem;
-
-			&:first-of-type {
-				text-align: left;
-				width: 10rem;
-			}
+		th:first-of-type {
+			text-align: left;
 		}
 	}
 
 	td,
 	th {
 		padding: 0.75rem 1rem;
+		overflow: hidden;
 	}
 
 	td:not(:first-of-type) {
 		text-align: center;
+	}
+
+	.voterName {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		width: 100%;
 	}
 
 	td > button {

@@ -8,7 +8,9 @@ main.landing {
 	div.seperator {
 		display: flex;
 		gap: 1rem;
-		margin: 2rem 0px;
+		// extra margin on bottom to match input group with error message hidden
+		margin: 2rem 0px 3rem 0px;
+		align-items: center;
 	}
 
 	section.copy {
@@ -22,6 +24,7 @@ main.landing {
 
 		p {
 			font-size: 1.25rem;
+			margin-top: 2.25rem;
 		}
 	}
 
@@ -31,6 +34,11 @@ main.landing {
 
 	section.roomCodeInputs {
 		text-align: center;
+
+		p {
+			margin-top: 2rem;
+			margin-bottom: 1rem;
+		}
 
 		form {
 			display: flex;
@@ -57,6 +65,7 @@ main.landing {
 			place-items: center;
 
 			p {
+				margin: 1rem 0;
 				color: var(--error-text-color);
 			}
 		}
@@ -66,8 +75,5 @@ main.landing {
 		display: block;
 		margin: auto;
 		width: fit-content;
-
-		// extra margin to match input group with error message hidden
-		margin-top: 1rem;
 	}
 }
