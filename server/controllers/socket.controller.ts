@@ -406,19 +406,6 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 					await handleModeratorChange(roomCode, data);
 					break;
 				}
-				case "Ping": {
-					if (!roomCode) break;
-					const roomData = await rooms.findOne({ roomCode });
-
-					if (!roomData) break;
-					const roomUpdateEvent: RoomUpdateEvent = {
-						event: "RoomUpdate",
-						roomData: roomData,
-					};
-
-					socket.send(JSON.stringify(roomUpdateEvent));
-					break;
-				}
 			}
 		},
 	);

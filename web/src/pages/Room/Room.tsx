@@ -20,8 +20,8 @@ const RoomCheckWrapper: Component = () => {
 	const [manualShow, setManualShow] = createSignal(true);
 
 	const handleReset = () => {
-		setManualShow(true);
 		setManualShow(false);
+		setManualShow(true);
 	};
 
 	const [done] = createResource(roomCode, () =>
@@ -176,37 +176,3 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 };
 
 export default RoomCheckWrapper;
-
-{
-	/* <main class={styles.room}>
-<Show
-	when={roomDetails.currentUserId}
-	fallback={<p>Connecting...</p>}
-	keyed
->
-	{(currentUserId) => (
-		<Show when={roomDetails.roomData} keyed>
-			{(roomData) => (
-				<Show
-					// is the current user the moderator?
-					when={roomData.moderator?.id === currentUserId}
-					fallback={
-						<VoterView
-							roomDetails={roomData}
-							dispatchEvent={roomDetails.dispatchEvent}
-							currentUserId={currentUserId}
-						/>
-					}
-				>
-					<ModeratorView
-						state={roomData.state}
-						voters={roomData.voters}
-						dispatchEvent={roomDetails.dispatchEvent}
-					/>
-				</Show>
-			)}
-		</Show>
-	)}
-</Show>
-</main> */
-}
