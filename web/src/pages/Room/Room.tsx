@@ -141,17 +141,14 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 			<Show
 				when={
 					roomDetails.currentUserId && roomDetails.roomData
-						? ([
-								roomDetails.currentUserId,
-								roomDetails.roomData,
-								roomDetails.dispatchEvent,
-						  ] as const)
+						? // Need to spread to get the values out of the store proxy
+						  { ...roomDetails }
 						: null
 				}
 				fallback={<p>Connecting...</p>}
 				keyed
 			>
-				{([currentUserId, roomData, dispatchEvent]) => (
+				{({ currentUserId, roomData, dispatchEvent }) => (
 					<Show
 						// is the current user the moderator?
 						when={roomData.moderator?.id === currentUserId}
