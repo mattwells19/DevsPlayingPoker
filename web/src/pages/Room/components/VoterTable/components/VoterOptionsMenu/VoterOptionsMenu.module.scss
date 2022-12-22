@@ -2,8 +2,7 @@
 	background-color: var(--elevated-background);
 	border-radius: 0.5rem;
 	overflow: hidden;
-	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	box-shadow: var(--shadow-xl);
 
 	.itemIcon {
 		margin-right: 0.25rem;
@@ -15,7 +14,7 @@
 		cursor: pointer;
 
 		&[data-focus] {
-			background-color: var(--border-gray);
+			background-color: var(--alpha-orange);
 		}
 	}
 }
