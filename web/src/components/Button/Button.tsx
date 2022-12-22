@@ -26,7 +26,7 @@ export const ButtonLink: Component<ButtonLinkProps> = ({
 };
 
 interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: "solid" | "outline";
+	variant?: "solid" | "outline" | "ghost";
 	loading?: boolean;
 	disabled?: boolean;
 }

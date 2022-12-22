@@ -24,6 +24,44 @@
 			cursor: not-allowed;
 		}
 	}
+
+	&.outline {
+		background-color: transparent;
+		border: 2px solid var(--primary-orange);
+		color: var(--primary-text-color);
+
+		&:hover:not(:disabled) {
+			background-color: var(--alpha-orange);
+			cursor: pointer;
+		}
+		&:active:not(:disabled) {
+			border-color: var(--border-gray);
+			color: var(--border-gray);
+		}
+		&:disabled {
+			border-color: var(--border-gray);
+			color: var(--border-gray);
+			cursor: not-allowed;
+		}
+	}
+
+	&.ghost {
+		background-color: transparent;
+
+		&:hover:not(:disabled) {
+			background-color: var(--alpha-orange);
+			cursor: pointer;
+		}
+		&:active:not(:disabled) {
+			border-color: var(--border-gray);
+			color: var(--border-gray);
+		}
+		&:disabled {
+			border-color: var(--border-gray);
+			color: var(--border-gray);
+			cursor: not-allowed;
+		}
+	}
 }
 
 button.button {

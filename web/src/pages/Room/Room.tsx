@@ -9,7 +9,12 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import styles from "./Room.module.scss";
-import type { WebSocketEvent, RoomSchema } from "@/shared-types";
+import type {
+	RoomSchema,
+	JoinEvent,
+	WebSocketTriggeredEvent,
+	WebScoketMessageEvent,
+} from "@/shared-types";
 import ModeratorView from "./views/moderator";
 import VoterView from "./views/voter/VoterView";
 import Header from "@/components/Header";
@@ -38,7 +43,10 @@ const RoomCheckWrapper: Component = () => {
 		<>
 			<Header className={styles.header}>
 				<div class={styles.homeLinkContainer}>
-					<Link href="/">Home</Link>
+					<Link href="/">
+						<span aria-hidden>🏠</span>
+						Home
+					</Link>
 				</div>
 				<button
 					class={styles.roomCodeBtn}
@@ -58,7 +66,7 @@ const RoomCheckWrapper: Component = () => {
 interface RoomDetails {
 	currentUserId: string;
 	roomData: RoomSchema;
-	dispatchEvent: (event: WebSocketEvent) => void;
+	dispatchEvent: (event: WebScoketMessageEvent) => void;
 }
 
 interface EmptyRoomDetails {
@@ -95,17 +103,16 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
 
 		ws.addEventListener("open", () => {
-			ws.send(
-				JSON.stringify({
-					event: "Join",
-					roomCode: roomCode,
-					name: userName,
-				}),
-			);
+			const joinEvent: JoinEvent = {
+				event: "Join",
+				roomCode: roomCode,
+				name: userName,
+			};
+			ws.send(JSON.stringify(joinEvent));
 		});
 
 		ws.addEventListener("message", (messageEvent) => {
-			const data = JSON.parse(messageEvent.data) as WebSocketEvent;
+			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
 				case "RoomUpdate":
@@ -117,6 +124,10 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 				case "Connected":
 					sessionStorage.setItem("userId", data.userId);
 					setRoomDetails({ currentUserId: data.userId });
+					break;
+				case "Kicked":
+					navigate("/");
+					break;
 				default:
 					return;
 			}

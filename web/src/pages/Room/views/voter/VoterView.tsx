@@ -1,12 +1,12 @@
 import { Component, For, Match, Switch } from "solid-js";
-import type { RoomSchema, WebSocketEvent } from "@/shared-types";
+import type { RoomSchema, WebScoketMessageEvent } from "@/shared-types";
 import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
 
 interface VoterViewProps {
 	roomDetails: RoomSchema;
-	dispatchEvent: (event: WebSocketEvent) => void;
+	dispatchEvent: (event: WebScoketMessageEvent) => void;
 	currentUserId: string;
 }
 

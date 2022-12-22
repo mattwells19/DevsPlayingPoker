@@ -1,13 +1,20 @@
 import { Component, Match, Switch } from "solid-js";
-import type { RoomSchema, Voter, WebSocketEvent } from "@/shared-types";
+import type {
+	KickVoterEvent,
+	ModeratorChangeEvent,
+	RoomSchema,
+	Voter,
+	WebScoketMessageEvent,
+} from "@/shared-types";
 import Button from "@/components/Button";
 import VoterTable from "../../components/VoterTable";
 import styles from "./ModeratorView.module.scss";
+import type { VoterClickAction } from "../../components/VoterTable";
 
 interface ModeratorViewProps {
 	state: RoomSchema["state"];
 	voters: RoomSchema["voters"];
-	dispatchEvent: (event: WebSocketEvent) => void;
+	dispatchEvent: (event: WebScoketMessageEvent) => void;
 }
 
 const ModeratorView: Component<ModeratorViewProps> = ({
@@ -15,15 +22,24 @@ const ModeratorView: Component<ModeratorViewProps> = ({
 	voters,
 	dispatchEvent,
 }) => {
-	function handleVoterClick(voter: Voter) {
-		const confirmed = confirm(
-			`Are you sure you want to make ${voter.name} the new moderator?`,
-		);
-		if (confirmed) {
-			dispatchEvent({
-				event: "ModeratorChange",
-				newModeratorId: voter.id,
-			});
+	function handleVoterAction(action: VoterClickAction, voter: Voter) {
+		const event = (() => {
+			switch (action) {
+				case "kickVoter":
+					return {
+						event: "KickVoter",
+						voterId: voter.id,
+					} as KickVoterEvent;
+				case "makeModerator":
+					return {
+						event: "ModeratorChange",
+						newModeratorId: voter.id,
+					} as ModeratorChangeEvent;
+			}
+		})();
+
+		if (event) {
+			dispatchEvent(event);
 		}
 	}
 
@@ -53,7 +69,7 @@ const ModeratorView: Component<ModeratorViewProps> = ({
 			<VoterTable
 				roomState={state}
 				voters={voters}
-				onVoterClick={handleVoterClick}
+				onVoterAction={handleVoterAction}
 			/>
 		</>
 	);

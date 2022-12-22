@@ -34,11 +34,35 @@ export interface OptionSelectedEvent {
 	selection: number;
 }
 
-export type WebSocketEvent =
-	| ModeratorChangeEvent
+export interface KickVoterEvent {
+	event: "KickVoter";
+	voterId: string;
+}
+
+/**
+ * Event sent to the kicked voter
+ */
+export interface KickedEvent {
+	event: "Kicked";
+}
+
+/**
+ * Events triggered from the server
+ */
+export type WebSocketTriggeredEvent =
 	| ConnectEvent
-	| JoinEvent
-	| OptionSelectedEvent
 	| RoomUpdateEvent
+	| KickedEvent;
+
+/**
+ * Events triggered by the client
+ */
+export type WebScoketMessageEvent =
+	| JoinEvent
+	| ModeratorChangeEvent
+	| OptionSelectedEvent
 	| StartVotingEvent
-	| StopVotingEvent;
+	| StopVotingEvent
+	| KickVoterEvent;
+
+export type WebSocketEvent = WebSocketTriggeredEvent | WebScoketMessageEvent;
