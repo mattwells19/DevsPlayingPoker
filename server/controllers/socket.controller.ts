@@ -1,17 +1,15 @@
-import {
-	NextFunction,
-	OpineRequest,
-	OpineResponse,
-	getCookies,
-} from "../deps.ts";
 import type { RoomSchema, User, Voter } from "../types/schemas.ts";
 import {
 	JoinEvent,
-	WebSocketEvent,
 	RoomUpdateEvent,
 	ConnectEvent,
 	OptionSelectedEvent,
 	ModeratorChangeEvent,
+	KickedEvent,
+	StartVotingEvent,
+	StopVotingEvent,
+	KickVoterEvent,
+	WebScoketMessageEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/db.ts";
@@ -56,6 +54,10 @@ setInterval(async () => {
 }, 60 * 1000);
 
 /**
+ * Utils
+ */
+
+/**
  * Sends updated roomData to all voters and moderator in room
  * @param roomData
  * @returns void
@@ -87,15 +89,38 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 };
 
 /**
+ * Event Handlers
+ */
+
+interface EventFunctionError {
+	message: string;
+}
+
+interface SocketContext {
+	userId: string;
+	userAlreadyExists: boolean;
+}
+
+type EventFunction<Event extends WebScoketMessageEvent> = (
+	roomData: RoomSchema,
+	context: SocketContext,
+	event: Event,
+) => Promise<EventFunctionError | void> | (EventFunctionError | void);
+
+/**
  * Adds a player to the room specified either as a moderator or voter.
  * @param userId ID of the user joining
  * @param data JoinEvent data
  * @returns Whether the person who joined is the moderator of the room
  */
-async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
-	const roomData = await rooms.findOne({ roomCode: data.roomCode });
-	if (!roomData) {
-		throw new Error(`No room with room code ${data.roomCode}.`);
+const handleJoin: EventFunction<JoinEvent> = async (
+	roomData,
+	{ userId, userAlreadyExists },
+	data,
+) => {
+	if (userAlreadyExists) {
+		sendRoomData(roomData);
+		return;
 	}
 
 	const isModerator = !roomData.moderator;
@@ -124,9 +149,7 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
 	);
 
 	sendRoomData(updatedRoomData);
-
-	return isModerator;
-}
+};
 
 /**
  * Removes the user from the room and performs moderator migration if necessary
@@ -134,11 +157,11 @@ async function handleJoin(userId: string, data: JoinEvent): Promise<boolean> {
  * @param roomCode 4-character code for the room
  * @returns void
  */
-async function handleLeave(userId: string, roomCode: string): Promise<void> {
+const handleLeave = async (
+	roomData: RoomSchema,
+	userId: string,
+): Promise<void> => {
 	let updatedRoomData: RoomSchema | undefined;
-
-	const roomData = await rooms.findOne({ roomCode });
-	if (!roomData) return;
 
 	if (roomData.moderator && roomData.moderator.id === userId) {
 		if (roomData.voters.length > 0) {
@@ -176,19 +199,14 @@ async function handleLeave(userId: string, roomCode: string): Promise<void> {
 	}
 
 	sendRoomData(updatedRoomData);
-}
+};
 
 /**
  * Begins voting, clearing previous votes
  * @param roomCode 4-character code for the room
  * @returns void
  */
-async function handleStartVoting(roomCode: string | null): Promise<void> {
-	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
-
-	const roomData = await rooms.findOne({ roomCode });
-	if (!roomData) return;
-
+const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 	const updatedVoters = roomData.voters.map((voter) => ({
 		id: voter.id,
 		name: voter.name,
@@ -211,19 +229,14 @@ async function handleStartVoting(roomCode: string | null): Promise<void> {
 	);
 
 	sendRoomData(updatedRoomData);
-}
+};
 
 /**
  * Ends voting, transitioning to "Results" state
  * @param roomCode 4-character code for the room
  * @returns void
  */
-async function handleStopVoting(roomCode: string | null): Promise<void> {
-	if (!roomCode) throw new Error("Unable to stop voting due to no room code.");
-
-	const roomData = await rooms.findOne({ roomCode });
-	if (!roomData) return;
-
+const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
 	const updatedRoomData = await rooms.findAndModify(
 		{ _id: roomData._id },
 		{
@@ -237,7 +250,7 @@ async function handleStopVoting(roomCode: string | null): Promise<void> {
 	);
 
 	sendRoomData(updatedRoomData);
-}
+};
 
 /**
  * Updates voter selection and confidence.  Sends updated roomdata
@@ -246,15 +259,16 @@ async function handleStopVoting(roomCode: string | null): Promise<void> {
  * @param data OptionSelectedEvent data
  * @returns void
  */
-async function handleOptionSelected(
-	userId: string,
-	roomCode: string | null,
-	data: OptionSelectedEvent,
-): Promise<void> {
-	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
-
-	const roomData = await rooms.findOne({ roomCode });
-	if (!roomData) return;
+const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
+	roomData,
+	{ userId },
+	data,
+) => {
+	if (!roomData.options.includes(data.selection)) {
+		return {
+			message: "Invalid option selected.",
+		};
+	}
 
 	const updatedVoters = roomData.voters.map((voter) => {
 		if (voter.id === userId) {
@@ -280,7 +294,7 @@ async function handleOptionSelected(
 	);
 
 	sendRoomData(updatedRoomData);
-}
+};
 
 /**
  * Updates moderator to existing voter.  Adds former moderator to list of voters.
@@ -288,23 +302,19 @@ async function handleOptionSelected(
  * @param data ModeratorChangeEvent data including new moderatorId
  * @returns void
  */
-async function handleModeratorChange(
-	roomCode: string | null,
-	data: ModeratorChangeEvent,
-): Promise<void> {
-	if (!roomCode) throw new Error("Unable to start voting due to no room code.");
-	const roomData = await rooms.findOne({ roomCode });
-	if (!roomData || !roomData.moderator || !roomData.voters)
-		throw new Error(
-			"Room does not contain data, moderator, or voters. Unable to handle moderatorChange",
-		);
-
+const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
+	roomData,
+	_,
+	data,
+) => {
 	const votersWithoutNewModerator = roomData.voters.filter(
 		(voter) => voter.id !== data.newModeratorId,
 	);
+
+	// validated by validateModerator function
 	const newVoter: Voter = {
-		id: roomData.moderator.id,
-		name: roomData.moderator.name,
+		id: roomData.moderator!.id,
+		name: roomData.moderator!.name,
 		confidence: null,
 		selection: null,
 	};
@@ -315,8 +325,11 @@ async function handleModeratorChange(
 	);
 
 	if (!newModerator) {
-		throw new Error("Unable to find new moderator information");
+		return {
+			message: "Unable to find new moderator information",
+		};
 	}
+
 	const updatedModerator: User = {
 		id: data.newModeratorId,
 		name: newModerator.name,
@@ -336,9 +349,68 @@ async function handleModeratorChange(
 	);
 
 	sendRoomData(updatedRoomData);
-}
+};
 
-// TODO: how to handle thrown errors?
+const handleKickVoter: EventFunction<KickVoterEvent> = async (
+	roomData,
+	_,
+	{ voterId },
+) => {
+	const updatedRoomData = await rooms.findAndModify(
+		{ _id: roomData._id },
+		{
+			update: {
+				$pull: {
+					voters: {
+						id: voterId,
+					},
+				},
+			},
+			new: true,
+		},
+	);
+
+	if (!updatedRoomData) return;
+
+	sendRoomData(updatedRoomData);
+
+	const kickedVoterSocket = sockets.get(voterId);
+	if (kickedVoterSocket && kickedVoterSocket.readyState === WebSocket.OPEN) {
+		const kickedEvent: KickedEvent = {
+			event: "Kicked",
+		};
+		kickedVoterSocket.send(JSON.stringify(kickedEvent));
+	}
+};
+
+/**
+ * Middlewares
+ */
+
+const validateModerator: EventFunction<WebScoketMessageEvent> = (
+	roomData,
+	{ userId },
+) => {
+	if (!roomData.moderator || roomData.moderator.id !== userId) {
+		return {
+			message:
+				"This command can only be executed by a moderator which you are not.",
+		};
+	}
+};
+
+const eventHandlerMap = new Map<
+	WebScoketMessageEvent["event"],
+	Array<EventFunction<any>>
+>([
+	["Join", [handleJoin]],
+	["StartVoting", [validateModerator, handleStartVoting]],
+	["StopVoting", [validateModerator, handleStopVoting]],
+	["OptionSelected", [handleOptionSelected]],
+	["ModeratorChange", [validateModerator, handleModeratorChange]],
+	["KickVoter", [validateModerator, handleKickVoter]],
+]);
+
 export const handleWs = (socket: WebSocket, userId: string) => {
 	const userAlreadyExists = sockets.has(userId);
 	sockets.set(userId, socket);
@@ -366,7 +438,10 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 			sockets.delete(userId);
 
 			if (roomCode) {
-				await handleLeave(userId, roomCode);
+				const roomData = await rooms.findOne({ roomCode });
+				if (!roomData) return;
+
+				await handleLeave(roomData, userId);
 			}
 			// socket is left alive for 3 seconds to allow user to rejoin
 		}, 3000);
@@ -375,54 +450,37 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 	socket.addEventListener(
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
-			const data = JSON.parse(event.data) as WebSocketEvent;
+			const data = JSON.parse(event.data) as WebScoketMessageEvent;
 
-			switch (data.event) {
-				case "Join": {
-					roomCode = data.roomCode;
+			if (data.event === "Join") {
+				roomCode = data.roomCode;
+			}
 
-					if (userAlreadyExists) {
-						const roomData = await rooms.findOne({ roomCode });
-						sendRoomData(roomData);
-					} else {
-						await handleJoin(userId, data);
+			if (!roomCode) return;
+
+			const roomData = await rooms.findOne({ roomCode });
+			if (!roomData) return;
+
+			const eventFns = eventHandlerMap.get(data.event);
+			if (!eventFns) return;
+
+			try {
+				for (const eventFn of eventFns) {
+					const stop = await eventFn(
+						roomData,
+						{ userId, userAlreadyExists },
+						data,
+					);
+					if (stop) {
+						console.info(stop.message);
+						break;
 					}
-
-					break;
 				}
-				case "StartVoting": {
-					await handleStartVoting(roomCode);
-					break;
-				}
-				case "StopVoting": {
-					await handleStopVoting(roomCode);
-					break;
-				}
-				case "OptionSelected": {
-					await handleOptionSelected(userId, roomCode, data);
-					break;
-				}
-				case "ModeratorChange": {
-					await handleModeratorChange(roomCode, data);
-					break;
+			} catch (err) {
+				if (err instanceof Error) {
+					console.error(err.message);
 				}
 			}
 		},
 	);
 };
-
-export async function establishSocketConnection(
-	req: OpineRequest,
-	res: OpineResponse,
-	next: NextFunction,
-) {
-	if (req.headers.get("upgrade") === "websocket") {
-		const sock = req.upgrade();
-		const sessionId = getCookies(req.headers)["session"];
-		await handleWs(sock, sessionId);
-	} else {
-		res.send("You've gotta set the magic header...");
-	}
-
-	next();
-}

@@ -30,7 +30,7 @@ table.voterTable {
 	.voterName {
 		text-overflow: ellipsis;
 		overflow: hidden;
-		width: 100%;
+		max-width: 100%;
 	}
 
 	td > button {

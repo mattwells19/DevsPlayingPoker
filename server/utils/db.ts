@@ -19,6 +19,22 @@ const connectToDb = async () => {
 	const rooms = collectionList.includes("rooms")
 		? db.collection<RoomSchema>("rooms")
 		: await db.createCollection<RoomSchema>("rooms");
+
+	const roomIndexes = await rooms.listIndexes().toArray();
+	if (roomIndexes.every((index) => index.name !== "RoomCode")) {
+		await rooms.createIndexes({
+			indexes: [
+				{
+					key: {
+						roomCode: "text",
+					},
+					name: "RoomCode",
+					unique: true,
+				},
+			],
+		});
+	}
+
 	const sessions = collectionList.includes("sessions")
 		? db.collection<SessionSchema>("sessions")
 		: await db.createCollection<SessionSchema>("sessions");

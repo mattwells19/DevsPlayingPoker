@@ -16,6 +16,9 @@
 		"vite-plugin-solid": "^2.5.0"
 	},
 	"dependencies": {
+		"@zag-js/dialog": "^0.2.5",
+		"@zag-js/menu": "^0.3.2",
+		"@zag-js/solid": "^0.2.3",
 		"solid-app-router": "^0.4.2",
 		"solid-js": "^1.6.5"
 	}

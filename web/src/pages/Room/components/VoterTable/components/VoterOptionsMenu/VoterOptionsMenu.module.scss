@@ -1,0 +1,21 @@
+.voterActionMenu {
+	background-color: var(--elevated-background);
+	border-radius: 0.5rem;
+	overflow: hidden;
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+	.itemIcon {
+		margin-right: 0.25rem;
+	}
+
+	[data-part="item"] {
+		list-style-type: none;
+		padding: 0.5rem 0.75rem;
+		cursor: pointer;
+
+		&[data-focus] {
+			background-color: var(--border-gray);
+		}
+	}
+}
