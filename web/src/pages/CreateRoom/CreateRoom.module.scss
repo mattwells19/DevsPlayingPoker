@@ -9,7 +9,7 @@ form.createRoomForm {
 	gap: 2rem;
 	padding: 3rem 0.5rem;
 
-	& > div {
+	& > div, & > dl {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
