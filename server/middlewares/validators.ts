@@ -1,4 +1,4 @@
-import { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
+import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
 
 export function validateRoomCode(
 	req: OpineRequest,
