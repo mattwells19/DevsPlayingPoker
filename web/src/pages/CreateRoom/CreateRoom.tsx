@@ -109,6 +109,7 @@ const CreateRoom: Component = () => {
 	const handleChange = (form: EventTarget & HTMLFormElement) => {
 		const { voterOptions, noVote, numberOfOptions } = getFormValues(form);
 		let fieldOptions: Array<number> = [];
+		setError(null);
 
 		if (voterOptions === "") {
 			setList("");
