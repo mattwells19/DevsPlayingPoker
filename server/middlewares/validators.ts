@@ -20,7 +20,8 @@ const newRoomSchema = zod.object({
 		.number()
 		.array()
 		.min(2, "Need at least 2 options.")
-		.max(15, "No more than 15 options is allowed."),
+		// 15 from pattern + 1 no-vote option
+		.max(15 + 1, "No more than 16 options is allowed."),
 });
 
 export function validateNewRoom(

@@ -8,7 +8,11 @@ import zod from "zod";
 
 const createRoomSchema = zod.object({
 	voterOptions: zod.enum(["fibonacci", "linear"]),
-	numberOfOptions: zod.number().min(2).max(15),
+	// 15 from slider + 1 no-vote option
+	numberOfOptions: zod
+		.number()
+		.min(2)
+		.max(15 + 1),
 	noVote: zod.boolean(),
 });
 
@@ -184,6 +188,7 @@ const CreateRoom: Component = () => {
 							<span class={styles.required}>*</span>
 						</label>
 						<select
+							id="voterOptions"
 							name="voterOptions"
 							required
 							value={defaultFormValues?.voterOptions ?? ""}
