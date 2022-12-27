@@ -18,6 +18,10 @@ const JoinRoom: Component = () => {
 			setErrorMsg("Please enter a name.");
 			return;
 		}
+		if (name.length > 10) {
+			setErrorMsg("Name too long. Must be no more than 10 characters.");
+			return;
+		}
 
 		localStorage.setItem("name", name);
 		navigate(`/room/${roomCode}`);
@@ -40,6 +44,7 @@ const JoinRoom: Component = () => {
 						type="text"
 						required
 						minLength="1"
+						maxLength="10"
 						autofocus
 						value={localStorage.getItem("name") ?? ""}
 						onInput={() => setErrorMsg(null)}

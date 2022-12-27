@@ -20,6 +20,7 @@
 		"@zag-js/menu": "^0.3.2",
 		"@zag-js/solid": "^0.2.3",
 		"solid-app-router": "^0.4.2",
-		"solid-js": "^1.6.5"
+		"solid-js": "^1.6.5",
+		"zod": "^3.20.2"
 	}
 }

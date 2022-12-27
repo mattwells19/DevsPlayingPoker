@@ -4,17 +4,37 @@ import post from "@/utils/post";
 import Button from "@/components/Button";
 import styles from "./CreateRoom.module.scss";
 import Header from "@/components/Header";
+import zod from "zod";
+
+const createRoomSchema = zod.object({
+	voterOptions: zod.enum(["fibonacci", "linear"]),
+	// 15 from slider + 1 no-vote option
+	numberOfOptions: zod
+		.number()
+		.min(2)
+		.max(15 + 1),
+	noVote: zod.boolean(),
+});
+
+const createRoomWithNameSchema = createRoomSchema.extend({
+	moderatorName: zod
+		.string()
+		.min(1, { message: "Must provide a value for name." })
+		.max(10, { message: "Name too long. Must be no more than 10 characters." }),
+});
+
+function safeJSONParse<T>(value: string): T | undefined {
+	try {
+		return JSON.parse(value);
+	} catch {
+		return undefined;
+	}
+}
 
 const options = {
 	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
 	linear: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 };
-
-interface CreateRoomFormValues {
-	voterOptions: "fibonacci" | "linear";
-	numberOfOptions: number;
-	noVote: boolean;
-}
 
 function getFormValues(form: HTMLFormElement) {
 	const formData = new FormData(form);
@@ -34,9 +54,16 @@ const CreateRoom: Component = () => {
 
 	const defaultName = localStorage.getItem("name") ?? "";
 	const rawSavedFormValues = localStorage.getItem("newRoomFields");
-	const defaultFormValues = (
-		rawSavedFormValues ? JSON.parse(rawSavedFormValues) : undefined
-	) as CreateRoomFormValues | undefined;
+	const parsedSavedFormValues = rawSavedFormValues
+		? safeJSONParse(rawSavedFormValues)
+		: undefined;
+
+	const createRoomSchemaCheck = createRoomSchema.safeParse(
+		parsedSavedFormValues,
+	);
+	const defaultFormValues = createRoomSchemaCheck.success
+		? createRoomSchemaCheck.data
+		: undefined;
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
@@ -55,6 +82,21 @@ const CreateRoom: Component = () => {
 			fieldOptions = [0, ...fieldOptions];
 		}
 
+		const createRoomWithNameSchemaCheck =
+			createRoomWithNameSchema.safeParse(formData);
+
+		if (!createRoomWithNameSchemaCheck.success) {
+			const allErrorMessages =
+				createRoomWithNameSchemaCheck.error.flatten().fieldErrors;
+
+			const singleErrorMessage = Object.entries(allErrorMessages)
+				.map(([key, value]) => `${key}: ${value.join("; ")}`)
+				.join("\n");
+
+			setError(singleErrorMessage);
+			return;
+		}
+
 		post("/api/v1/create", { options: fieldOptions })
 			.then((res) => {
 				localStorage.setItem("newRoomFields", JSON.stringify(formData));
@@ -67,6 +109,7 @@ const CreateRoom: Component = () => {
 	const handleChange = (form: EventTarget & HTMLFormElement) => {
 		const { voterOptions, noVote, numberOfOptions } = getFormValues(form);
 		let fieldOptions: Array<number> = [];
+		setError(null);
 
 		if (voterOptions === "") {
 			setList("");
@@ -126,8 +169,11 @@ const CreateRoom: Component = () => {
 						</label>
 						<input
 							autofocus
+							id="moderatorName"
 							name="moderatorName"
 							required
+							minLength="1"
+							maxLength="10"
 							type="text"
 							value={defaultName}
 						/>
@@ -143,6 +189,7 @@ const CreateRoom: Component = () => {
 							<span class={styles.required}>*</span>
 						</label>
 						<select
+							id="voterOptions"
 							name="voterOptions"
 							required
 							value={defaultFormValues?.voterOptions ?? ""}
@@ -159,6 +206,7 @@ const CreateRoom: Component = () => {
 						</label>
 						<input
 							type="range"
+							id="numberOfOptions"
 							name="numberOfOptions"
 							min="2"
 							max="15"
@@ -191,10 +239,10 @@ const CreateRoom: Component = () => {
 						</label>
 					</fieldset>
 
-					<div class={styles.finalPreview}>
+					<dl class={styles.finalPreview}>
 						<dt>Final preview</dt>
 						<dd>{list}</dd>
-					</div>
+					</dl>
 
 					<div class={styles.seperator}>
 						<hr />

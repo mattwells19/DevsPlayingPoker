@@ -1,5 +1,5 @@
 import type { RoomSchema, User, Voter } from "../types/schemas.ts";
-import {
+import type {
 	JoinEvent,
 	RoomUpdateEvent,
 	ConnectEvent,
@@ -123,6 +123,43 @@ const handleJoin: EventFunction<JoinEvent> = async (
 		return;
 	}
 
+	if (!data.name || data.name.length === 0) {
+		return {
+			message: `Invalid name. Expected a name with length between 1 and 10, but got: '${data.name}'.`,
+		};
+	}
+
+	const cleansedName = (() => {
+		// max name length of 10 characters (not including potential name counter)
+		const trimmedName = data.name.trim().substring(0, 10);
+
+		const allPeopleInRoom = [
+			roomData.moderator?.name,
+			...roomData.voters.map((voter) => voter.name),
+		];
+
+		const isNameAlreadyUsed = (nameToCheck: string) =>
+			allPeopleInRoom.some(
+				(personInRoom) =>
+					personInRoom
+						?.toLowerCase()
+						.localeCompare(nameToCheck.toLowerCase()) === 0,
+			);
+
+		let cnt = 1;
+		let newUserName = trimmedName;
+		while (isNameAlreadyUsed(newUserName)) {
+			if (cnt === 10) {
+				throw new Error("Too many duplicate names. Suspected bad behavior.");
+			}
+
+			newUserName = trimmedName + ` (${cnt})`;
+			cnt++;
+		}
+
+		return newUserName;
+	})();
+
 	const isModerator = !roomData.moderator;
 
 	const updatedRoomData = await rooms.findAndModify(
@@ -135,7 +172,7 @@ const handleJoin: EventFunction<JoinEvent> = async (
 								$each: [
 									{
 										id: userId,
-										name: data.name,
+										name: cleansedName,
 										confidence: null,
 										selection: null,
 									},
@@ -143,7 +180,7 @@ const handleJoin: EventFunction<JoinEvent> = async (
 							},
 						},
 				  }
-				: { $set: { moderator: { id: userId, name: data.name } } },
+				: { $set: { moderator: { id: userId, name: cleansedName } } },
 			new: true,
 		},
 	);
@@ -399,6 +436,18 @@ const validateModerator: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
+const validateVoter: EventFunction<WebScoketMessageEvent> = (
+	roomData,
+	{ userId },
+) => {
+	if (roomData.voters.every((voter) => voter.id !== userId)) {
+		return {
+			message:
+				"This command can only be executed by a voter in the specified room which you are not.",
+		};
+	}
+};
+
 const eventHandlerMap = new Map<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
@@ -406,7 +455,7 @@ const eventHandlerMap = new Map<
 	["Join", [handleJoin]],
 	["StartVoting", [validateModerator, handleStartVoting]],
 	["StopVoting", [validateModerator, handleStopVoting]],
-	["OptionSelected", [handleOptionSelected]],
+	["OptionSelected", [validateVoter, handleOptionSelected]],
 	["ModeratorChange", [validateModerator, handleModeratorChange]],
 	["KickVoter", [validateModerator, handleKickVoter]],
 ]);
