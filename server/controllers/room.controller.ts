@@ -26,6 +26,7 @@ export const createRoom: OpineController = async (req, res) => {
 			options,
 			voters: [],
 			votingStartedAt: null,
+			lastUpdated: new Date(),
 		});
 		console.debug(
 			`Room created with _id of ${room} and roomCode of ${roomCode}`,

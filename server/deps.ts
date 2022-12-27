@@ -12,6 +12,8 @@ export {
 	ObjectId,
 	Collection,
 	Database,
+	type IndexOptions,
+	type UpdateFilter,
 } from "https://deno.land/x/mongo@v0.30.1/mod.ts";
 export {
 	getCookies,
