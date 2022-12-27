@@ -3,7 +3,7 @@ import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
 const rateLimitMap = new Map<string, Array<number>>();
 
 const windowMs = 30 * 1000;
-const attempts = 5;
+const attempts = 10;
 
 setInterval(() => {
 	rateLimitMap.forEach((requestTimestamps, ip) => {
