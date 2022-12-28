@@ -16,8 +16,8 @@ router.get(
 		const relativePath = (() => {
 			if (req.url.includes("/assets/") || req.url.includes("/icons/")) {
 				return `./www${req.url}`;
-			} else if (req.url.includes("manifest.json")) {
-				return "./www/manifest.json";
+			} else if (req.url.includes("site.webmanifest")) {
+				return "./www/site.webmanifest";
 			} else {
 				return "./www/index.html";
 			}
