@@ -9,12 +9,12 @@
 	"description": "A simple and fast tool to help your scrum team effort tickets as quickly as possible.",
 	"icons": [
 		{
-			"src": "icons/dpp-icon_192x192.png",
+			"src": "icons/android-chrome-192x192.png",
 			"sizes": "192x192",
 			"type": "image/png"
 		},
 		{
-			"src": "icons/dpp-icon_512x512.png",
+			"src": "icons/android-chrome-512x512.png",
 			"sizes": "512x512",
 			"type": "image/png"
 		}
