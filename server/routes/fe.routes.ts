@@ -13,8 +13,6 @@ router.get(
 		"/site.webmanifest",
 	],
 	async (req: OpineRequest, res: OpineResponse) => {
-		console.log(req.url, req.url.includes("site.webmanifest"));
-
 		const relativePath = (() => {
 			if (req.url.includes("/assets/") || req.url.includes("/icons/")) {
 				return `./www${req.url}`;
