@@ -1,7 +1,7 @@
 {
 	"name": "Devs Playing Poker",
 	"short_name": "DPP",
-	"start_url": "index.html",
+	"start_url": "/",
 	"display": "standalone",
 	"background_color": "#fafafa",
 	"theme_color": "#f48241",

@@ -10,9 +10,11 @@ router.get(
 		"/room/:roomCode",
 		"/assets/*",
 		"/icons/*",
-		"/manifest.json",
+		"/site.webmanifest",
 	],
 	async (req: OpineRequest, res: OpineResponse) => {
+		console.log(req.url, req.url.includes("site.webmanifest"));
+
 		const relativePath = (() => {
 			if (req.url.includes("/assets/") || req.url.includes("/icons/")) {
 				return `./www${req.url}`;
