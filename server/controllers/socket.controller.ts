@@ -14,44 +14,12 @@ import type {
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/db.ts";
 import constants from "../utils/constants.ts";
+import { ObjectId } from "../deps.ts";
+import * as rooms from "../models/rooms.ts";
 
-const { rooms, sessions } = await connectToDb();
+const { sessions } = await connectToDb();
 
 const sockets = new Map<string, WebSocket>();
-
-// update/prune user sessions
-setInterval(async () => {
-	const allSessions = await sessions
-		.find({ environment: constants.environment })
-		.toArray();
-	const promises = [];
-
-	for (const sess of allSessions) {
-		const sessionExpired = sess.maxAge < Date.now();
-
-		if (sessionExpired) {
-			let updatePromise = null;
-
-			if (sockets.has(sess._id.toString())) {
-				// revalidate session since socket is still alive
-				updatePromise = sessions.updateOne(
-					{ _id: sess._id },
-					{
-						$set: {
-							maxAge: Date.now() + constants.sessionTimeout,
-						},
-					},
-				);
-			} else {
-				updatePromise = sessions.deleteOne({ _id: sess._id });
-			}
-
-			promises.push(updatePromise);
-		}
-	}
-
-	await Promise.all(promises);
-}, 60 * 1000);
 
 /**
  * Utils
@@ -162,27 +130,28 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 	const isModerator = !roomData.moderator;
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: !isModerator
-				? {
-						$push: {
-							voters: {
-								$each: [
-									{
-										id: userId,
-										name: cleansedName,
-										confidence: null,
-										selection: null,
-									},
-								],
-							},
+	const updatedRoomData = await rooms.updateById(
+		roomData._id,
+		!isModerator
+			? {
+					$push: {
+						voters: {
+							$each: [
+								{
+									id: userId,
+									name: cleansedName,
+									confidence: null,
+									selection: null,
+								},
+							],
 						},
-				  }
-				: { $set: { moderator: { id: userId, name: cleansedName } } },
-			new: true,
-		},
+					},
+			  }
+			: {
+					$set: {
+						moderator: { id: userId, name: cleansedName },
+					},
+			  },
 	);
 
 	sendRoomData(updatedRoomData);
@@ -204,35 +173,21 @@ const handleLeave = async (
 		if (roomData.voters.length > 0) {
 			const newModerator = roomData.voters[0];
 
-			updatedRoomData = await rooms.findAndModify(
-				{ _id: roomData._id },
-				{
-					update: {
-						$set: {
-							moderator: { id: newModerator.id, name: newModerator.name },
-						},
-						$pull: { voters: { id: newModerator.id } },
-					},
-					new: true,
+			updatedRoomData = await rooms.updateById(roomData._id, {
+				$set: {
+					moderator: { id: newModerator.id, name: newModerator.name },
 				},
-			);
+				$pull: { voters: { id: newModerator.id } },
+			});
 		} else {
 			// if the moderator left and there's no one else in the room, delete the room
-			await rooms.deleteOne({ _id: roomData._id });
+			await rooms.deleteById(roomData._id);
 			return;
 		}
 	} else {
-		updatedRoomData = await rooms.findAndModify(
-			{
-				_id: roomData._id,
-			},
-			{
-				update: {
-					$pull: { voters: { id: userId } },
-				},
-				new: true,
-			},
-		);
+		updatedRoomData = await rooms.updateById(roomData._id, {
+			$pull: { voters: { id: userId } },
+		});
 	}
 
 	sendRoomData(updatedRoomData);
@@ -251,19 +206,13 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 		confidence: null,
 	}));
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					state: "Voting",
-					voters: updatedVoters,
-					votingStartedAt: new Date(),
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			state: "Voting",
+			voters: updatedVoters,
+			votingStartedAt: new Date(),
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
@@ -274,17 +223,11 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
  * @returns void
  */
 const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					state: "Results",
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			state: "Results",
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
@@ -318,17 +261,11 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 		return voter;
 	});
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					voters: updatedVoters,
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			voters: updatedVoters,
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
@@ -372,18 +309,12 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 		name: newModerator.name,
 	};
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					voters: updatedVoters,
-					moderator: updatedModerator,
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			voters: updatedVoters,
+			moderator: updatedModerator,
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
@@ -393,19 +324,13 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 	_,
 	{ voterId },
 ) => {
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$pull: {
-					voters: {
-						id: voterId,
-					},
-				},
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$pull: {
+			voters: {
+				id: voterId,
 			},
-			new: true,
 		},
-	);
+	});
 
 	if (!updatedRoomData) return;
 
@@ -448,6 +373,19 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
+const updateSession = (
+	userId: string,
+): ReturnType<typeof sessions.updateOne> => {
+	return sessions.updateOne(
+		{ _id: new ObjectId(userId) },
+		{
+			$set: {
+				maxAge: new Date(Date.now() + constants.sessionTimeout),
+			},
+		},
+	);
+};
+
 const eventHandlerMap = new Map<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
@@ -487,7 +425,7 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 			sockets.delete(userId);
 
 			if (roomCode) {
-				const roomData = await rooms.findOne({ roomCode });
+				const roomData = await rooms.findByRoomCode(roomCode);
 				if (!roomData) return;
 
 				await handleLeave(roomData, userId);
@@ -500,6 +438,7 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
+			await updateSession(userId);
 
 			if (data.event === "Join") {
 				roomCode = data.roomCode;
@@ -507,7 +446,7 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 
 			if (!roomCode) return;
 
-			const roomData = await rooms.findOne({ roomCode });
+			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;
 
 			const eventFns = eventHandlerMap.get(data.event);
