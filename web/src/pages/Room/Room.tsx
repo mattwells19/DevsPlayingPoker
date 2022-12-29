@@ -4,20 +4,19 @@ import {
 	createResource,
 	createSignal,
 	onCleanup,
-	onMount,
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import styles from "./Room.module.scss";
-import type {
-	RoomSchema,
-	JoinEvent,
-	WebSocketTriggeredEvent,
-	WebScoketMessageEvent,
-} from "@/shared-types";
+import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
 import ModeratorView from "./views/moderator";
 import VoterView from "./views/voter/VoterView";
 import Header from "@/components/Header";
+import {
+	defaultRoomDetails,
+	RoomContextProvider,
+	RoomDetails,
+} from "./RoomContext";
 
 const RoomCheckWrapper: Component = () => {
 	const navigate = useNavigate();
@@ -41,7 +40,7 @@ const RoomCheckWrapper: Component = () => {
 
 	return (
 		<>
-			<Header className={styles.header}>
+			<Header class={styles.header}>
 				<div class={styles.homeLinkContainer}>
 					<Link href="/">
 						<span aria-hidden>🏠</span>
@@ -63,18 +62,6 @@ const RoomCheckWrapper: Component = () => {
 	);
 };
 
-interface RoomDetails {
-	currentUserId: string;
-	roomData: RoomSchema;
-	dispatchEvent: (event: WebScoketMessageEvent) => void;
-}
-
-interface EmptyRoomDetails {
-	currentUserId: "";
-	roomData: null;
-	dispatchEvent: () => void;
-}
-
 interface RoomProps {
 	roomCode: string;
 	resetConnection: () => void;
@@ -82,13 +69,8 @@ interface RoomProps {
 
 const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 	const navigate = useNavigate();
-	const [roomDetails, setRoomDetails] = createStore<
-		RoomDetails | EmptyRoomDetails
-	>({
-		currentUserId: "",
-		dispatchEvent: () => null,
-		roomData: null,
-	});
+	const [roomDetails, setRoomDetails] =
+		createStore<RoomDetails>(defaultRoomDetails);
 
 	const userName = localStorage.getItem("name");
 	if (!userName) {
@@ -96,88 +78,68 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 		return;
 	}
 
-	onMount(() => {
-		const wsProtocol = window.location.protocol.includes("https")
-			? "wss"
-			: "ws";
-		const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+	const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
+	const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
 
-		ws.addEventListener("open", () => {
-			const joinEvent: JoinEvent = {
-				event: "Join",
-				roomCode: roomCode,
-				name: userName,
-			};
-			ws.send(JSON.stringify(joinEvent));
-		});
+	ws.addEventListener("open", () => {
+		const joinEvent: JoinEvent = {
+			event: "Join",
+			roomCode: roomCode,
+			name: userName,
+		};
+		ws.send(JSON.stringify(joinEvent));
+	});
 
-		ws.addEventListener("message", (messageEvent) => {
-			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
+	ws.addEventListener("message", (messageEvent) => {
+		const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
-			switch (data.event) {
-				case "RoomUpdate":
-					setRoomDetails({
-						roomData: data.roomData,
-						dispatchEvent: (e) => ws.send(JSON.stringify(e)),
-					});
-					break;
-				case "Connected":
-					sessionStorage.setItem("userId", data.userId);
-					setRoomDetails({ currentUserId: data.userId });
-					break;
-				case "Kicked":
-					navigate("/");
-					break;
-				default:
-					return;
-			}
-		});
+		switch (data.event) {
+			case "RoomUpdate":
+				setRoomDetails({
+					roomData: data.roomData,
+					dispatchEvent: (e) => ws.send(JSON.stringify(e)),
+				});
+				break;
+			case "Connected":
+				sessionStorage.setItem("userId", data.userId);
+				setRoomDetails({ currentUserId: data.userId });
+				break;
+			case "Kicked":
+				navigate("/");
+				break;
+			default:
+				return;
+		}
+	});
 
-		ws.addEventListener("close", (closeEvent) => {
-			// 1000 means closed normally
-			if (closeEvent.code !== 1000) {
-				resetConnection();
-			} else {
-				console.error(closeEvent.reason);
-			}
-		});
+	ws.addEventListener("close", (closeEvent) => {
+		// 1000 means closed normally
+		if (closeEvent.code !== 1000) {
+			resetConnection();
+		} else {
+			console.error(closeEvent.reason);
+		}
+	});
 
-		onCleanup(() => {
-			ws.close();
-		});
+	onCleanup(() => {
+		ws.close();
 	});
 
 	return (
 		<main class={styles.room}>
-			<Show
-				when={
-					roomDetails.currentUserId && roomDetails.roomData
-						? // Need to spread to get the values out of the store proxy
-						  { ...roomDetails }
-						: null
-				}
-				fallback={<p>Connecting...</p>}
-				keyed
-			>
-				{({ currentUserId, roomData, dispatchEvent }) => (
+			<Show when={roomDetails.roomData} fallback={<p>Connecting...</p>}>
+				{/* 🚧 RoomContext assumes roomData is defined */}
+				<RoomContextProvider value={roomDetails}>
 					<Show
 						// is the current user the moderator?
-						when={roomData.moderator?.id === currentUserId}
-						fallback={
-							<VoterView
-								roomDetails={roomData}
-								dispatchEvent={dispatchEvent}
-								currentUserId={currentUserId}
-							/>
+						when={
+							roomDetails.roomData.moderator?.id === roomDetails.currentUserId
 						}
+						fallback={<VoterView />}
 					>
-						<ModeratorView
-							state={roomData.state}
-							voters={roomData.voters}
-							dispatchEvent={dispatchEvent}
-						/>
+						<ModeratorView />
 					</Show>
-				)}
+				</RoomContextProvider>
 			</Show>
 		</main>
 	);

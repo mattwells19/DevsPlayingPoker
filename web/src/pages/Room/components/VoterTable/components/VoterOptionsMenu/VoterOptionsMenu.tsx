@@ -12,15 +12,12 @@ interface VoterOptionsMenuProps {
 	onVoterClick: (action: VoterClickAction, voter: Voter) => void;
 }
 
-const VoterOptionsMenu: Component<VoterOptionsMenuProps> = ({
-	voter,
-	onVoterClick,
-}) => {
+const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 	const [state, send] = useMachine(
 		menu.machine({
 			id: createUniqueId(),
 			onSelect(value) {
-				onVoterClick(value as VoterClickAction, voter);
+				props.onVoterClick(value as VoterClickAction, props.voter);
 			},
 			closeOnSelect: true,
 			positioning: { placement: "right-start" },
@@ -32,7 +29,7 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = ({
 	return (
 		<>
 			<button class={styles.voterName} {...api().triggerProps}>
-				{voter.name}
+				{props.voter.name}
 			</button>
 			<Portal>
 				<div class={styles.voterActionMenu} {...api().positionerProps}>

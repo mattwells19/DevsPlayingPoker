@@ -14,17 +14,14 @@ interface OptionConfirmationDialogProps {
 	onCancel: () => void;
 }
 
-const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = ({
-	action,
-	voter,
-	onCancel,
-	onConfirm,
-}) => {
+const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
+	props,
+) => {
 	const [state, send] = useMachine(
 		dialog.machine({
 			id: createUniqueId(),
 			role: "alertdialog",
-			onClose: onCancel,
+			onClose: props.onCancel,
 			defaultOpen: true,
 			// needed to avoid body.style.paddingRight content shift
 			preventScroll: false,
@@ -34,7 +31,7 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = ({
 	const api = createMemo(() => dialog.connect(state, send, normalizeProps));
 
 	const title = (() => {
-		switch (action) {
+		switch (props.action) {
 			case "kickVoter":
 				return "Kick Voter";
 			case "makeModerator":
@@ -45,18 +42,19 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = ({
 	})();
 
 	const description = () => {
-		switch (action) {
+		switch (props.action) {
 			case "kickVoter":
 				return (
 					<span>
-						Are you sure you want to remove <b>{voter.name}</b> from the room?
+						Are you sure you want to remove <b>{props.voter.name}</b> from the
+						room?
 					</span>
 				);
 			case "makeModerator":
 				return (
 					<span>
-						Are you sure you want to make <b>{voter.name}</b> the new moderator?
-						This will turn you into a voter.
+						Are you sure you want to make <b>{props.voter.name}</b> the new
+						moderator? This will turn you into a voter.
 					</span>
 				);
 			default:
@@ -75,10 +73,10 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = ({
 						&#10005;
 					</Button>
 					<div role="group" onClick={() => api().close()}>
-						<Button variant="solid" onClick={() => onConfirm()}>
+						<Button variant="solid" onClick={() => props.onConfirm()}>
 							Confirm
 						</Button>
-						<Button variant="outline" onClick={() => onCancel()}>
+						<Button variant="outline" onClick={() => props.onCancel()}>
 							Cancel
 						</Button>
 					</div>

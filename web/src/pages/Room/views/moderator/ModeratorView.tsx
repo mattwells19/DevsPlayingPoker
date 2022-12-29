@@ -2,26 +2,19 @@ import { Component, Match, Switch } from "solid-js";
 import type {
 	KickVoterEvent,
 	ModeratorChangeEvent,
-	RoomSchema,
 	Voter,
-	WebScoketMessageEvent,
 } from "@/shared-types";
 import Button from "@/components/Button";
 import VoterTable from "../../components/VoterTable";
 import styles from "./ModeratorView.module.scss";
 import type { VoterClickAction } from "../../components/VoterTable";
+import { useRoom } from "../../RoomContext";
 
-interface ModeratorViewProps {
-	state: RoomSchema["state"];
-	voters: RoomSchema["voters"];
-	dispatchEvent: (event: WebScoketMessageEvent) => void;
-}
+interface ModeratorViewProps {}
 
-const ModeratorView: Component<ModeratorViewProps> = ({
-	state,
-	voters,
-	dispatchEvent,
-}) => {
+const ModeratorView: Component<ModeratorViewProps> = () => {
+	const room = useRoom();
+
 	function handleVoterAction(action: VoterClickAction, voter: Voter) {
 		const event = (() => {
 			switch (action) {
@@ -39,38 +32,34 @@ const ModeratorView: Component<ModeratorViewProps> = ({
 		})();
 
 		if (event) {
-			dispatchEvent(event);
+			room.dispatchEvent(event);
 		}
 	}
 
 	return (
 		<>
 			<Switch>
-				<Match when={state === "Results"}>
+				<Match when={room.roomData.state === "Results"}>
 					<Button
 						class={styles.moderatorBtn}
-						onClick={() => dispatchEvent({ event: "StartVoting" })}
-						disabled={voters.length === 0}
+						onClick={() => room.dispatchEvent({ event: "StartVoting" })}
+						disabled={room.roomData.voters.length === 0}
 					>
-						{voters.some((voter) => voter.selection !== null)
+						{room.roomData.voters.some((voter) => voter.selection !== null)
 							? "Reset Votes & Start Voting"
 							: "Start Voting"}
 					</Button>
 				</Match>
-				<Match when={state === "Voting"}>
+				<Match when={room.roomData.state === "Voting"}>
 					<Button
 						class={styles.moderatorBtn}
-						onClick={() => dispatchEvent({ event: "StopVoting" })}
+						onClick={() => room.dispatchEvent({ event: "StopVoting" })}
 					>
 						Stop Voting
 					</Button>
 				</Match>
 			</Switch>
-			<VoterTable
-				roomState={state}
-				voters={voters}
-				onVoterAction={handleVoterAction}
-			/>
+			<VoterTable onVoterAction={handleVoterAction} />
 		</>
 	);
 };

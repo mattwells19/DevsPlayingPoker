@@ -1,33 +1,25 @@
 import { Component, For, Match, Switch } from "solid-js";
-import type { RoomSchema, WebScoketMessageEvent } from "@/shared-types";
 import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
+import { useRoom } from "../../RoomContext";
 
-interface VoterViewProps {
-	roomDetails: RoomSchema;
-	dispatchEvent: (event: WebScoketMessageEvent) => void;
-	currentUserId: string;
-}
+interface VoterViewProps {}
 
-const VoterView: Component<VoterViewProps> = ({
-	roomDetails,
-	dispatchEvent,
-	currentUserId,
-}) => {
-	// the user object of the current user if they're a voter. null if they're the moderator
-	const currentVoter =
-		roomDetails.voters.find((voter) => voter.id === currentUserId) ?? null;
+const VoterView: Component<VoterViewProps> = () => {
+	const room = useRoom();
+	const currentVoter = () =>
+		room.roomData.voters.find((voter) => voter.id === room.currentUserId);
 
 	return (
 		<Switch>
-			<Match when={roomDetails.state === "Results"}>
+			<Match when={room.roomData.state === "Results"}>
 				<p class={styles.infoText}>
-					Waiting for {roomDetails.moderator?.name}...
+					Waiting for {room.roomData.moderator?.name}...
 				</p>
-				<VoterTable roomState={roomDetails.state} voters={roomDetails.voters} />
+				<VoterTable />
 			</Match>
-			<Match when={roomDetails.state === "Voting"}>
+			<Match when={room.roomData.state === "Voting"}>
 				<fieldset
 					class={styles.voterChoices}
 					onchange={(e) => {
@@ -37,21 +29,21 @@ const VoterView: Component<VoterViewProps> = ({
 						if (!selectionValue) throw new Error("Didn't get a value");
 						const selection = parseInt(selectionValue, 10);
 
-						dispatchEvent({
+						room.dispatchEvent({
 							event: "OptionSelected",
 							selection,
 						});
 					}}
 				>
 					<legend>
-						{currentVoter?.selection !== null
+						{currentVoter()?.selection !== null
 							? "Got it! You can change your mind if you want. Otherwise sit tight."
 							: "Make a selection"}
 					</legend>
-					<For each={roomDetails.options}>
+					<For each={room.roomData.options}>
 						{(option) => (
 							<OptionCard
-								selected={option === currentVoter?.selection}
+								selected={option === currentVoter()?.selection}
 								value={option}
 							/>
 						)}
