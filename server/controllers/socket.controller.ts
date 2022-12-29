@@ -17,8 +17,6 @@ import constants from "../utils/constants.ts";
 import { ObjectId } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
 
-const { sessions } = await connectToDb();
-
 const sockets = new Map<string, WebSocket>();
 
 /**
@@ -373,9 +371,11 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
-const updateSession = (
+const updateSession = async (
 	userId: string,
 ): ReturnType<typeof sessions.updateOne> => {
+	const { sessions } = await connectToDb();
+
 	return sessions.updateOne(
 		{ _id: new ObjectId(userId) },
 		{

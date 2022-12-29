@@ -7,8 +7,6 @@ type OpineController<ResBody = any> = (
 	res: OpineResponse,
 ) => Promise<OpineResponse<ResBody>>;
 
-const { rooms } = await connectToDb();
-
 export interface CreateRoomRequest {
 	moderatorName: string;
 	options: number[];
@@ -18,6 +16,8 @@ export const createRoom: OpineController = async (req, res) => {
 	const { options }: CreateRoomRequest = req.body;
 
 	try {
+		const { rooms } = await connectToDb();
+
 		const roomCode = await generateRoomCode();
 		const room = await rooms.insertOne({
 			roomCode,
@@ -46,6 +46,8 @@ export const createRoom: OpineController = async (req, res) => {
 };
 
 export const getRoom: OpineController = async (req, res) => {
+	const { rooms } = await connectToDb();
+
 	const room = await rooms.findOne({ roomCode: req.params.roomCode });
 	if (room) {
 		return res.setStatus(200).json({
@@ -60,6 +62,8 @@ export const getRoom: OpineController = async (req, res) => {
 };
 
 export const checkRoomExists: OpineController = async (req, res) => {
+	const { rooms } = await connectToDb();
+
 	const room = await rooms.findOne({ roomCode: req.params.roomCode });
 	if (room) {
 		return res.setStatus(200).json({

@@ -1,29 +1,33 @@
 import { Collection, Database, IndexOptions, MongoClient } from "../deps.ts";
 import { RoomSchema, SessionSchema } from "../types/schemas.ts";
 
-let mongo_db: Database | null = null;
+let db: Database | null = null;
+let collectionList: Array<string> | null = null;
 
 async function getCollection<T>(
 	collectionName: string,
 	indexMap?: Map<string, IndexOptions>,
 ): Promise<Collection<T>> {
-	const db = await (async () => {
-		if (mongo_db) return Promise.resolve(mongo_db);
+	db =
+		db ??
+		(await (() => {
+			const DB_URL = Deno.env.get("DB_URL");
+			if (!DB_URL) throw new Error("Problem importing from .env");
 
-		const DB_URL = Deno.env.get("DB_URL");
-		if (!DB_URL) throw new Error("Problem importing from .env");
-		const client = new MongoClient();
-		mongo_db = await client.connect(`${DB_URL}/devs_playing_poker`);
-		return mongo_db;
-	})();
+			const client = new MongoClient();
+			return client.connect(`${DB_URL}/devs_playing_poker`);
+		})());
 
-	const collectionList = await db.listCollectionNames();
+	collectionList = collectionList ?? (await db.listCollectionNames());
 
-	const collection = await (async () => {
+	const collection = await (() => {
 		if (collectionList.includes(collectionName)) {
 			return db.collection<T>(collectionName);
 		} else {
-			return await db.createCollection<T>(collectionName);
+			// invalidate poor-mans collection list cache
+			collectionList = null;
+			console.info(`\nCreating collection: '${collectionName}'`);
+			return db.createCollection<T>(collectionName);
 		}
 	})();
 
@@ -38,6 +42,10 @@ async function getCollection<T>(
 			.map((indexName) => indexMap.get(indexName)!);
 
 		if (indexesToAdd.length > 0) {
+			console.info(
+				`Creating indexes for '${collectionName}' collection:`,
+				indexesToAdd.map((index) => index.name).join(", "),
+			);
 			await collection.createIndexes({ indexes: indexesToAdd });
 		}
 	}
