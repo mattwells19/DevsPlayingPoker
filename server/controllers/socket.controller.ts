@@ -21,6 +21,9 @@ const { sessions } = await connectToDb();
 
 const sockets = new Map<string, WebSocket>();
 
+const getSocketId = (userId: string, roomCode: string) =>
+	`${userId}-${roomCode}`;
+
 /**
  * Utils
  */
@@ -40,7 +43,9 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	};
 
 	if (roomData.moderator) {
-		const moderatorSock = sockets.get(roomData.moderator.id);
+		const moderatorSock = sockets.get(
+			getSocketId(roomData.moderator.id, roomData.roomCode),
+		);
 
 		if (moderatorSock && moderatorSock.readyState === WebSocket.OPEN) {
 			moderatorSock.send(JSON.stringify(roomUpdateEvent));
@@ -48,7 +53,9 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	}
 
 	for (const voter of roomData.voters) {
-		const voterSock = sockets.get(voter.id.toString());
+		const voterSock = sockets.get(
+			getSocketId(voter.id.toString(), roomData.roomCode),
+		);
 
 		if (voterSock && voterSock.readyState === WebSocket.OPEN) {
 			voterSock.send(JSON.stringify(roomUpdateEvent));
@@ -159,9 +166,6 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 /**
  * Removes the user from the room and performs moderator migration if necessary
- * @param userId ID of the user leaving
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleLeave = async (
 	roomData: RoomSchema,
@@ -195,8 +199,6 @@ const handleLeave = async (
 
 /**
  * Begins voting, clearing previous votes
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 	const updatedVoters = roomData.voters.map((voter) => ({
@@ -219,8 +221,6 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 
 /**
  * Ends voting, transitioning to "Results" state
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
 	const updatedRoomData = await rooms.updateById(roomData._id, {
@@ -234,10 +234,6 @@ const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
 
 /**
  * Updates voter selection and confidence.  Sends updated roomdata
- * @param userId
- * @param roomCode 4-character code for the room
- * @param data OptionSelectedEvent data
- * @returns void
  */
 const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 	roomData,
@@ -272,9 +268,6 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 
 /**
  * Updates moderator to existing voter.  Adds former moderator to list of voters.
- * @param roomCode 4-character code for the room
- * @param data ModeratorChangeEvent data including new moderatorId
- * @returns void
  */
 const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 	roomData,
@@ -336,7 +329,9 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 
 	sendRoomData(updatedRoomData);
 
-	const kickedVoterSocket = sockets.get(voterId);
+	const kickedVoterSocket = sockets.get(
+		getSocketId(voterId, roomData.roomCode),
+	);
 	if (kickedVoterSocket && kickedVoterSocket.readyState === WebSocket.OPEN) {
 		const kickedEvent: KickedEvent = {
 			event: "Kicked",
@@ -398,10 +393,14 @@ const eventHandlerMap = new Map<
 	["KickVoter", [validateModerator, handleKickVoter]],
 ]);
 
-export const handleWs = (socket: WebSocket, userId: string) => {
-	const userAlreadyExists = sockets.has(userId);
-	sockets.set(userId, socket);
-	let roomCode: string | null = null;
+export const handleWs = (
+	socket: WebSocket,
+	userId: string,
+	roomCode: string,
+) => {
+	const socketId = getSocketId(userId, roomCode);
+	const userAlreadyExists = sockets.has(socketId);
+	sockets.set(socketId, socket);
 
 	socket.addEventListener("open", () => {
 		const connectEvent: ConnectEvent = {
@@ -412,24 +411,22 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 	});
 
 	socket.addEventListener("close", () => {
-		const preSocket = sockets.get(userId);
+		const preSocket = sockets.get(socketId);
 		setTimeout(async () => {
-			const postSocket = sockets.get(userId);
+			const postSocket = sockets.get(socketId);
 
-			// same userId but different socket object means they reconnected
+			// same socketId but different socket object means they reconnected
 			if (preSocket !== postSocket) {
 				return;
 			}
 
 			// remove voter from room
-			sockets.delete(userId);
+			sockets.delete(socketId);
 
-			if (roomCode) {
-				const roomData = await rooms.findByRoomCode(roomCode);
-				if (!roomData) return;
+			const roomData = await rooms.findByRoomCode(roomCode);
+			if (!roomData) return;
 
-				await handleLeave(roomData, userId);
-			}
+			await handleLeave(roomData, userId);
 			// socket is left alive for 3 seconds to allow user to rejoin
 		}, 3000);
 	});
@@ -439,12 +436,6 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 		async (event: MessageEvent<string>): Promise<void> => {
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
 			await updateSession(userId);
-
-			if (data.event === "Join") {
-				roomCode = data.roomCode;
-			}
-
-			if (!roomCode) return;
 
 			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;

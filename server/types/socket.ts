@@ -12,7 +12,6 @@ export interface RoomUpdateEvent {
 
 export interface JoinEvent {
 	event: "Join";
-	roomCode: string;
 	name: string;
 }
 
