@@ -4,6 +4,7 @@ import {
 	createResource,
 	createSignal,
 	For,
+	JSX,
 	Show,
 } from "solid-js";
 import { useNavigate } from "solid-app-router";
@@ -42,6 +43,30 @@ const Landing: Component = () => {
 		}
 	};
 
+	const handlePaste: JSX.EventHandlerUnion<HTMLFormElement, ClipboardEvent> = (
+		e,
+	) => {
+		e.preventDefault();
+		const pastedData = e.clipboardData?.getData("text");
+
+		if (pastedData && pastedData.length === 4) {
+			pastedData.split("").forEach((letter, index) => {
+				const element = roomCodeInputsRefs[index];
+
+				if (element) {
+					element.value = letter;
+					// focus last input
+					if (index === pastedData.length - 1) {
+						element.focus();
+					}
+				}
+			});
+
+			// Firefox doesn't trigger onInput for pasted data so need to manually trigger
+			handleInputChange(e.currentTarget);
+		}
+	};
+
 	createEffect(() => {
 		if (roomExists()) {
 			navigate(`/room/${roomCodeValue()}`);
@@ -62,7 +87,10 @@ const Landing: Component = () => {
 				<div class={styles.roomOps}>
 					<section class={styles.roomCodeInputs}>
 						<p>Already have a room code? Enter it here</p>
-						<form onInput={(e) => handleInputChange(e.currentTarget)}>
+						<form
+							onInput={(e) => handleInputChange(e.currentTarget)}
+							onPaste={(e) => handlePaste(e)}
+						>
 							<For each={[0, 1, 2, 3]}>
 								{(index) => (
 									<input
@@ -74,6 +102,7 @@ const Landing: Component = () => {
 										maxLength="1"
 										required
 										autofocus={index === 0}
+										autocomplete="off"
 										ref={(el) => (roomCodeInputsRefs[index] = el)}
 										onInput={(e) => {
 											if (e.currentTarget.value.trim().length > 0) {
@@ -87,27 +116,6 @@ const Landing: Component = () => {
 												if (e.currentTarget.value === "") {
 													roomCodeInputsRefs[index - 1]?.focus();
 												}
-											}
-										}}
-										onPaste={(e) => {
-											const pastedData = e.clipboardData?.getData("text");
-
-											if (
-												index === 0 &&
-												pastedData &&
-												pastedData.length === 4
-											) {
-												pastedData.split("").forEach((letter, index) => {
-													const element = roomCodeInputsRefs[index];
-
-													if (element) {
-														element.value = letter;
-														// focus last input
-														if (index === pastedData.length - 1) {
-															element.focus();
-														}
-													}
-												});
 											}
 										}}
 									/>

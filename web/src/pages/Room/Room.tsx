@@ -87,7 +87,6 @@ const Room: Component<RoomProps> = (props) => {
 		});
 
 		ws().addEventListener("message", (messageEvent) => {
-			console.log("handle message");
 			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
