@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 import styles from "./OptionCard.module.scss";
 
 interface OptionCardProps {
@@ -7,6 +7,8 @@ interface OptionCardProps {
 }
 
 const OptionCard: Component<OptionCardProps> = (props) => {
+	const cornerText = () => (props.value > 0 ? props.value : "No-vote");
+
 	return (
 		<span class={styles.optionContainer}>
 			<input
@@ -28,23 +30,26 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 					<rect width="158" height="221" rx="8" fill="white" />
 					<rect x="1" y="1" width="156" height="219" rx="7" />
 					<text x="15" y="208" fill="black" text-anchor="start">
-						{props.value > 0 ? props.value : "No-vote"}
+						{cornerText()}
 					</text>
 					<text x="143" y="25" fill="black" text-anchor="end">
-						{props.value > 0 ? props.value : "No-vote"}
+						{cornerText()}
 					</text>
-					{props.value > 0 ? (
-						<text
-							x="79"
-							y="135"
-							fill="black"
-							text-anchor="middle"
-							font-weight="bold"
-							style="font-size: 5rem"
-						>
-							{props.value}
-						</text>
-					) : (
+					<Show
+						fallback={
+							<text
+								x="79"
+								y="135"
+								fill="black"
+								text-anchor="middle"
+								font-weight="bold"
+								style="font-size: 5rem"
+							>
+								{props.value}
+							</text>
+						}
+						when={props.value === 0}
+					>
 						<svg
 							width="80"
 							height="80"
@@ -61,7 +66,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 								stroke-width="11"
 							/>
 						</svg>
-					)}
+					</Show>
 				</svg>
 			</label>
 		</span>
