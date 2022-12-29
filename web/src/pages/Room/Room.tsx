@@ -67,24 +67,25 @@ interface RoomProps {
 	resetConnection: () => void;
 }
 
-const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
+const Room: Component<RoomProps> = (props) => {
 	const navigate = useNavigate();
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
 
 	const userName = localStorage.getItem("name");
 	if (!userName) {
-		navigate(`/join/${roomCode}`);
+		navigate(`/join/${props.roomCode}`);
 		return;
 	}
 
 	const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
-	const ws = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+	const ws = new WebSocket(
+		`${wsProtocol}://${window.location.host}/ws/${props.roomCode}`,
+	);
 
 	ws.addEventListener("open", () => {
 		const joinEvent: JoinEvent = {
 			event: "Join",
-			roomCode: roomCode,
 			name: userName,
 		};
 		ws.send(JSON.stringify(joinEvent));
@@ -115,14 +116,12 @@ const Room: Component<RoomProps> = ({ roomCode, resetConnection }) => {
 	ws.addEventListener("close", (closeEvent) => {
 		// 1000 means closed normally
 		if (closeEvent.code !== 1000) {
-			resetConnection();
-		} else {
-			console.error(closeEvent.reason);
+			props.resetConnection();
 		}
 	});
 
 	onCleanup(() => {
-		ws.close();
+		ws.close(1000);
 	});
 
 	return (
