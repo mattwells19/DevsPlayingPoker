@@ -22,15 +22,32 @@ server.use(async (req, res, next) => {
 			_id: new ObjectId(sessionId),
 			environment: constants.environment,
 		});
-		if (session && session.maxAge > Date.now()) {
+
+		// session still valid, update cookie header and continue
+		if (session && session.maxAge.valueOf() > Date.now()) {
+			if (!res.headers) {
+				res.headers = new Headers();
+			}
+
+			setCookie(res.headers, {
+				name: "session",
+				value: session._id.toString(),
+				maxAge: session.maxAge.valueOf(),
+				path: "/",
+				sameSite: "Strict",
+				secure: constants.environment !== "local",
+				httpOnly: true,
+			});
+
 			return next();
 		}
 	}
 
+	// if there's no sessionId in the cookie list or it is invalid, start a new session
 	const maxAge = Date.now() + constants.sessionTimeout;
 	await sessions
 		.insertOne({
-			maxAge,
+			maxAge: new Date(maxAge),
 			environment: constants.environment,
 		})
 		.then((newSession) => {

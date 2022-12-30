@@ -1,9 +1,12 @@
-import { Database, MongoClient } from "../deps.ts";
+import { Collection, Database, IndexOptions, MongoClient } from "../deps.ts";
 import { RoomSchema, SessionSchema } from "../types/schemas.ts";
 
 let mongo_db: Database | null = null;
 
-const connectToDb = async () => {
+async function getCollection<T>(
+	collectionName: string,
+	indexMap?: Map<string, IndexOptions>,
+): Promise<Collection<T>> {
 	const db = await (async () => {
 		if (mongo_db) return Promise.resolve(mongo_db);
 
@@ -16,28 +19,72 @@ const connectToDb = async () => {
 
 	const collectionList = await db.listCollectionNames();
 
-	const rooms = collectionList.includes("rooms")
-		? db.collection<RoomSchema>("rooms")
-		: await db.createCollection<RoomSchema>("rooms");
+	const collection = await (async () => {
+		if (collectionList.includes(collectionName)) {
+			return db.collection<T>(collectionName);
+		} else {
+			return await db.createCollection<T>(collectionName);
+		}
+	})();
 
-	const roomIndexes = await rooms.listIndexes().toArray();
-	if (roomIndexes.every((index) => index.name !== "RoomCode")) {
-		await rooms.createIndexes({
-			indexes: [
-				{
-					key: {
-						roomCode: "text",
-					},
-					name: "RoomCode",
-					unique: true,
-				},
-			],
-		});
+	if (indexMap) {
+		const collectionIndexes = await collection
+			.listIndexes()
+			.toArray()
+			.then((indexes) => indexes.map((index) => index.name));
+
+		const indexesToAdd = Array.from(indexMap.keys())
+			.filter((indexName) => !collectionIndexes.includes(indexName))
+			.map((indexName) => indexMap.get(indexName)!);
+
+		if (indexesToAdd.length > 0) {
+			await collection.createIndexes({ indexes: indexesToAdd });
+		}
 	}
 
-	const sessions = collectionList.includes("sessions")
-		? db.collection<SessionSchema>("sessions")
-		: await db.createCollection<SessionSchema>("sessions");
+	return collection;
+}
+
+const RoomCodeIndex: IndexOptions = {
+	key: {
+		roomCode: "text",
+	},
+	name: "RoomCode",
+	unique: true,
+};
+
+// automatically remove rooms that haven't been updated after `expireAfterSeconds` time
+const StaleRoomIndex: IndexOptions = {
+	key: {
+		lastUpdated: 1,
+	},
+	expireAfterSeconds: 60 * 60, // 1 hour
+	name: "StaleRooms",
+};
+
+// automatically remove sessions that have expired based on the maxAge time
+const StaleSessionIndex: IndexOptions = {
+	key: {
+		maxAge: 1,
+	},
+	// setting this to 0 will cause the document to expire at maxAge datetime
+	expireAfterSeconds: 0,
+	name: "StaleSessions",
+};
+
+const RoomIndexes = new Map([
+	["RoomCode", RoomCodeIndex],
+	["StaleRooms", StaleRoomIndex],
+]);
+const SessionIndexes = new Map([["StaleSessions", StaleSessionIndex]]);
+
+const connectToDb = async () => {
+	const rooms = await getCollection<RoomSchema>("rooms", RoomIndexes);
+
+	const sessions = await getCollection<SessionSchema>(
+		"sessions",
+		SessionIndexes,
+	);
 
 	return { rooms, sessions };
 };

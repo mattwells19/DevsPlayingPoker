@@ -14,44 +14,15 @@ import type {
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import connectToDb from "../utils/db.ts";
 import constants from "../utils/constants.ts";
+import { ObjectId } from "../deps.ts";
+import * as rooms from "../models/rooms.ts";
 
-const { rooms, sessions } = await connectToDb();
+const { sessions } = await connectToDb();
 
 const sockets = new Map<string, WebSocket>();
 
-// update/prune user sessions
-setInterval(async () => {
-	const allSessions = await sessions
-		.find({ environment: constants.environment })
-		.toArray();
-	const promises = [];
-
-	for (const sess of allSessions) {
-		const sessionExpired = sess.maxAge < Date.now();
-
-		if (sessionExpired) {
-			let updatePromise = null;
-
-			if (sockets.has(sess._id.toString())) {
-				// revalidate session since socket is still alive
-				updatePromise = sessions.updateOne(
-					{ _id: sess._id },
-					{
-						$set: {
-							maxAge: Date.now() + constants.sessionTimeout,
-						},
-					},
-				);
-			} else {
-				updatePromise = sessions.deleteOne({ _id: sess._id });
-			}
-
-			promises.push(updatePromise);
-		}
-	}
-
-	await Promise.all(promises);
-}, 60 * 1000);
+const getSocketId = (userId: string, roomCode: string) =>
+	`${userId}-${roomCode}`;
 
 /**
  * Utils
@@ -72,7 +43,9 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	};
 
 	if (roomData.moderator) {
-		const moderatorSock = sockets.get(roomData.moderator.id);
+		const moderatorSock = sockets.get(
+			getSocketId(roomData.moderator.id, roomData.roomCode),
+		);
 
 		if (moderatorSock && moderatorSock.readyState === WebSocket.OPEN) {
 			moderatorSock.send(JSON.stringify(roomUpdateEvent));
@@ -80,7 +53,9 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	}
 
 	for (const voter of roomData.voters) {
-		const voterSock = sockets.get(voter.id.toString());
+		const voterSock = sockets.get(
+			getSocketId(voter.id.toString(), roomData.roomCode),
+		);
 
 		if (voterSock && voterSock.readyState === WebSocket.OPEN) {
 			voterSock.send(JSON.stringify(roomUpdateEvent));
@@ -162,27 +137,28 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 	const isModerator = !roomData.moderator;
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: !isModerator
-				? {
-						$push: {
-							voters: {
-								$each: [
-									{
-										id: userId,
-										name: cleansedName,
-										confidence: null,
-										selection: null,
-									},
-								],
-							},
+	const updatedRoomData = await rooms.updateById(
+		roomData._id,
+		!isModerator
+			? {
+					$push: {
+						voters: {
+							$each: [
+								{
+									id: userId,
+									name: cleansedName,
+									confidence: null,
+									selection: null,
+								},
+							],
 						},
-				  }
-				: { $set: { moderator: { id: userId, name: cleansedName } } },
-			new: true,
-		},
+					},
+			  }
+			: {
+					$set: {
+						moderator: { id: userId, name: cleansedName },
+					},
+			  },
 	);
 
 	sendRoomData(updatedRoomData);
@@ -190,9 +166,6 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 /**
  * Removes the user from the room and performs moderator migration if necessary
- * @param userId ID of the user leaving
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleLeave = async (
 	roomData: RoomSchema,
@@ -204,35 +177,21 @@ const handleLeave = async (
 		if (roomData.voters.length > 0) {
 			const newModerator = roomData.voters[0];
 
-			updatedRoomData = await rooms.findAndModify(
-				{ _id: roomData._id },
-				{
-					update: {
-						$set: {
-							moderator: { id: newModerator.id, name: newModerator.name },
-						},
-						$pull: { voters: { id: newModerator.id } },
-					},
-					new: true,
+			updatedRoomData = await rooms.updateById(roomData._id, {
+				$set: {
+					moderator: { id: newModerator.id, name: newModerator.name },
 				},
-			);
+				$pull: { voters: { id: newModerator.id } },
+			});
 		} else {
 			// if the moderator left and there's no one else in the room, delete the room
-			await rooms.deleteOne({ _id: roomData._id });
+			await rooms.deleteById(roomData._id);
 			return;
 		}
 	} else {
-		updatedRoomData = await rooms.findAndModify(
-			{
-				_id: roomData._id,
-			},
-			{
-				update: {
-					$pull: { voters: { id: userId } },
-				},
-				new: true,
-			},
-		);
+		updatedRoomData = await rooms.updateById(roomData._id, {
+			$pull: { voters: { id: userId } },
+		});
 	}
 
 	sendRoomData(updatedRoomData);
@@ -240,8 +199,6 @@ const handleLeave = async (
 
 /**
  * Begins voting, clearing previous votes
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 	const updatedVoters = roomData.voters.map((voter) => ({
@@ -251,50 +208,32 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 		confidence: null,
 	}));
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					state: "Voting",
-					voters: updatedVoters,
-					votingStartedAt: new Date(),
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			state: "Voting",
+			voters: updatedVoters,
+			votingStartedAt: new Date(),
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
 
 /**
  * Ends voting, transitioning to "Results" state
- * @param roomCode 4-character code for the room
- * @returns void
  */
 const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					state: "Results",
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			state: "Results",
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
 
 /**
  * Updates voter selection and confidence.  Sends updated roomdata
- * @param userId
- * @param roomCode 4-character code for the room
- * @param data OptionSelectedEvent data
- * @returns void
  */
 const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 	roomData,
@@ -318,26 +257,17 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 		return voter;
 	});
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					voters: updatedVoters,
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			voters: updatedVoters,
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
 
 /**
  * Updates moderator to existing voter.  Adds former moderator to list of voters.
- * @param roomCode 4-character code for the room
- * @param data ModeratorChangeEvent data including new moderatorId
- * @returns void
  */
 const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 	roomData,
@@ -372,18 +302,12 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 		name: newModerator.name,
 	};
 
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$set: {
-					voters: updatedVoters,
-					moderator: updatedModerator,
-				},
-			},
-			new: true,
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			voters: updatedVoters,
+			moderator: updatedModerator,
 		},
-	);
+	});
 
 	sendRoomData(updatedRoomData);
 };
@@ -393,25 +317,21 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 	_,
 	{ voterId },
 ) => {
-	const updatedRoomData = await rooms.findAndModify(
-		{ _id: roomData._id },
-		{
-			update: {
-				$pull: {
-					voters: {
-						id: voterId,
-					},
-				},
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$pull: {
+			voters: {
+				id: voterId,
 			},
-			new: true,
 		},
-	);
+	});
 
 	if (!updatedRoomData) return;
 
 	sendRoomData(updatedRoomData);
 
-	const kickedVoterSocket = sockets.get(voterId);
+	const kickedVoterSocket = sockets.get(
+		getSocketId(voterId, roomData.roomCode),
+	);
 	if (kickedVoterSocket && kickedVoterSocket.readyState === WebSocket.OPEN) {
 		const kickedEvent: KickedEvent = {
 			event: "Kicked",
@@ -448,6 +368,19 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
+const updateSession = (
+	userId: string,
+): ReturnType<typeof sessions.updateOne> => {
+	return sessions.updateOne(
+		{ _id: new ObjectId(userId) },
+		{
+			$set: {
+				maxAge: new Date(Date.now() + constants.sessionTimeout),
+			},
+		},
+	);
+};
+
 const eventHandlerMap = new Map<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
@@ -460,10 +393,14 @@ const eventHandlerMap = new Map<
 	["KickVoter", [validateModerator, handleKickVoter]],
 ]);
 
-export const handleWs = (socket: WebSocket, userId: string) => {
-	const userAlreadyExists = sockets.has(userId);
-	sockets.set(userId, socket);
-	let roomCode: string | null = null;
+export const handleWs = (
+	socket: WebSocket,
+	userId: string,
+	roomCode: string,
+) => {
+	const socketId = getSocketId(userId, roomCode);
+	const userAlreadyExists = sockets.has(socketId);
+	sockets.set(socketId, socket);
 
 	socket.addEventListener("open", () => {
 		const connectEvent: ConnectEvent = {
@@ -474,24 +411,22 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 	});
 
 	socket.addEventListener("close", () => {
-		const preSocket = sockets.get(userId);
+		const preSocket = sockets.get(socketId);
 		setTimeout(async () => {
-			const postSocket = sockets.get(userId);
+			const postSocket = sockets.get(socketId);
 
-			// same userId but different socket object means they reconnected
+			// same socketId but different socket object means they reconnected
 			if (preSocket !== postSocket) {
 				return;
 			}
 
 			// remove voter from room
-			sockets.delete(userId);
+			sockets.delete(socketId);
 
-			if (roomCode) {
-				const roomData = await rooms.findOne({ roomCode });
-				if (!roomData) return;
+			const roomData = await rooms.findByRoomCode(roomCode);
+			if (!roomData) return;
 
-				await handleLeave(roomData, userId);
-			}
+			await handleLeave(roomData, userId);
 			// socket is left alive for 3 seconds to allow user to rejoin
 		}, 3000);
 	});
@@ -500,14 +435,9 @@ export const handleWs = (socket: WebSocket, userId: string) => {
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
+			await updateSession(userId);
 
-			if (data.event === "Join") {
-				roomCode = data.roomCode;
-			}
-
-			if (!roomCode) return;
-
-			const roomData = await rooms.findOne({ roomCode });
+			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;
 
 			const eventFns = eventHandlerMap.get(data.event);

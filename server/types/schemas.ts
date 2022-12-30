@@ -31,10 +31,11 @@ export interface RoomSchema {
 	options: number[];
 	voters: Voter[];
 	votingStartedAt: Date | null;
+	lastUpdated: Date;
 }
 
 export interface SessionSchema {
 	_id: ObjectId;
-	maxAge: number;
+	maxAge: Date;
 	environment: "local" | "test" | "prod";
 }
