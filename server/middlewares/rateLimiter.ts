@@ -31,7 +31,7 @@ export default function rateLimiter(
 		const timestampsInWindow = ipRequestTimestamps.filter(
 			(requestTimestamp) => Date.now() - requestTimestamp < windowMs,
 		);
-		const usedAttempts = attempts - timestampsInWindow.length;
+		const attemptsRemaining = attempts - timestampsInWindow.length;
 
 		// Since we're tracking failed attempts as well this is to prevent memory overflow from a barage of bad requests
 		// prepend most recent timestamp to maintain sort order (lower index = more recent request)
@@ -42,7 +42,18 @@ export default function rateLimiter(
 
 		rateLimitMap.set(ip, limitedTimestampsInWindow);
 
-		if (usedAttempts <= 0) {
+		// https://developer.okta.com/docs/reference/rl-best-practices/
+		const nextOpening =
+			Date.now() +
+			(windowMs -
+				(Date.now() -
+					limitedTimestampsInWindow[limitedTimestampsInWindow.length - 1]));
+		res
+			.setHeader("X-Rate-Limit-Limit", attempts.toString())
+			.setHeader("X-Rate-Limit-Remaining", attemptsRemaining.toString())
+			.setHeader("X-Rate-Limit-Reset", nextOpening.toString());
+
+		if (attemptsRemaining <= 0) {
 			return res.setStatus(429).send({
 				success: false,
 				message: "Too many requests. Try again later.",
