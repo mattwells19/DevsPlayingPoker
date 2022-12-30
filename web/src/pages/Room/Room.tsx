@@ -122,23 +122,17 @@ const Room: Component<RoomProps> = (props) => {
 
 	return (
 		<main class={styles.room}>
-			<Show
-				when={roomDetails.currentUserId && roomDetails.roomData}
-				fallback={<p>Connecting...</p>}
-			>
-				{/* ⚠ RoomContext assumes roomData is defined */}
-				<RoomContextProvider value={roomDetails}>
-					<Show
-						// is the current user the moderator?
-						when={
-							roomDetails.roomData.moderator?.id === roomDetails.currentUserId
-						}
-						fallback={<VoterView />}
-					>
-						<ModeratorView />
-					</Show>
-				</RoomContextProvider>
-			</Show>
+			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
+				<Show
+					// is the current user the moderator?
+					when={
+						roomDetails.roomData.moderator?.id === roomDetails.currentUserId
+					}
+					fallback={<VoterView />}
+				>
+					<ModeratorView />
+				</Show>
+			</RoomContextProvider>
 		</main>
 	);
 };
