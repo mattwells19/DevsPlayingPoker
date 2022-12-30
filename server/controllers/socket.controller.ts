@@ -16,6 +16,7 @@ import connectToDb from "../utils/db.ts";
 import constants from "../utils/constants.ts";
 import { ObjectId } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
+import { delay } from "https://deno.land/std@0.137.0/async/delay.ts";
 
 const sockets = new Map<string, WebSocket>();
 
@@ -435,7 +436,7 @@ export const handleWs = (
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
-			await updateSession(userId);
+			const updateSessionPromise = updateSession(userId);
 
 			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;
@@ -459,6 +460,9 @@ export const handleWs = (
 				if (err instanceof Error) {
 					console.error(err.message);
 				}
+			} finally {
+				// don't want to block the other options. Just by the time you're done make sure the session is updates pls
+				await updateSessionPromise;
 			}
 		},
 	);
