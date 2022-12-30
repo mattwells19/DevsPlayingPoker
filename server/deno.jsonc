@@ -1,0 +1,11 @@
+{
+	"lint": {
+		"files": {
+			"exclude": ["www/"]
+		}
+	},
+	"lock": false,
+	"tasks": {
+		"run": "deno run --allow-net --allow-read --allow-env server.ts"
+	}
+}
