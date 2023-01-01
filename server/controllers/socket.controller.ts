@@ -16,7 +16,6 @@ import connectToDb from "../utils/db.ts";
 import constants from "../utils/constants.ts";
 import { ObjectId } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
-import { delay } from "https://deno.land/std@0.137.0/async/delay.ts";
 
 const sockets = new Map<string, WebSocket>();
 
