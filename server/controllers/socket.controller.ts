@@ -436,7 +436,7 @@ export const handleWs = (
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
-			const updateSessionPromise = updateSession(userId);
+			await updateSession(userId);
 
 			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;
@@ -460,9 +460,6 @@ export const handleWs = (
 				if (err instanceof Error) {
 					console.error(err.message);
 				}
-			} finally {
-				// don't want to block the other options. Just by the time you're done make sure the session is updates pls
-				await updateSessionPromise;
 			}
 		},
 	);
