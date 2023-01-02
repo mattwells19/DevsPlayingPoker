@@ -1,8 +1,9 @@
-import { Component, For, Match, Switch } from "solid-js";
+import { Component, For, JSX, Match, Switch } from "solid-js";
 import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
 import { useRoom } from "../../RoomContext";
+import { RoomSchema } from "../../../../../../server/types/schemas";
 
 interface VoterViewProps {}
 
@@ -29,9 +30,13 @@ const VoterView: Component<VoterViewProps> = () => {
 						if (!selectionValue) throw new Error("Didn't get a value");
 						const selection = parseInt(selectionValue, 10);
 
+						console.log(selection, selectionValue, selection ?? selectionValue);
+
 						room.dispatchEvent({
 							event: "OptionSelected",
-							selection,
+							selection: !Number.isNaN(selection)
+								? selection
+								: (selectionValue as "Yes" | "No"),
 						});
 					}}
 				>
@@ -40,7 +45,7 @@ const VoterView: Component<VoterViewProps> = () => {
 							? "Got it! You can change your mind if you want. Otherwise sit tight."
 							: "Make a selection"}
 					</legend>
-					<For each={room.roomData.options}>
+					<For<number | string, JSX.Element> each={room.roomData.options}>
 						{(option) => (
 							<OptionCard
 								selected={option === currentVoter()?.selection}

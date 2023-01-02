@@ -15,7 +15,7 @@ export type Voter = User &
 	(
 		| {
 				confidence: ConfidenceValue;
-				selection: number;
+				selection: number | string;
 		  }
 		| {
 				confidence: null;
@@ -28,7 +28,7 @@ export interface RoomSchema {
 	state: "Voting" | "Results";
 	roomCode: string;
 	moderator: User | null;
-	options: number[];
+	options: number[] | string[];
 	voters: Voter[];
 	votingStartedAt: Date | null;
 	lastUpdated: Date;
