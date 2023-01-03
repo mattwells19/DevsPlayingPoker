@@ -1,4 +1,4 @@
-import { Component, For, JSX, Match, Switch } from "solid-js";
+import { Component, For, Match, Switch } from "solid-js";
 import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";

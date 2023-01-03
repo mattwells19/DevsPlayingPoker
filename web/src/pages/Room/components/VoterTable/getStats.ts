@@ -10,46 +10,48 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 			selection === null || selection === "N/A" || !isNaN(parseInt(selection)),
 	);
 	if (isNumbers) {
-		let high = -1,
-			low = Infinity,
-			mode = -1,
-			voterCount = 0,
-			avgConfidence: ConfidenceValue = 0;
 		const modeCounter = new Map<number, number>();
 
-		voters.forEach(({ selection, confidence }) => {
-			if (selection === null || selection === "N/A") return;
-			const selectionNum = parseInt(selection, 10);
-			voterCount++;
+		const numStats = voters.reduce(
+			(acc, { selection, confidence }) => {
+				if (selection === null || selection === "N/A") {
+					return acc;
+				}
+				const selectionNum = parseInt(selection, 10);
 
-			const currCount = modeCounter.get(selectionNum) ?? 0;
-			const newCount = currCount + 1;
+				const currCount = modeCounter.get(selectionNum) ?? 0;
+				const newCount = currCount + 1;
+				const currModeCount = modeCounter.get(acc.mode) ?? -1;
 
-			const currModeCount = modeCounter.get(mode) ?? -1;
-			if (
-				newCount > currModeCount ||
-				(newCount === currModeCount && selectionNum > mode)
-			) {
-				mode = selectionNum;
-			}
+				return {
+					high: selectionNum > acc.high ? selectionNum : acc.high,
+					low: selectionNum < acc.low ? selectionNum : acc.low,
+					mode:
+						newCount > currModeCount ||
+						(newCount === currModeCount && selectionNum > acc.mode)
+							? selectionNum
+							: acc.mode,
+					totalConfidence: acc.totalConfidence + confidence,
+					voterCount: acc.voterCount + 1,
+				};
+			},
+			{
+				high: -1,
+				low: Infinity,
+				mode: -1,
+				totalConfidence: 0,
+				voterCount: 0,
+			},
+		);
 
-			modeCounter.set(selectionNum, newCount);
-
-			if (selectionNum > high) {
-				high = selectionNum;
-			}
-			if (selectionNum < low) {
-				low = selectionNum;
-			}
-
-			avgConfidence += confidence;
-		});
-		avgConfidence = Math.round(avgConfidence / voterCount);
+		const avgConfidence: ConfidenceValue = Math.round(
+			numStats.totalConfidence / numStats.voterCount,
+		);
 
 		return [
-			{ label: "Low", value: low.toString() },
-			{ label: "High", value: high.toString() },
-			{ label: "Mode", value: mode.toString() },
+			{ label: "Low", value: numStats.low.toString() },
+			{ label: "High", value: numStats.high.toString() },
+			{ label: "Mode", value: numStats.mode.toString() },
 			{
 				label: "Confidence",
 				value: ConfidenceEmojiMap[avgConfidence],
@@ -63,7 +65,7 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 			selection === null || selection === "Yes" || selection === "No",
 	);
 	if (isRightSize) {
-		const countMap = voters.reduce(
+		const rightSizeStats = voters.reduce(
 			(acc, curr) => {
 				if (curr.selection === "Yes") {
 					return {
@@ -80,22 +82,22 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 				}
 				return acc;
 			},
-			{ yes: 0, no: 0, totalConfidence: 0 as ConfidenceValue },
+			{ yes: 0, no: 0, totalConfidence: 0 },
 		);
 
-		const voterCount = countMap.yes + countMap.no;
+		const voterCount = rightSizeStats.yes + rightSizeStats.no;
 		const avgConfidence: ConfidenceValue = Math.round(
-			countMap.totalConfidence / voterCount,
+			rightSizeStats.totalConfidence / voterCount,
 		);
 
 		return [
 			{
 				label: "Yes",
-				value: `${Math.round((countMap.yes / voterCount) * 100)}%`,
+				value: `${Math.round((rightSizeStats.yes / voterCount) * 100)}%`,
 			},
 			{
 				label: "No",
-				value: `${Math.round((countMap.no / voterCount) * 100)}%`,
+				value: `${Math.round((rightSizeStats.no / voterCount) * 100)}%`,
 			},
 			{
 				label: "DNV",
