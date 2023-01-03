@@ -12,7 +12,7 @@ import type {
 	WebScoketMessageEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
-import connectToDb from "../utils/db.ts";
+import db from "../utils/db.ts";
 import constants from "../utils/constants.ts";
 import { ObjectId } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
@@ -366,12 +366,8 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
-const updateSession = async (
-	userId: string,
-): ReturnType<typeof sessions.updateOne> => {
-	const { sessions } = await connectToDb();
-
-	return sessions.updateOne(
+const updateSession = (userId: string) => {
+	return db.sessions.updateOne(
 		{ _id: new ObjectId(userId) },
 		{
 			$set: {

@@ -3,7 +3,6 @@ import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
 import { useRoom } from "../../RoomContext";
-import { RoomSchema } from "../../../../../../server/types/schemas";
 
 interface VoterViewProps {}
 

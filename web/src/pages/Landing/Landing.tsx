@@ -1,12 +1,4 @@
-import {
-	Component,
-	createEffect,
-	createResource,
-	createSignal,
-	For,
-	JSX,
-	Show,
-} from "solid-js";
+import { Component, createSignal, For, JSX, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
@@ -17,16 +9,7 @@ const Landing: Component = () => {
 		Array(4).fill(null);
 	const navigate = useNavigate();
 
-	const [roomCodeValue, setRoomCodeValue] = createSignal<string | null>(null);
-
-	// async call gets triggered when roomCodeValue is truthy
-	const [roomExists] = createResource<boolean, string>(
-		roomCodeValue,
-		(roomCode) =>
-			fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then(
-				({ status }) => status === 200,
-			),
-	);
+	const [error, setError] = createSignal<string | null>(null);
 
 	const handleInputChange = (formElement: EventTarget & HTMLFormElement) => {
 		const formData = new FormData(formElement);
@@ -38,8 +21,19 @@ const Landing: Component = () => {
 			.toUpperCase();
 
 		if (roomCode.length === 4) {
-			// set room code to truthy value to trigger resource call
-			setRoomCodeValue(roomCode);
+			fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then(({ status }) => {
+				switch (status) {
+					case 200:
+						navigate(`/room/${roomCode}`);
+						break;
+					case 204:
+						setError("A room does not exist with that code. Try again.");
+						break;
+					case 429:
+						setError("Too many attempts. Please wait and try again later.");
+						break;
+				}
+			});
 		}
 	};
 
@@ -66,12 +60,6 @@ const Landing: Component = () => {
 			handleInputChange(e.currentTarget);
 		}
 	};
-
-	createEffect(() => {
-		if (roomExists()) {
-			navigate(`/room/${roomCodeValue()}`);
-		}
-	});
 
 	return (
 		<>
@@ -111,7 +99,7 @@ const Landing: Component = () => {
 										}}
 										onKeyDown={(e) => {
 											if (e.key === "Backspace") {
-												setRoomCodeValue(null);
+												setError(null);
 
 												if (e.currentTarget.value === "") {
 													roomCodeInputsRefs[index - 1]?.focus();
@@ -123,10 +111,8 @@ const Landing: Component = () => {
 							</For>
 						</form>
 						<div class={styles.errorMsg}>
-							<Show when={roomCodeValue() && roomExists() === false}>
-								<p aria-live="polite">
-									A room does not exist with that code. Try again.
-								</p>
+							<Show when={error()} keyed>
+								{(errorMsg) => <p aria-live="polite">{errorMsg}</p>}
 							</Show>
 						</div>
 					</section>
