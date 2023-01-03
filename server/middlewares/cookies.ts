@@ -7,19 +7,18 @@ import {
 	ObjectId,
 } from "../deps.ts";
 import constants from "../utils/constants.ts";
-import connectToDb from "../utils/db.ts";
+import db from "../utils/db.ts";
 
 export async function handleCookie(
 	req: OpineRequest,
 	res: OpineResponse,
 	next: NextFunction,
 ) {
-	const { sessions } = await connectToDb();
 	const cookies = getCookies(req.headers);
 	const sessionId = cookies["session"];
 
 	if (sessionId) {
-		const session = await sessions.findOne({
+		const session = await db.sessions.findOne({
 			_id: new ObjectId(sessionId),
 			environment: constants.environment,
 		});
@@ -46,7 +45,7 @@ export async function handleCookie(
 
 	// if there's no sessionId in the cookie list or it is invalid, start a new session
 	const maxAge = Date.now() + constants.sessionTimeout;
-	await sessions
+	await db.sessions
 		.insertOne({
 			maxAge: new Date(maxAge),
 			environment: constants.environment,

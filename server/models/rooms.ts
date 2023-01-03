@@ -1,30 +1,17 @@
 import { ObjectId, UpdateFilter } from "../deps.ts";
 import type { RoomSchema } from "../types/schemas.ts";
-import connectToDb from "../utils/db.ts";
+import db from "../utils/db.ts";
 
-export const findByRoomCode = async (
-	roomCode: string,
-): ReturnType<typeof rooms.findOne> => {
-	const { rooms } = await connectToDb();
-
-	return rooms.findOne({ roomCode });
+export const findByRoomCode = (roomCode: string) => {
+	return db.rooms.findOne({ roomCode });
 };
 
-export const findById = async (
-	id: ObjectId,
-): ReturnType<typeof rooms.findOne> => {
-	const { rooms } = await connectToDb();
-
-	return rooms.findOne({ _id: id });
+export const findById = (id: ObjectId) => {
+	return db.rooms.findOne({ _id: id });
 };
 
-export const updateById = async (
-	id: ObjectId,
-	updates: UpdateFilter<RoomSchema>,
-): ReturnType<typeof rooms.findAndModify> => {
-	const { rooms } = await connectToDb();
-
-	return rooms.findAndModify(
+export const updateById = (id: ObjectId, updates: UpdateFilter<RoomSchema>) => {
+	return db.rooms.findAndModify(
 		{ _id: id },
 		{
 			update: {
@@ -39,10 +26,6 @@ export const updateById = async (
 	);
 };
 
-export const deleteById = async (
-	id: ObjectId,
-): ReturnType<typeof rooms.deleteOne> => {
-	const { rooms } = await connectToDb();
-
-	return rooms.deleteOne({ _id: id });
+export const deleteById = (id: ObjectId) => {
+	return db.rooms.deleteOne({ _id: id });
 };

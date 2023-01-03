@@ -102,7 +102,9 @@ class MongoDb {
 
 	public get rooms(): Collection<RoomSchema> {
 		if (!this.#rooms) {
-			throw new Error("Need to run connect function.");
+			throw new Error(
+				"Looks like you tried to access a collection before running the 'connect' method. You can't do that.",
+			);
 		}
 
 		return this.#rooms;
@@ -110,7 +112,9 @@ class MongoDb {
 
 	public get sessions(): Collection<SessionSchema> {
 		if (!this.#sessions) {
-			throw new Error("Need to run connect function.");
+			throw new Error(
+				"Looks like you tried to access a collection before running the 'connect' method. You can't do that.",
+			);
 		}
 
 		return this.#sessions;
@@ -121,17 +125,5 @@ class MongoDb {
 	}
 }
 
-const mongoDb = new MongoDb();
-
-const connectToDb = async () => {
-	if (!mongoDb.initialized) {
-		await mongoDb.connect();
-	}
-
-	return {
-		rooms: mongoDb.rooms,
-		sessions: mongoDb.sessions,
-	};
-};
-
-export default connectToDb;
+const db = new MongoDb();
+export default db;

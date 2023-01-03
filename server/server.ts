@@ -1,6 +1,6 @@
 import { opine, json } from "./deps.ts";
 
-import connectToDb from "./utils/db.ts";
+import db from "./utils/db.ts";
 import { handleCookie } from "./middlewares/cookies.ts";
 
 //Import routes
@@ -19,7 +19,7 @@ server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
 server.use("/", FeRoutes);
 
-connectToDb()
+db.connect()
 	.then(() => {
 		server.listen(5555, () => console.info("Server started on port 5555."));
 	})
