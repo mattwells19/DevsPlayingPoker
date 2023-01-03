@@ -15,25 +15,26 @@ import VoterOptionsMenu, {
 } from "./components/VoterOptionsMenu";
 import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
 import { useRoom } from "../../RoomContext";
+import getStats from "./getStats";
 
 interface VoterTableProps {
 	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
 }
 
-const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
+export const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.high]: "💪",
 	[ConfidenceValue.medium]: "😌",
 	[ConfidenceValue.low]: "😰",
 };
 
-const ConfidenceTextMap: Record<ConfidenceValue, string> = {
+export const ConfidenceTextMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.high]: "High confidence",
 	[ConfidenceValue.medium]: "Medium confidence",
 	[ConfidenceValue.low]: "Low confidence",
 };
 
-function formatSelection(selection: number | null): string | number {
-	if (selection === null || selection === 0) {
+function formatSelection(selection: string | null): string {
+	if (selection === null || selection === "N/A") {
 		return "☕";
 	}
 
@@ -47,50 +48,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 	} | null>(null);
 	const room = useRoom();
 
-	const stats = createMemo(() => {
-		let high = -1,
-			low = Infinity,
-			mode = -1,
-			voterCount = 0,
-			avgConfidence: ConfidenceValue = 0;
-		const modeCounter = new Map<number, number>();
-
-		room.roomData.voters.forEach(({ selection, confidence }) => {
-			if (selection === null || selection === 0) return;
-			voterCount++;
-
-			const currCount = modeCounter.get(selection) ?? 0;
-			const newCount = currCount + 1;
-
-			const currModeCount = modeCounter.get(mode) ?? -1;
-			if (
-				newCount > currModeCount ||
-				(newCount === currModeCount && selection > mode)
-			) {
-				mode = selection;
-			}
-
-			modeCounter.set(selection, newCount);
-
-			if (selection > high) {
-				high = selection;
-			}
-			if (selection < low) {
-				low = selection;
-			}
-
-			avgConfidence += confidence;
-		});
-		avgConfidence = Math.round(avgConfidence / voterCount);
-
-		return {
-			high,
-			low,
-			mode,
-			voterCount,
-			avgConfidence,
-		};
-	});
+	const stats = createMemo(() => getStats(room.roomData.voters));
 
 	return (
 		<>
@@ -164,20 +122,15 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 								<Match
 									when={
 										room.roomData.state === "Results" &&
-										room.roomData.voters.every((voter) => voter.selection === 0)
+										room.roomData.voters.every(
+											(voter) => voter.selection === "N/A",
+										)
 									}
 								>
 									<td colspan="4">No votes were cast.</td>
 								</Match>
 								<Match when={room.roomData.state === "Results"}>
-									<Metric label="Low" value={stats().low} />
-									<Metric label="High" value={stats().high} />
-									<Metric label="Mode" value={stats().mode} />
-									<Metric
-										label="Confidence"
-										value={ConfidenceEmojiMap[stats().avgConfidence]}
-										title={ConfidenceTextMap[stats().avgConfidence]}
-									/>
+									<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
 								</Match>
 							</Switch>
 						</tr>

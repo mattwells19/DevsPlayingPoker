@@ -1,11 +1,10 @@
-import { Component, createSignal, onMount, Show } from "solid-js";
+import { Component, createSignal, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
+import zod from "zod";
 import post from "@/utils/post";
 import Button from "@/components/Button";
-import styles from "./CreateRoom.module.scss";
 import Header from "@/components/Header";
-import zod from "zod";
-import type { RoomSchema } from "@/shared-types";
+import styles from "./CreateRoom.module.scss";
 
 const numberPatternSchema = zod.object({
 	voterOptions: zod.enum(["fibonacci", "linear"]),
@@ -18,8 +17,9 @@ const numberPatternSchema = zod.object({
 });
 
 const rightSizeSchema = zod.object({
-	voterOptions: zod.literal("yes-no"),
-	options: zod.tuple([zod.literal("Yes"), zod.literal("No")]),
+	voterOptions: zod.literal("yesNo"),
+	numberOfOptions: zod.literal(null),
+	noVote: zod.literal(false),
 });
 
 const nameSchema = {
@@ -37,13 +37,46 @@ function safeJSONParse<T>(value: string): T | undefined {
 	}
 }
 
-const availableOptions = {
-	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
-	linear: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+const availableOptions: Record<VoterOptions, Array<string>> = {
+	"": [],
+	fibonacci: [
+		"1",
+		"2",
+		"3",
+		"5",
+		"8",
+		"13",
+		"21",
+		"34",
+		"55",
+		"89",
+		"144",
+		"233",
+		"377",
+		"610",
+		"987",
+	],
+	linear: [
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"10",
+		"11",
+		"12",
+		"13",
+		"14",
+		"15",
+	],
 	yesNo: ["Yes", "No"],
 };
 
-type VoterOptions = "" | "fibonacci" | "linear" | "yes-no";
+type VoterOptions = "" | "fibonacci" | "linear" | "yesNo";
 
 function getFormValues(form: HTMLFormElement) {
 	const formData = new FormData(form);
@@ -51,11 +84,12 @@ function getFormValues(form: HTMLFormElement) {
 	const moderatorName = formData.get("moderatorName") as string;
 	const voterOptions = formData.get("voterOptions") as VoterOptions;
 
-	if (voterOptions === "yes-no") {
+	if (voterOptions === "yesNo") {
 		return {
 			moderatorName,
 			voterOptions,
-			options: availableOptions.yesNo,
+			numberOfOptions: null,
+			noVote: false,
 		};
 	} else {
 		const numberOfOptions = formData.get("numberOfOptions")?.toString();
@@ -68,6 +102,14 @@ function getFormValues(form: HTMLFormElement) {
 			noVote: noVote ? noVote === "yes" : false,
 		};
 	}
+}
+
+function getOptions(
+	optionsSelect: VoterOptions,
+	numberOfOptions: number | null,
+): Array<string> {
+	const options = availableOptions[optionsSelect];
+	return numberOfOptions ? options.slice(0, numberOfOptions) : options;
 }
 
 const CreateRoom: Component = () => {
@@ -99,28 +141,11 @@ const CreateRoom: Component = () => {
 	const defaultList = (() => {
 		if (!defaultFormValues) return "";
 
-		const { voterOptions } = defaultFormValues;
-
-		if (voterOptions === "yes-no") {
-			return availableOptions.yesNo.join(", ");
-		}
-
-		let fieldOptions: RoomSchema["options"] = [];
-
-		if (voterOptions === "fibonacci") {
-			fieldOptions = availableOptions.fibonacci.slice(
-				0,
-				defaultFormValues.numberOfOptions,
-			);
-		} else if (voterOptions === "linear") {
-			fieldOptions = availableOptions.linear.slice(
-				0,
-				defaultFormValues.numberOfOptions,
-			);
-		}
+		const { voterOptions, numberOfOptions, noVote } = defaultFormValues;
+		const fieldOptions = getOptions(voterOptions, numberOfOptions);
 
 		const updatedList = fieldOptions.join(", ");
-		if (defaultFormValues.noVote) {
+		if (noVote) {
 			return updatedList + ", 🚫";
 		} else {
 			return updatedList;
@@ -129,7 +154,7 @@ const CreateRoom: Component = () => {
 
 	const [list, setList] = createSignal<string>(defaultList);
 	const [optionsSelect, setOptionsSelect] = createSignal<VoterOptions>(
-		defaultFormValues ? defaultFormValues.voterOptions : "",
+		defaultFormValues?.voterOptions ?? "",
 	);
 	const [error, setError] = createSignal<string | null>(null);
 	const navigate = useNavigate();
@@ -142,7 +167,7 @@ const CreateRoom: Component = () => {
 		}
 
 		const schemaCheck = (
-			formData.voterOptions === "yes-no" ? rightSizeSchema : numberPatternSchema
+			formData.voterOptions === "yesNo" ? rightSizeSchema : numberPatternSchema
 		)
 			.extend(nameSchema)
 			.safeParse(formData);
@@ -159,26 +184,13 @@ const CreateRoom: Component = () => {
 		}
 
 		const finalOptions = (() => {
-			if (formData.voterOptions === "yes-no") {
-				return availableOptions.yesNo;
-			}
-
-			let fieldOptions: Array<number> = [];
-
-			if (formData.voterOptions === "fibonacci") {
-				fieldOptions = availableOptions.fibonacci.slice(
-					0,
-					formData.numberOfOptions,
-				);
-			} else if (formData.voterOptions === "linear") {
-				fieldOptions = availableOptions.linear.slice(
-					0,
-					formData.numberOfOptions,
-				);
-			}
+			const fieldOptions = getOptions(
+				formData.voterOptions,
+				formData.numberOfOptions,
+			);
 
 			if (formData.noVote) {
-				fieldOptions = [0, ...fieldOptions];
+				fieldOptions.unshift("N/A");
 			}
 
 			return fieldOptions;
@@ -203,18 +215,7 @@ const CreateRoom: Component = () => {
 			return;
 		}
 
-		if (voterOptions === "yes-no") {
-			setList(availableOptions.yesNo.join(", "));
-			return;
-		}
-
-		let fieldOptions: RoomSchema["options"] = [];
-
-		if (voterOptions === "fibonacci") {
-			fieldOptions = availableOptions.fibonacci.slice(0, numberOfOptions);
-		} else if (voterOptions === "linear") {
-			fieldOptions = availableOptions.linear.slice(0, numberOfOptions);
-		}
+		const fieldOptions = getOptions(voterOptions, numberOfOptions);
 
 		const updatedList = fieldOptions.join(", ");
 		if (noVote) {
@@ -271,11 +272,11 @@ const CreateRoom: Component = () => {
 							<option value="">Select options</option>
 							<option value="fibonacci">Fibonacci</option>
 							<option value="linear">Linear</option>
-							<option value="yes-no">Yes/No</option>
+							<option value="yesNo">Yes/No</option>
 						</select>
 					</div>
 
-					<Show when={optionsSelect() !== "yes-no"}>
+					<Show when={optionsSelect() !== "yesNo"}>
 						<div>
 							<label for="numberOfOptions">
 								Number of options (min: 2, max: 15)
@@ -288,7 +289,7 @@ const CreateRoom: Component = () => {
 								max="15"
 								step="1"
 								value={
-									defaultFormValues?.voterOptions !== "yes-no"
+									defaultFormValues?.voterOptions !== "yesNo"
 										? defaultFormValues?.numberOfOptions
 										: ""
 								}
@@ -305,7 +306,7 @@ const CreateRoom: Component = () => {
 									value="yes"
 									checked={
 										defaultFormValues &&
-										defaultFormValues.voterOptions !== "yes-no" &&
+										defaultFormValues.voterOptions !== "yesNo" &&
 										defaultFormValues.noVote
 									}
 								/>
@@ -319,7 +320,7 @@ const CreateRoom: Component = () => {
 									value="no"
 									checked={
 										!defaultFormValues ||
-										defaultFormValues.voterOptions === "yes-no" ||
+										defaultFormValues.voterOptions === "yesNo" ||
 										!defaultFormValues.noVote
 									}
 								/>

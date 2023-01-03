@@ -238,7 +238,7 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 	{ userId },
 	data,
 ) => {
-	if (![...roomData.options].includes(data.selection)) {
+	if (!roomData.options.includes(data.selection)) {
 		return {
 			message: "Invalid option selected.",
 		};

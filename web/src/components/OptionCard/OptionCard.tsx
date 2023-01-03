@@ -2,13 +2,13 @@ import { Component, Show } from "solid-js";
 import styles from "./OptionCard.module.scss";
 
 interface OptionCardProps {
-	value: number | string;
+	value: string;
 	selected: boolean;
 }
 
 const OptionCard: Component<OptionCardProps> = (props) => {
 	const cornerText = () => {
-		if (typeof props.value === "number" && props.value === 0) {
+		if (props.value === "N/A") {
 			return "No-vote";
 		} else {
 			return props.value;
@@ -54,7 +54,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 								{props.value}
 							</text>
 						}
-						when={props.value === 0}
+						when={props.value === "N/A"}
 					>
 						<svg
 							width="80"

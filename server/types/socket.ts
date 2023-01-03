@@ -30,7 +30,7 @@ export interface StopVotingEvent {
 
 export interface OptionSelectedEvent {
 	event: "OptionSelected";
-	selection: number | string;
+	selection: RoomSchema["options"][0];
 }
 
 export interface KickVoterEvent {

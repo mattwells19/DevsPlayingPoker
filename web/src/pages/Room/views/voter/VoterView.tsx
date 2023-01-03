@@ -23,19 +23,14 @@ const VoterView: Component<VoterViewProps> = () => {
 				<fieldset
 					class={styles.voterChoices}
 					onchange={(e) => {
-						const selectionValue = e.target.hasAttribute("value")
+						const selection = e.target.hasAttribute("value")
 							? (e.target as HTMLInputElement).value
 							: null;
-						if (!selectionValue) throw new Error("Didn't get a value");
-						const selection = parseInt(selectionValue, 10);
-
-						console.log(selection, selectionValue, selection ?? selectionValue);
+						if (!selection) throw new Error("Didn't get a value");
 
 						room.dispatchEvent({
 							event: "OptionSelected",
-							selection: !Number.isNaN(selection)
-								? selection
-								: (selectionValue as "Yes" | "No"),
+							selection,
 						});
 					}}
 				>
@@ -44,7 +39,7 @@ const VoterView: Component<VoterViewProps> = () => {
 							? "Got it! You can change your mind if you want. Otherwise sit tight."
 							: "Make a selection"}
 					</legend>
-					<For<number | string, JSX.Element> each={room.roomData.options}>
+					<For each={room.roomData.options}>
 						{(option) => (
 							<OptionCard
 								selected={option === currentVoter()?.selection}
