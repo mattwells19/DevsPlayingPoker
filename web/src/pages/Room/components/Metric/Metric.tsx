@@ -1,5 +1,5 @@
 import mergeClassNames from "@/utils/mergeClassNames";
-import type { Component, JSX } from "solid-js";
+import { Component, JSX, splitProps } from "solid-js";
 import styles from "./Metric.module.scss";
 
 interface MetricProps extends JSX.TdHTMLAttributes<HTMLTableCellElement> {
@@ -7,16 +7,12 @@ interface MetricProps extends JSX.TdHTMLAttributes<HTMLTableCellElement> {
 	value: string | number;
 }
 
-const Metric: Component<MetricProps> = ({
-	label,
-	value,
-	class: className,
-	...props
-}) => {
+const Metric: Component<MetricProps> = (props) => {
+	const [customProps, tdProps] = splitProps(props, ["label", "value", "class"]);
 	return (
-		<td class={mergeClassNames(styles.metric, className)} {...props}>
-			<dt>{label}</dt>
-			<dd>{value}</dd>
+		<td class={mergeClassNames(styles.metric, customProps.class)} {...tdProps}>
+			<dt>{customProps.label}</dt>
+			<dd>{customProps.value}</dd>
 		</td>
 	);
 };

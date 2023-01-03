@@ -1,13 +1,11 @@
 import { OpineRequest, OpineResponse } from "../deps.ts";
-import connectToDb from "../utils/db.ts";
+import db from "../utils/db.ts";
 import generateRoomCode from "../utils/generateRoomCode.ts";
 
-type OpineController<ResBody = any> = (
+type OpineController<ResBody = unknown> = (
 	req: OpineRequest,
 	res: OpineResponse,
 ) => Promise<OpineResponse<ResBody>>;
-
-const { rooms } = await connectToDb();
 
 export interface CreateRoomRequest {
 	moderatorName: string;
@@ -19,7 +17,7 @@ export const createRoom: OpineController = async (req, res) => {
 
 	try {
 		const roomCode = await generateRoomCode();
-		const room = await rooms.insertOne({
+		const room = await db.rooms.insertOne({
 			roomCode,
 			moderator: null,
 			state: "Results",
@@ -46,7 +44,7 @@ export const createRoom: OpineController = async (req, res) => {
 };
 
 export const getRoom: OpineController = async (req, res) => {
-	const room = await rooms.findOne({ roomCode: req.params.roomCode });
+	const room = await db.rooms.findOne({ roomCode: req.params.roomCode });
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
@@ -60,7 +58,7 @@ export const getRoom: OpineController = async (req, res) => {
 };
 
 export const checkRoomExists: OpineController = async (req, res) => {
-	const room = await rooms.findOne({ roomCode: req.params.roomCode });
+	const room = await db.rooms.findOne({ roomCode: req.params.roomCode });
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,

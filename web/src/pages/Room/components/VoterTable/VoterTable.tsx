@@ -1,15 +1,22 @@
-import { Component, createSignal, For, Match, Show, Switch } from "solid-js";
-import { RoomSchema, ConfidenceValue, Voter } from "@/shared-types";
+import {
+	Component,
+	createMemo,
+	createSignal,
+	For,
+	Match,
+	Show,
+	Switch,
+} from "solid-js";
+import { ConfidenceValue, Voter } from "@/shared-types";
 import Metric from "../Metric";
 import styles from "./VoterTable.module.scss";
 import VoterOptionsMenu, {
 	VoterClickAction,
 } from "./components/VoterOptionsMenu";
 import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
+import { useRoom } from "../../RoomContext";
 
 interface VoterTableProps {
-	voters: RoomSchema["voters"];
-	roomState: RoomSchema["state"];
 	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
 }
 
@@ -33,50 +40,57 @@ function formatSelection(selection: number | null): string | number {
 	return selection;
 }
 
-const VoterTable: Component<VoterTableProps> = ({
-	roomState,
-	voters,
-	onVoterAction,
-}) => {
+const VoterTable: Component<VoterTableProps> = (props) => {
 	const [optionConfirmation, setOptionConfirmation] = createSignal<{
 		action: VoterClickAction;
 		voter: Voter;
 	} | null>(null);
+	const room = useRoom();
 
-	let high = -1,
-		low = Infinity,
-		mode = -1,
-		voterCount = 0,
-		avgConfidence: ConfidenceValue = 0;
-	const modeCounter = new Map<number, number>();
+	const stats = createMemo(() => {
+		let high = -1,
+			low = Infinity,
+			mode = -1,
+			voterCount = 0,
+			avgConfidence: ConfidenceValue = 0;
+		const modeCounter = new Map<number, number>();
 
-	voters.forEach(({ selection, confidence }) => {
-		if (selection === null || selection === 0) return;
-		voterCount++;
+		room.roomData.voters.forEach(({ selection, confidence }) => {
+			if (selection === null || selection === 0) return;
+			voterCount++;
 
-		const currCount = modeCounter.get(selection) ?? 0;
-		const newCount = currCount + 1;
+			const currCount = modeCounter.get(selection) ?? 0;
+			const newCount = currCount + 1;
 
-		const currModeCount = modeCounter.get(mode) ?? -1;
-		if (
-			newCount > currModeCount ||
-			(newCount === currModeCount && selection > mode)
-		) {
-			mode = selection;
-		}
+			const currModeCount = modeCounter.get(mode) ?? -1;
+			if (
+				newCount > currModeCount ||
+				(newCount === currModeCount && selection > mode)
+			) {
+				mode = selection;
+			}
 
-		modeCounter.set(selection, newCount);
+			modeCounter.set(selection, newCount);
 
-		if (selection > high) {
-			high = selection;
-		}
-		if (selection < low) {
-			low = selection;
-		}
+			if (selection > high) {
+				high = selection;
+			}
+			if (selection < low) {
+				low = selection;
+			}
 
-		avgConfidence += confidence;
+			avgConfidence += confidence;
+		});
+		avgConfidence = Math.round(avgConfidence / voterCount);
+
+		return {
+			high,
+			low,
+			mode,
+			voterCount,
+			avgConfidence,
+		};
 	});
-	avgConfidence = Math.round(avgConfidence / voterCount);
 
 	return (
 		<>
@@ -90,11 +104,11 @@ const VoterTable: Component<VoterTableProps> = ({
 						</tr>
 					</thead>
 					<tbody>
-						<For each={voters}>
+						<For each={room.roomData.voters}>
 							{(voter) => (
 								<tr>
 									<td colspan="2">
-										{onVoterAction ? (
+										{props.onVoterAction ? (
 											<VoterOptionsMenu
 												voter={voter}
 												onVoterClick={(action, voter) =>
@@ -106,7 +120,7 @@ const VoterTable: Component<VoterTableProps> = ({
 										)}
 									</td>
 									<td>
-										{roomState === "Results"
+										{room.roomData.state === "Results"
 											? formatSelection(voter.selection)
 											: voter.selection !== null
 											? "✅"
@@ -130,37 +144,39 @@ const VoterTable: Component<VoterTableProps> = ({
 					<tfoot>
 						<tr>
 							<Switch>
-								<Match when={roomState === "Voting"}>
+								<Match when={room.roomData.state === "Voting"}>
 									<td colspan="4">Voting in progress</td>
 								</Match>
 								<Match
 									when={
-										roomState === "Results" &&
-										voters.every((voter) => voter.selection === null)
+										room.roomData.state === "Results" &&
+										room.roomData.voters.every(
+											(voter) => voter.selection === null,
+										)
 									}
 								>
 									<td colspan="4">
-										{voters.length > 0
+										{room.roomData.voters.length > 0
 											? "Waiting to start voting"
 											: "Waiting for people to join"}
 									</td>
 								</Match>
 								<Match
 									when={
-										roomState === "Results" &&
-										voters.every((voter) => voter.selection === 0)
+										room.roomData.state === "Results" &&
+										room.roomData.voters.every((voter) => voter.selection === 0)
 									}
 								>
 									<td colspan="4">No votes were cast.</td>
 								</Match>
-								<Match when={roomState === "Results"}>
-									<Metric label="Low" value={low} />
-									<Metric label="High" value={high} />
-									<Metric label="Mode" value={mode} />
+								<Match when={room.roomData.state === "Results"}>
+									<Metric label="Low" value={stats().low} />
+									<Metric label="High" value={stats().high} />
+									<Metric label="Mode" value={stats().mode} />
 									<Metric
 										label="Confidence"
-										value={ConfidenceEmojiMap[avgConfidence]}
-										title={ConfidenceTextMap[avgConfidence]}
+										value={ConfidenceEmojiMap[stats().avgConfidence]}
+										title={ConfidenceTextMap[stats().avgConfidence]}
 									/>
 								</Match>
 							</Switch>
@@ -168,13 +184,13 @@ const VoterTable: Component<VoterTableProps> = ({
 					</tfoot>
 				</table>
 			</div>
-			{onVoterAction ? (
+			{props.onVoterAction ? (
 				<Show when={optionConfirmation()} keyed>
 					{({ action, voter }) => (
 						<OptionConfirmationDialog
 							action={action}
 							voter={voter}
-							onConfirm={() => onVoterAction(action, voter)}
+							onConfirm={() => props.onVoterAction!(action, voter)}
 							onCancel={() => setOptionConfirmation(null)}
 						/>
 					)}

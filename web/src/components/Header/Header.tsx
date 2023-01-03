@@ -1,16 +1,26 @@
 import mergeClassNames from "@/utils/mergeClassNames";
-import { Component, JSXElement } from "solid-js";
+import { Link, useLocation } from "solid-app-router";
+import { ParentComponent, Show } from "solid-js";
 import styles from "./Header.module.scss";
 
 interface HeaderProps {
-	children?: JSXElement;
-	className?: string;
+	class?: string;
 }
 
-const Header: Component<HeaderProps> = ({ children, className = "" }) => {
+const Header: ParentComponent<HeaderProps> = (props) => {
+	const location = useLocation();
+
 	return (
-		<header class={mergeClassNames(styles.header, className)}>
-			{children}
+		<header class={mergeClassNames(styles.header, props.class)}>
+			<div class={styles.homeLinkContainer}>
+				<Show when={location.pathname !== "/"}>
+					<Link href="/">
+						<span aria-hidden>🏠</span>
+						Home
+					</Link>
+				</Show>
+			</div>
+			{props.children}
 			<button
 				class={styles.themeBtn}
 				type="button"

@@ -17,29 +17,6 @@ button.roomCodeBtn {
 	}
 }
 
-.header {
-	display: grid;
-	grid-auto-columns: minmax(0, 1fr);
-	grid-auto-flow: column;
-	align-items: center;
-
-	.homeLinkContainer {
-		a {
-			padding: 1rem;
-			color: var(--primary-text-color);
-			text-decoration: none;
-
-			&:hover {
-				text-decoration: underline;
-			}
-
-			span[aria-hidden] {
-				margin-right: 0.25rem;
-			}
-		}
-	}
-}
-
 main.room {
 	max-width: 30rem;
 	margin: 5rem auto auto auto;

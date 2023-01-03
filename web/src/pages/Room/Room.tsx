@@ -1,36 +1,36 @@
-import { Link, useNavigate, useParams } from "solid-app-router";
+import { useNavigate, useParams } from "solid-app-router";
 import {
 	Component,
+	createEffect,
 	createResource,
 	createSignal,
 	onCleanup,
-	onMount,
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import styles from "./Room.module.scss";
-import type {
-	RoomSchema,
-	JoinEvent,
-	WebSocketTriggeredEvent,
-	WebScoketMessageEvent,
-} from "@/shared-types";
+import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
 import ModeratorView from "./views/moderator";
 import VoterView from "./views/voter/VoterView";
 import Header from "@/components/Header";
+import {
+	defaultRoomDetails,
+	RoomContextProvider,
+	RoomDetails,
+} from "./RoomContext";
 
 const RoomCheckWrapper: Component = () => {
 	const navigate = useNavigate();
-	const { roomCode } = useParams();
-	const [manualShow, setManualShow] = createSignal(true);
+	const params = useParams();
 
-	const handleReset = () => {
-		setManualShow(false);
-		setManualShow(true);
-	};
+	const userName = localStorage.getItem("name");
+	if (!userName) {
+		navigate(`/join/${params.roomCode}`);
+		return;
+	}
 
-	const [done] = createResource(roomCode, () =>
-		fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then((res) => {
+	const [roomExists] = createResource(params.roomCode, () =>
+		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
 			if (res.status !== 200) {
 				navigate("/");
 				return false;
@@ -41,85 +41,59 @@ const RoomCheckWrapper: Component = () => {
 
 	return (
 		<>
-			<Header className={styles.header}>
-				<div class={styles.homeLinkContainer}>
-					<Link href="/">
-						<span aria-hidden>🏠</span>
-						Home
-					</Link>
-				</div>
+			<Header>
 				<button
 					class={styles.roomCodeBtn}
-					onClick={() => navigator.clipboard.writeText(roomCode)}
+					onClick={() => navigator.clipboard.writeText(params.roomCode)}
 					title="Click to copy code."
 				>
-					<h1>{roomCode}</h1>
+					<h1>{params.roomCode}</h1>
 				</button>
 			</Header>
-			<Show when={done() && manualShow()} fallback={<h1>Checking room...</h1>}>
-				<Room roomCode={roomCode} resetConnection={handleReset} />
+			<Show
+				when={roomExists() && userName ? userName : null}
+				fallback={<h1>Checking room...</h1>}
+				keyed
+			>
+				{(userName) => <Room roomCode={params.roomCode} userName={userName} />}
 			</Show>
 		</>
 	);
 };
 
-interface RoomDetails {
-	currentUserId: string;
-	roomData: RoomSchema;
-	dispatchEvent: (event: WebScoketMessageEvent) => void;
-}
-
-interface EmptyRoomDetails {
-	currentUserId: "";
-	roomData: null;
-	dispatchEvent: () => void;
-}
-
 interface RoomProps {
 	roomCode: string;
-	resetConnection: () => void;
+	userName: string;
 }
+
+const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
+const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
 const Room: Component<RoomProps> = (props) => {
 	const navigate = useNavigate();
-	const [roomDetails, setRoomDetails] = createStore<
-		RoomDetails | EmptyRoomDetails
-	>({
-		currentUserId: "",
-		dispatchEvent: () => null,
-		roomData: null,
-	});
+	const [roomDetails, setRoomDetails] =
+		createStore<RoomDetails>(defaultRoomDetails);
+	const [ws, setWs] = createSignal<WebSocket>(
+		new WebSocket(`${wsPath}/${props.roomCode}`),
+	);
 
-	const userName = localStorage.getItem("name");
-	if (!userName) {
-		navigate(`/join/${props.roomCode}`);
-		return;
-	}
-
-	onMount(() => {
-		const wsProtocol = window.location.protocol.includes("https")
-			? "wss"
-			: "ws";
-		const ws = new WebSocket(
-			`${wsProtocol}://${window.location.host}/ws/${props.roomCode}`,
-		);
-
-		ws.addEventListener("open", () => {
+	createEffect(() => {
+		ws().addEventListener("open", () => {
 			const joinEvent: JoinEvent = {
 				event: "Join",
-				name: userName,
+				name: props.userName,
 			};
-			ws.send(JSON.stringify(joinEvent));
+			ws().send(JSON.stringify(joinEvent));
 		});
 
-		ws.addEventListener("message", (messageEvent) => {
+		ws().addEventListener("message", (messageEvent) => {
 			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
 				case "RoomUpdate":
 					setRoomDetails({
 						roomData: data.roomData,
-						dispatchEvent: (e) => ws.send(JSON.stringify(e)),
+						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
 				case "Connected":
@@ -134,50 +108,31 @@ const Room: Component<RoomProps> = (props) => {
 			}
 		});
 
-		ws.addEventListener("close", (closeEvent) => {
+		ws().addEventListener("close", (closeEvent) => {
 			// 1000 means closed normally
 			if (closeEvent.code !== 1000) {
-				props.resetConnection();
+				setWs(new WebSocket(`${wsPath}/${props.roomCode}`));
 			}
 		});
+	});
 
-		onCleanup(() => {
-			ws.close(1000);
-		});
+	onCleanup(() => {
+		ws().close(1000);
 	});
 
 	return (
 		<main class={styles.room}>
-			<Show
-				when={
-					roomDetails.currentUserId && roomDetails.roomData
-						? // Need to spread to get the values out of the store proxy
-						  { ...roomDetails }
-						: null
-				}
-				fallback={<p>Connecting...</p>}
-				keyed
-			>
-				{({ currentUserId, roomData, dispatchEvent }) => (
-					<Show
-						// is the current user the moderator?
-						when={roomData.moderator?.id === currentUserId}
-						fallback={
-							<VoterView
-								roomDetails={roomData}
-								dispatchEvent={dispatchEvent}
-								currentUserId={currentUserId}
-							/>
-						}
-					>
-						<ModeratorView
-							state={roomData.state}
-							voters={roomData.voters}
-							dispatchEvent={dispatchEvent}
-						/>
-					</Show>
-				)}
-			</Show>
+			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
+				<Show
+					// is the current user the moderator?
+					when={
+						roomDetails.roomData.moderator?.id === roomDetails.currentUserId
+					}
+					fallback={<VoterView />}
+				>
+					<ModeratorView />
+				</Show>
+			</RoomContextProvider>
 		</main>
 	);
 };

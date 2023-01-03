@@ -1,31 +1,28 @@
 import { Router } from "../deps.ts";
-import { OpineRequest, OpineResponse } from "../deps.ts";
+
 const router = Router();
 
 router.get(
-	[
-		"/",
-		"/create-room",
-		"/join/:roomCode",
-		"/room/:roomCode",
-		"/assets/*",
-		"/icons/*",
-		"/site.webmanifest",
-	],
-	async (req: OpineRequest, res: OpineResponse) => {
-		const relativePath = (() => {
-			if (req.url.includes("/assets/") || req.url.includes("/icons/")) {
-				return `./www${req.url}`;
-			} else if (req.url.includes("site.webmanifest")) {
-				return "./www/site.webmanifest";
-			} else {
-				return "./www/index.html";
-			}
-		})();
-
-		const path = await Deno.realPath(relativePath);
+	["/", "/create-room", "/join/:roomCode", "/room/:roomCode"],
+	async (_, res) => {
+		const path = await Deno.realPath("./www/index.html");
 		return res.sendFile(path);
 	},
 );
+
+router.get("/assets/:fileName", async (req, res) => {
+	const path = await Deno.realPath(`./www/assets/${req.params.fileName}`);
+	return res.sendFile(path);
+});
+
+router.get("/icons/:fileName", async (req, res) => {
+	const path = await Deno.realPath(`./www/icons/${req.params.fileName}`);
+	return res.sendFile(path);
+});
+
+router.get("/site.webmanifest", async (_, res) => {
+	const path = await Deno.realPath("./www/site.webmanifest");
+	return res.sendFile(path);
+});
 
 export default router;

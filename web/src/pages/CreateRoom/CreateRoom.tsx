@@ -48,22 +48,44 @@ function getFormValues(form: HTMLFormElement) {
 }
 
 const CreateRoom: Component = () => {
-	const [list, setList] = createSignal<string>("");
+	const defaultName = localStorage.getItem("name") ?? "";
+	const defaultFormValues = (() => {
+		const rawSavedFormValues = localStorage.getItem("newRoomFields");
+		const parsedSavedFormValues = rawSavedFormValues
+			? safeJSONParse(rawSavedFormValues)
+			: undefined;
+
+		const createRoomSchemaCheck = createRoomSchema.safeParse(
+			parsedSavedFormValues,
+		);
+		return createRoomSchemaCheck.success
+			? createRoomSchemaCheck.data
+			: undefined;
+	})();
+
+	const defaultList = (() => {
+		if (!defaultFormValues) return "";
+
+		const { voterOptions, noVote, numberOfOptions } = defaultFormValues;
+		let fieldOptions: Array<number> = [];
+
+		if (voterOptions === "fibonacci") {
+			fieldOptions = options.fibonacci.slice(0, numberOfOptions);
+		} else if (voterOptions === "linear") {
+			fieldOptions = options.linear.slice(0, numberOfOptions);
+		}
+
+		const updatedList = fieldOptions.join(", ");
+		if (noVote) {
+			return updatedList + ", 🚫";
+		} else {
+			return updatedList;
+		}
+	})();
+
+	const [list, setList] = createSignal<string>(defaultList);
 	const [error, setError] = createSignal<string | null>(null);
 	const navigate = useNavigate();
-
-	const defaultName = localStorage.getItem("name") ?? "";
-	const rawSavedFormValues = localStorage.getItem("newRoomFields");
-	const parsedSavedFormValues = rawSavedFormValues
-		? safeJSONParse(rawSavedFormValues)
-		: undefined;
-
-	const createRoomSchemaCheck = createRoomSchema.safeParse(
-		parsedSavedFormValues,
-	);
-	const defaultFormValues = createRoomSchemaCheck.success
-		? createRoomSchemaCheck.data
-		: undefined;
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
@@ -129,26 +151,6 @@ const CreateRoom: Component = () => {
 			setList(updatedList);
 		}
 	};
-
-	onMount(() => {
-		if (!defaultFormValues) return;
-
-		const { voterOptions, noVote, numberOfOptions } = defaultFormValues;
-		let fieldOptions: Array<number> = [];
-
-		if (voterOptions === "fibonacci") {
-			fieldOptions = options.fibonacci.slice(0, numberOfOptions);
-		} else if (voterOptions === "linear") {
-			fieldOptions = options.linear.slice(0, numberOfOptions);
-		}
-
-		const updatedList = fieldOptions.join(", ");
-		if (noVote) {
-			setList(updatedList + ", 🚫");
-		} else {
-			setList(updatedList);
-		}
-	});
 
 	return (
 		<>

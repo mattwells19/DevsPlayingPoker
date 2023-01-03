@@ -1,12 +1,10 @@
-import connectToDb from "./db.ts";
+import db from "./db.ts";
 
 const generateRoomCode = async (): Promise<string> => {
-	const { rooms } = await connectToDb();
-
 	let roomCode = getRandomCode();
 
 	for (let i = 0; i < 5; i++) {
-		const duplicateCode = await rooms.findOne({ roomCode });
+		const duplicateCode = await db.rooms.findOne({ roomCode });
 
 		if (!duplicateCode) return roomCode;
 

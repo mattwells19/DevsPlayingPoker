@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 import styles from "./OptionCard.module.scss";
 
 interface OptionCardProps {
@@ -6,18 +6,20 @@ interface OptionCardProps {
 	selected: boolean;
 }
 
-const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
+const OptionCard: Component<OptionCardProps> = (props) => {
+	const cornerText = () => (props.value > 0 ? props.value : "No-vote");
+
 	return (
 		<span class={styles.optionContainer}>
 			<input
-				id={`option-${value}`}
+				id={`option-${props.value}`}
 				type="radio"
 				name="selection"
-				value={value}
-				checked={selected}
-				title={value > 0 ? value.toString() : "No-vote"}
+				value={props.value}
+				checked={props.selected}
+				title={props.value > 0 ? props.value.toString() : "No-vote"}
 			/>
-			<label for={`option-${value}`}>
+			<label for={`option-${props.value}`}>
 				<svg
 					width="158"
 					height="221"
@@ -28,23 +30,26 @@ const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
 					<rect width="158" height="221" rx="8" fill="white" />
 					<rect x="1" y="1" width="156" height="219" rx="7" />
 					<text x="15" y="208" fill="black" text-anchor="start">
-						{value > 0 ? value : "No-vote"}
+						{cornerText()}
 					</text>
 					<text x="143" y="25" fill="black" text-anchor="end">
-						{value > 0 ? value : "No-vote"}
+						{cornerText()}
 					</text>
-					{value > 0 ? (
-						<text
-							x="79"
-							y="135"
-							fill="black"
-							text-anchor="middle"
-							font-weight="bold"
-							style="font-size: 5rem"
-						>
-							{value}
-						</text>
-					) : (
+					<Show
+						fallback={
+							<text
+								x="79"
+								y="135"
+								fill="black"
+								text-anchor="middle"
+								font-weight="bold"
+								style="font-size: 5rem"
+							>
+								{props.value}
+							</text>
+						}
+						when={props.value === 0}
+					>
 						<svg
 							width="80"
 							height="80"
@@ -61,7 +66,7 @@ const OptionCard: Component<OptionCardProps> = ({ value, selected }) => {
 								stroke-width="11"
 							/>
 						</svg>
-					)}
+					</Show>
 				</svg>
 			</label>
 		</span>
