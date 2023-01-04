@@ -1,1 +1,1 @@
-export { default } from "./Metric";
+export { default, type MetricProps } from "./Metric";

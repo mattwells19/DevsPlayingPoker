@@ -17,7 +17,7 @@ export function validateRoomCode(
 
 const newRoomSchema = zod.object({
 	options: zod
-		.number()
+		.string()
 		.array()
 		.min(2, "Need at least 2 options.")
 		// 15 from pattern + 1 no-vote option

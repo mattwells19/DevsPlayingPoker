@@ -23,11 +23,10 @@ const VoterView: Component<VoterViewProps> = () => {
 				<fieldset
 					class={styles.voterChoices}
 					onchange={(e) => {
-						const selectionValue = e.target.hasAttribute("value")
+						const selection = e.target.hasAttribute("value")
 							? (e.target as HTMLInputElement).value
 							: null;
-						if (!selectionValue) throw new Error("Didn't get a value");
-						const selection = parseInt(selectionValue, 10);
+						if (!selection) throw new Error("Didn't get a value");
 
 						room.dispatchEvent({
 							event: "OptionSelected",

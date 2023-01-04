@@ -23,48 +23,30 @@ export async function handleCookie(
 			environment: constants.environment,
 		});
 
-		// session still valid, update cookie header and continue
+		// session still valid, you may pass
 		if (session && session.maxAge.valueOf() > Date.now()) {
-			if (!res.headers) {
-				res.headers = new Headers();
-			}
-
-			setCookie(res.headers, {
-				name: "session",
-				value: session._id.toString(),
-				maxAge: session.maxAge.valueOf(),
-				path: "/",
-				sameSite: "Strict",
-				secure: constants.environment !== "local",
-				httpOnly: true,
-			});
-
 			return next();
 		}
 	}
 
 	// if there's no sessionId in the cookie list or it is invalid, start a new session
-	const maxAge = Date.now() + constants.sessionTimeout;
-	await db.sessions
-		.insertOne({
-			maxAge: new Date(maxAge),
-			environment: constants.environment,
-		})
-		.then((newSession) => {
-			if (!res.headers) {
-				res.headers = new Headers();
-			}
+	const newSession = await db.sessions.insertOne({
+		maxAge: new Date(Date.now() + constants.sessionTimeout),
+		environment: constants.environment,
+	});
 
-			setCookie(res.headers, {
-				name: "session",
-				value: newSession.toString(),
-				maxAge,
-				path: "/",
-				sameSite: "Strict",
-				secure: constants.environment !== "local",
-				httpOnly: true,
-			});
+	if (!res.headers) {
+		res.headers = new Headers();
+	}
 
-			next();
-		});
+	setCookie(res.headers, {
+		name: "session",
+		value: newSession.toString(),
+		path: "/",
+		sameSite: "Strict",
+		secure: constants.environment !== "local",
+		httpOnly: true,
+	});
+
+	next();
 }

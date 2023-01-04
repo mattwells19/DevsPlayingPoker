@@ -1,115 +1,40 @@
-import { Component, createSignal, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
 import post from "@/utils/post";
 import Button from "@/components/Button";
-import styles from "./CreateRoom.module.scss";
 import Header from "@/components/Header";
-import zod from "zod";
-
-const createRoomSchema = zod.object({
-	voterOptions: zod.enum(["fibonacci", "linear"]),
-	// 15 from slider + 1 no-vote option
-	numberOfOptions: zod
-		.number()
-		.min(2)
-		.max(15 + 1),
-	noVote: zod.boolean(),
-});
-
-const createRoomWithNameSchema = createRoomSchema.extend({
-	moderatorName: zod
-		.string()
-		.min(1, { message: "Must provide a value for name." })
-		.max(10, { message: "Name too long. Must be no more than 10 characters." }),
-});
-
-function safeJSONParse<T>(value: string): T | undefined {
-	try {
-		return JSON.parse(value);
-	} catch {
-		return undefined;
-	}
-}
-
-const options = {
-	fibonacci: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987],
-	linear: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-};
-
-function getFormValues(form: HTMLFormElement) {
-	const formData = new FormData(form);
-
-	return {
-		moderatorName: formData.get("moderatorName") as string,
-		voterOptions: formData.get("voterOptions") as "" | "fibonacci" | "linear",
-		numberOfOptions: parseInt(formData.get("numberOfOptions")!.toString(), 10),
-		noVote: formData.get("noVote") === "yes",
-	};
-}
+import styles from "./CreateRoom.module.scss";
+import {
+	getOptions,
+	VoterOptions,
+	getFormValues,
+	getDefaultValues,
+} from "./CreateRoom.utils";
+import { nameSchema, optionsSchemaMap } from "./CreateRoom.schemas";
 
 const CreateRoom: Component = () => {
-	const defaultName = localStorage.getItem("name") ?? "";
-	const defaultFormValues = (() => {
-		const rawSavedFormValues = localStorage.getItem("newRoomFields");
-		const parsedSavedFormValues = rawSavedFormValues
-			? safeJSONParse(rawSavedFormValues)
-			: undefined;
-
-		const createRoomSchemaCheck = createRoomSchema.safeParse(
-			parsedSavedFormValues,
-		);
-		return createRoomSchemaCheck.success
-			? createRoomSchemaCheck.data
-			: undefined;
-	})();
-
-	const defaultList = (() => {
-		if (!defaultFormValues) return "";
-
-		const { voterOptions, noVote, numberOfOptions } = defaultFormValues;
-		let fieldOptions: Array<number> = [];
-
-		if (voterOptions === "fibonacci") {
-			fieldOptions = options.fibonacci.slice(0, numberOfOptions);
-		} else if (voterOptions === "linear") {
-			fieldOptions = options.linear.slice(0, numberOfOptions);
-		}
-
-		const updatedList = fieldOptions.join(", ");
-		if (noVote) {
-			return updatedList + ", 🚫";
-		} else {
-			return updatedList;
-		}
-	})();
-
-	const [list, setList] = createSignal<string>(defaultList);
+	const defaults = getDefaultValues();
+	let formRef: HTMLFormElement;
+	const [list, setList] = createSignal<string>(defaults.list);
+	const [optionsSelect, setOptionsSelect] = createSignal<VoterOptions>(
+		defaults.formValues?.voterOptions ?? "",
+	);
 	const [error, setError] = createSignal<string | null>(null);
 	const navigate = useNavigate();
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
-		let fieldOptions: Array<number> = [];
 
-		if (!formData.voterOptions) {
+		if (formData.voterOptions === "") {
 			return;
 		}
-		if (formData.voterOptions === "fibonacci") {
-			fieldOptions = options.fibonacci.slice(0, formData.numberOfOptions);
-		} else if (formData.voterOptions === "linear") {
-			fieldOptions = options.linear.slice(0, formData.numberOfOptions);
-		}
 
-		if (formData.noVote) {
-			fieldOptions = [0, ...fieldOptions];
-		}
+		const schemaCheck = optionsSchemaMap[formData.voterOptions]
+			.extend(nameSchema)
+			.safeParse(formData);
 
-		const createRoomWithNameSchemaCheck =
-			createRoomWithNameSchema.safeParse(formData);
-
-		if (!createRoomWithNameSchemaCheck.success) {
-			const allErrorMessages =
-				createRoomWithNameSchemaCheck.error.flatten().fieldErrors;
+		if (!schemaCheck.success) {
+			const allErrorMessages = schemaCheck.error.flatten().fieldErrors;
 
 			const singleErrorMessage = Object.entries(allErrorMessages)
 				.map(([key, value]) => `${key}: ${value.join("; ")}`)
@@ -119,7 +44,13 @@ const CreateRoom: Component = () => {
 			return;
 		}
 
-		post("/api/v1/create", { options: fieldOptions })
+		const options = getOptions(formData.voterOptions, formData.numberOfOptions);
+
+		if (formData.noVote) {
+			options.unshift("N/A");
+		}
+
+		post("/api/v1/create", { options })
 			.then((res) => {
 				localStorage.setItem("newRoomFields", JSON.stringify(formData));
 				localStorage.setItem("name", formData.moderatorName);
@@ -129,28 +60,45 @@ const CreateRoom: Component = () => {
 	};
 
 	const handleChange = (form: EventTarget & HTMLFormElement) => {
-		const { voterOptions, noVote, numberOfOptions } = getFormValues(form);
-		let fieldOptions: Array<number> = [];
+		const formData = getFormValues(form);
 		setError(null);
 
-		if (voterOptions === "") {
+		if (optionsSelect() !== formData.voterOptions) {
+			// allow the effect to set the values since elements may need to be mounted
+			setOptionsSelect(formData.voterOptions);
+			return;
+		}
+
+		if (optionsSelect() === "") {
 			setList("");
 			return;
 		}
 
-		if (voterOptions === "fibonacci") {
-			fieldOptions = options.fibonacci.slice(0, numberOfOptions);
-		} else if (voterOptions === "linear") {
-			fieldOptions = options.linear.slice(0, numberOfOptions);
+		const options = getOptions(optionsSelect(), formData.numberOfOptions);
+
+		if (formData.noVote) {
+			options.push("🚫");
 		}
 
-		const updatedList = fieldOptions.join(", ");
-		if (noVote) {
-			setList(updatedList + ", 🚫");
-		} else {
-			setList(updatedList);
-		}
+		setList(options.join(", "));
 	};
+
+	createEffect(() => {
+		const formData = getFormValues(formRef);
+
+		if (optionsSelect() === "") {
+			setList("");
+			return;
+		}
+
+		const options = getOptions(optionsSelect(), formData.numberOfOptions);
+
+		if (formData.noVote) {
+			options.push("🚫");
+		}
+
+		setList(options.join(", "));
+	});
 
 	return (
 		<>
@@ -158,6 +106,7 @@ const CreateRoom: Component = () => {
 			<main class={styles.createRoom}>
 				<form
 					class={styles.createRoomForm}
+					ref={(el) => (formRef = el)}
 					onInput={(e) => handleChange(e.currentTarget)}
 					onSubmit={(e) => {
 						e.preventDefault();
@@ -177,7 +126,7 @@ const CreateRoom: Component = () => {
 							minLength="1"
 							maxLength="10"
 							type="text"
-							value={defaultName}
+							value={defaults.name}
 						/>
 					</div>
 
@@ -194,52 +143,55 @@ const CreateRoom: Component = () => {
 							id="voterOptions"
 							name="voterOptions"
 							required
-							value={defaultFormValues?.voterOptions ?? ""}
+							value={defaults.formValues?.voterOptions ?? ""}
 						>
 							<option value="">Select options</option>
 							<option value="fibonacci">Fibonacci</option>
 							<option value="linear">Linear</option>
+							<option value="yesNo">Yes/No</option>
 						</select>
 					</div>
 
-					<div>
-						<label for="numberOfOptions">
-							Number of options (min: 2, max: 15)
-						</label>
-						<input
-							type="range"
-							id="numberOfOptions"
-							name="numberOfOptions"
-							min="2"
-							max="15"
-							step="1"
-							value={defaultFormValues?.numberOfOptions}
-						/>
-					</div>
-
-					<fieldset>
-						<legend>Include no-vote option?</legend>
-
-						<label class={styles.radio}>
+					<Show when={optionsSelect() !== "yesNo"}>
+						<div>
+							<label for="numberOfOptions">
+								Number of options (min: 2, max: 15)
+							</label>
 							<input
-								type="radio"
-								name="noVote"
-								value="yes"
-								checked={defaultFormValues && defaultFormValues.noVote}
+								type="range"
+								id="numberOfOptions"
+								name="numberOfOptions"
+								min="2"
+								max="15"
+								step="1"
+								value={defaults.formValues?.numberOfOptions ?? undefined}
 							/>
-							Yes
-						</label>
+						</div>
 
-						<label class={styles.radio}>
-							<input
-								type="radio"
-								name="noVote"
-								value="no"
-								checked={!defaultFormValues || !defaultFormValues.noVote}
-							/>
-							No
-						</label>
-					</fieldset>
+						<fieldset>
+							<legend>Include no-vote option?</legend>
+
+							<label class={styles.radio}>
+								<input
+									type="radio"
+									name="noVote"
+									value="yes"
+									checked={defaults.formValues && defaults.formValues.noVote}
+								/>
+								Yes
+							</label>
+
+							<label class={styles.radio}>
+								<input
+									type="radio"
+									name="noVote"
+									value="no"
+									checked={!defaults.formValues || !defaults.formValues.noVote}
+								/>
+								No
+							</label>
+						</fieldset>
+					</Show>
 
 					<dl class={styles.finalPreview}>
 						<dt>Final preview</dt>
