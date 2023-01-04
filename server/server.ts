@@ -12,12 +12,14 @@ import FeRoutes from "./routes/fe.routes.ts";
 const server = opine();
 server.use(json());
 
+// avoid setting cookie when requesting static assets
+server.use("/", FeRoutes);
+
 server.use(handleCookie);
 
 // Use routes
 server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
-server.use("/", FeRoutes);
 
 db.connect()
 	.then(() => {
