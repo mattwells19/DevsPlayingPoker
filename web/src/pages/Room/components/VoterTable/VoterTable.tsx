@@ -1,12 +1,4 @@
-import {
-	Component,
-	createMemo,
-	createSignal,
-	For,
-	Match,
-	Show,
-	Switch,
-} from "solid-js";
+import { Component, createSignal, For, Match, Show, Switch } from "solid-js";
 import { ConfidenceValue, Voter } from "@/shared-types";
 import Metric from "../Metric";
 import styles from "./VoterTable.module.scss";
@@ -48,7 +40,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 	} | null>(null);
 	const room = useRoom();
 
-	const stats = createMemo(() => getStats(room.roomData.voters));
+	const stats = () => getStats(room.roomData.voters);
 
 	return (
 		<>

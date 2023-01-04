@@ -43,7 +43,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 				name="selection"
 				value={props.value}
 				checked={props.selected}
-				title={cornerText().toString()}
+				title={cornerText()}
 			/>
 			<label for={`option-${props.value}`}>
 				<svg
