@@ -9,7 +9,8 @@ form.createRoomForm {
 	gap: 2rem;
 	padding: 3rem 0.5rem;
 
-	& > div, & > dl {
+	& > div,
+	& > dl {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
@@ -72,85 +73,73 @@ form.createRoomForm {
 	}
 }
 
-/* Generated input range styles*/
-/* http://danielstern.ca/range.css/#/ */
-input[type="range"] {
+/* -----------------------------------------------------------------------------
+* Slider from https://github.com/chakra-ui/zag/blob/18db4fc4d1bdefba3be99da98ff1ac040f09a638/shared/src/style.css#L403
+* -----------------------------------------------------------------------------*/
+
+[data-scope="slider"][data-part="root"] {
 	width: 100%;
-	margin: 5px 0;
-	background-color: transparent;
-	-webkit-appearance: none;
-}
-input[type="range"]::-webkit-slider-runnable-track {
-	background: var(--primary-orange);
-	border: 1px solid var(--border-gray);
-	border-radius: 23.4px;
-	width: 100%;
-	height: 10px;
-	cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-	margin-top: -6px;
-	width: 20px;
-	height: 20px;
-	background: var(--elevated-background);
-	border: 2px solid var(--border-gray);
-	border-radius: 20px;
-	cursor: pointer;
-	-webkit-appearance: none;
-}
-input[type="range"]:focus::-webkit-slider-runnable-track {
-	background: var(--primary-orange);
-}
-input[type="range"]::-moz-range-track {
-	background: var(--primary-orange);
-	border: 1px solid var(--border-gray);
-	border-radius: 23.4px;
-	width: 100%;
-	height: 10px;
-	cursor: pointer;
-}
-input[type="range"]::-moz-range-thumb {
-	width: 20px;
-	height: 20px;
-	background: var(--elevated-background);
-	border: 2px solid var(--border-gray);
-	border-radius: 20px;
-	cursor: pointer;
-}
-input[type="range"]::-ms-track {
-	background: transparent;
-	border-color: transparent;
-	border-width: 9px 0;
-	color: transparent;
-	width: 100%;
-	height: 10px;
-	cursor: pointer;
-}
-input[type="range"]::-ms-fill-lower {
-	background: var(--primary-orange);
-	border: 1px solid var(--border-gray);
-	border-radius: 46.8px;
-}
-input[type="range"]::-ms-fill-upper {
-	background: var(--primary-orange);
-	border: 1px solid var(--border-gray);
-	border-radius: 46.8px;
-}
-input[type="range"]::-ms-thumb {
-	width: 20px;
-	height: 20px;
-	background: var(--elevated-background);
-	border: 2px solid var(--border-gray);
-	border-radius: 20px;
-	cursor: pointer;
-	margin-top: 0px;
-	/*Needed to keep the Edge thumb centred*/
-}
-input[type="range"]:focus::-ms-fill-lower {
-	background: var(--primary-orange);
-}
-input[type="range"]:focus::-ms-fill-upper {
-	background: var(--primary-orange);
+	display: flex;
+	flex-direction: column;
+	margin-top: 0.5rem;
 }
 
-/* Generated input range styles*/
+[data-scope="slider"][data-part="control"] {
+	--slider-thumb-size: 20px;
+	--slider-track-height: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+[data-scope="slider"][data-part="control"][data-orientation="horizontal"] {
+	height: var(--slider-thumb-size);
+}
+
+[data-scope="slider"][data-part="control"][data-orientation="vertical"] {
+	width: var(--slider-thumb-size);
+}
+
+[data-scope="slider"][data-part="thumb"] {
+	all: unset;
+	width: var(--slider-thumb-size);
+	height: var(--slider-thumb-size);
+	border-radius: 999px;
+	background: var(--elevated-background);
+	border: 1px solid var(--border-gray);
+}
+
+[data-scope="slider"][data-part="thumb"]:focus {
+	outline: -webkit-focus-ring-color auto 1px;
+}
+
+[data-scope="slider"][data-part="track"] {
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 9999px;
+}
+[data-scope="slider"][data-part="track"][data-orientation="horizontal"] {
+	height: var(--slider-track-height);
+	width: 100%;
+}
+[data-scope="slider"][data-part="track"][data-orientation="vertical"] {
+	height: 100%;
+	width: var(--slider-track-height);
+}
+
+[data-scope="slider"][data-part="range"] {
+	background: var(--primary-orange);
+	border-radius: inherit;
+}
+
+[data-scope="slider"][data-part="range"][data-disabled] {
+	background: rgba(0, 0, 0, 0.4);
+}
+
+[data-scope="slider"][data-part="range"][data-orientation="horizontal"] {
+	height: 100%;
+}
+
+[data-scope="slider"][data-part="marker-group"][data-orientation="vertical"] {
+	height: 100%;
+}

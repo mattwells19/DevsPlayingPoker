@@ -2,11 +2,10 @@ import zod from "zod";
 
 export const numberPatternSchema = zod.object({
 	voterOptions: zod.enum(["fibonacci", "linear"]),
-	// 15 from slider + 1 no-vote option
-	numberOfOptions: zod
-		.number()
-		.min(2)
-		.max(15 + 1),
+	numberOfOptions: zod.tuple([
+		zod.number().min(0).max(13),
+		zod.number().min(2).max(14),
+	]),
 	noVote: zod.boolean(),
 });
 

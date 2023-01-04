@@ -1,10 +1,13 @@
 import { numberPatternSchema, rightSizeSchema } from "./CreateRoom.schemas";
 
+export type NumberRange = [number, number];
+
 export type VoterOptions = "" | "fibonacci" | "linear" | "yesNo";
 
 export const availableOptions: Record<VoterOptions, Array<string>> = {
 	"": [],
 	fibonacci: [
+		"0.5",
 		"1",
 		"2",
 		"3",
@@ -19,7 +22,6 @@ export const availableOptions: Record<VoterOptions, Array<string>> = {
 		"233",
 		"377",
 		"610",
-		"987",
 	],
 	linear: [
 		"1",
@@ -43,10 +45,12 @@ export const availableOptions: Record<VoterOptions, Array<string>> = {
 
 export function getOptions(
 	optionsSelect: VoterOptions,
-	numberOfOptions: number | null,
+	numberOfOptions: NumberRange | null,
 ): Array<string> {
 	const options = availableOptions[optionsSelect];
-	return numberOfOptions ? options.slice(0, numberOfOptions) : options;
+	return numberOfOptions
+		? options.slice(numberOfOptions[0], numberOfOptions[1])
+		: options;
 }
 
 export function getFormValues(form: HTMLFormElement) {
@@ -63,13 +67,19 @@ export function getFormValues(form: HTMLFormElement) {
 			noVote: false,
 		};
 	} else {
-		const numberOfOptions = formData.get("numberOfOptions")?.toString();
+		const numberOfOptionsMin = formData.get("numberOfOptions[0]")?.toString();
+		const numberOfOptionsMax = formData.get("numberOfOptions[1]")?.toString();
 		const noVote = formData.get("noVote");
+
+		if (!numberOfOptionsMin || !numberOfOptionsMax) throw new Error();
 
 		return {
 			moderatorName,
 			voterOptions,
-			numberOfOptions: numberOfOptions ? parseInt(numberOfOptions, 10) : 8,
+			numberOfOptions: [
+				parseInt(numberOfOptionsMin),
+				parseInt(numberOfOptionsMax),
+			] as NumberRange,
 			noVote: noVote ? noVote === "yes" : false,
 		};
 	}

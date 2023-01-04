@@ -7,7 +7,7 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 
 	const isNumbers = selections.every(
 		(selection) =>
-			selection === null || selection === "N/A" || !isNaN(parseInt(selection)),
+			selection === null || selection === "N/A" || !isNaN(Number(selection)),
 	);
 	if (isNumbers) {
 		const modeCounter = new Map<number, number>();
@@ -17,7 +17,7 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 				if (selection === null || selection === "N/A") {
 					return acc;
 				}
-				const selectionNum = parseInt(selection, 10);
+				const selectionNum = Number(selection);
 
 				const currCount = modeCounter.get(selectionNum) ?? 0;
 				const newCount = currCount + 1;

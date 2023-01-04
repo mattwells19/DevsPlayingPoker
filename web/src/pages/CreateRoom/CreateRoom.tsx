@@ -1,5 +1,6 @@
 import { Component, createEffect, createSignal, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
+import RangeSlider from "./components/RangeSlider";
 import post from "@/utils/post";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
@@ -157,13 +158,12 @@ const CreateRoom: Component = () => {
 							<label for="numberOfOptions">
 								Number of options (min: 2, max: 15)
 							</label>
-							<input
-								type="range"
+							<RangeSlider
 								id="numberOfOptions"
 								name="numberOfOptions"
-								min="2"
-								max="15"
-								step="1"
+								min={0}
+								max={14}
+								step={1}
 								value={defaults.formValues?.numberOfOptions ?? undefined}
 							/>
 						</div>
