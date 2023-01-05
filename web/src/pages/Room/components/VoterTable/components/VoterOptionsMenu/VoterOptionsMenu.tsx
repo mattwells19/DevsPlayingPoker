@@ -16,7 +16,7 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 	const [state, send] = useMachine(
 		menu.machine({
 			id: createUniqueId(),
-			onSelect(value) {
+			onSelect({ value }) {
 				props.onVoterClick(value as VoterClickAction, props.voter);
 			},
 			closeOnSelect: true,

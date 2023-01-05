@@ -41,7 +41,7 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 		}
 	})();
 
-	const description = () => {
+	const description = (() => {
 		switch (props.action) {
 			case "kickVoter":
 				return (
@@ -60,7 +60,7 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 			default:
 				return null;
 		}
-	};
+	})();
 
 	return (
 		<Portal>
