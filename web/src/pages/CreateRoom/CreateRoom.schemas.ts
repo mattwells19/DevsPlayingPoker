@@ -1,5 +1,14 @@
 import zod from "zod";
 
+export type NumberRange = [number, number];
+
+export interface CreateRoomFields {
+	moderatorName: string;
+	voterOptions: keyof typeof optionsSchemaMap;
+	numberOfOptions: NumberRange | null;
+	noVote: boolean;
+}
+
 export const numberPatternSchema = zod.object({
 	voterOptions: zod.enum(["fibonacci", "linear"]),
 	numberOfOptions: zod.tuple([
@@ -19,7 +28,6 @@ export const optionsSchemaMap = {
 	fibonacci: numberPatternSchema,
 	linear: numberPatternSchema,
 	yesNo: rightSizeSchema,
-	"": undefined,
 };
 
 export const nameSchema = {

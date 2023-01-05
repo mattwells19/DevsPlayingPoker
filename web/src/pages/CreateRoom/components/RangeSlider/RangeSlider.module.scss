@@ -1,0 +1,75 @@
+/* -----------------------------------------------------------------------------
+* Slider from https://github.com/chakra-ui/zag/blob/18db4fc4d1bdefba3be99da98ff1ac040f09a638/shared/src/style.css#L403
+* -----------------------------------------------------------------------------*/
+.slider {
+	[data-scope="slider"][data-part="root"] {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		margin-top: 0.5rem;
+	}
+
+	[data-scope="slider"][data-part="control"] {
+		--slider-thumb-size: 20px;
+		--slider-track-height: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	[data-scope="slider"][data-part="control"][data-orientation="horizontal"] {
+		height: var(--slider-thumb-size);
+	}
+
+	[data-scope="slider"][data-part="control"][data-orientation="vertical"] {
+		width: var(--slider-thumb-size);
+	}
+
+	[data-scope="slider"][data-part="thumb"] {
+		all: unset;
+		width: var(--slider-thumb-size);
+		height: var(--slider-thumb-size);
+		border-radius: 999px;
+		background: var(--elevated-background);
+		border: 1px solid var(--border-gray);
+	}
+
+	[data-scope="slider"][data-part="thumb"]:focus {
+		outline: auto 1px Highlight;
+		outline: auto 1px -webkit-focus-ring-color;
+	}
+
+	[data-scope="slider"][data-part="track"] {
+		background: rgba(0, 0, 0, 0.2);
+		border-radius: 9999px;
+	}
+	[data-scope="slider"][data-part="track"][data-orientation="horizontal"] {
+		height: var(--slider-track-height);
+		width: 100%;
+	}
+	[data-scope="slider"][data-part="track"][data-orientation="vertical"] {
+		height: 100%;
+		width: var(--slider-track-height);
+	}
+
+	[data-scope="slider"][data-part="range"] {
+		background: var(--primary-orange);
+		border-radius: inherit;
+	}
+
+	[data-scope="slider"][data-part="range"][data-disabled] {
+		background: rgba(0, 0, 0, 0.4);
+	}
+
+	[data-scope="slider"][data-part="range"][data-orientation="horizontal"] {
+		height: 100%;
+	}
+
+	[data-scope="slider"][data-part="marker-group"][data-orientation="vertical"] {
+		height: 100%;
+	}
+}

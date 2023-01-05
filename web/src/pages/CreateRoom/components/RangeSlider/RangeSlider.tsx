@@ -1,11 +1,13 @@
 import * as rangeSlider from "@zag-js/range-slider";
 import { normalizeProps, useMachine } from "@zag-js/solid";
 import { createMemo, Component } from "solid-js";
-import type { NumberRange } from "../CreateRoom.utils";
+import type { NumberRange } from "../../CreateRoom.schemas";
+import styles from "./RangeSlider.module.scss";
 
 interface RangeSliderProps {
 	id: string;
 	name: string;
+	label: string;
 	value?: NumberRange;
 	min?: number;
 	max?: number;
@@ -23,10 +25,11 @@ const RangeSlider: Component<RangeSliderProps> = (props) => {
 		rangeSlider.connect(state, send, normalizeProps),
 	);
 
-	// TODO: figure out how to connect label
-
 	return (
-		<div {...api().rootProps}>
+		<div class={styles.slider} {...api().rootProps}>
+			<div>
+				<label {...api().labelProps}>{props.label}</label>
+			</div>
 			<div {...api().controlProps}>
 				<div {...api().trackProps}>
 					<div {...api().rangeProps} />
