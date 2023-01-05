@@ -3,8 +3,10 @@ import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
+import { useIntl } from "@/i18n";
 
 const Landing: Component = () => {
+	const t = useIntl();
 	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
 		Array(4).fill(null);
 	const navigate = useNavigate();
@@ -67,14 +69,11 @@ const Landing: Component = () => {
 			<main class={styles.landing}>
 				<section class={styles.copy}>
 					<h1>🃏 Devs Playing Poker</h1>
-					<p>
-						If you have items you want to effort as fast as possible you've come
-						to the right place.
-					</p>
+					<p>{t("comeToTheRightPlace")}</p>
 				</section>
 				<div class={styles.roomOps}>
 					<section class={styles.roomCodeInputs}>
-						<p>Already have a room code? Enter it here</p>
+						<p>{t("enterRoomCodeHere")}</p>
 						<form
 							onInput={(e) => handleInputChange(e.currentTarget)}
 							onPaste={(e) => handlePaste(e)}
@@ -118,12 +117,12 @@ const Landing: Component = () => {
 					</section>
 					<div class={styles.seperator}>
 						<hr />
-						<span>or</span>
+						<span>{t("or")}</span>
 						<hr />
 					</div>
 					<section>
 						<ButtonLink class={styles.btnLink} href="/create-room">
-							Start a new room
+							{t("newRoom")}
 						</ButtonLink>
 					</section>
 				</div>
