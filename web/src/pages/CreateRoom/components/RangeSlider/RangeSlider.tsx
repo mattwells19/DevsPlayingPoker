@@ -18,7 +18,7 @@ const RangeSlider: Component<RangeSliderProps> = (props) => {
 	const [state, send] = useMachine(
 		rangeSlider.machine({
 			...props,
-			minStepsBetweenThumbs: 2,
+			minStepsBetweenThumbs: 1,
 		}),
 	);
 	const api = createMemo(() =>

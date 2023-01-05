@@ -13,7 +13,7 @@ export const numberPatternSchema = zod.object({
 	voterOptions: zod.enum(["fibonacci", "linear"]),
 	numberOfOptions: zod.tuple([
 		zod.number().min(0).max(13),
-		zod.number().min(2).max(14),
+		zod.number().min(1).max(14),
 	]),
 	noVote: zod.boolean(),
 });

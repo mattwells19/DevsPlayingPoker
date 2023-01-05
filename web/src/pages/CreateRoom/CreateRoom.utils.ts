@@ -2,6 +2,7 @@ import type { RoomSchema } from "@/shared-types";
 import {
 	CreateRoomFields,
 	numberPatternSchema,
+	NumberRange,
 	rightSizeSchema,
 } from "./CreateRoom.schemas";
 
@@ -52,9 +53,12 @@ export function getOptions(
 ): Array<string> {
 	const options = availableOptions[optionsSelect];
 	return numberOfOptions
-		? options.slice(numberOfOptions[0], numberOfOptions[1])
+		? // slice doesn't include the last index, but we need it so +1 to include it
+		  options.slice(numberOfOptions[0], numberOfOptions[1] + 1)
 		: options;
 }
+
+export const defaultRangeSelect: NumberRange = [0, 5];
 
 export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 	const formData = new FormData(form);
@@ -72,19 +76,17 @@ export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 			noVote: false,
 		};
 	} else {
-		const numberOfOptionsMin =
-			formData.get("numberOfOptions[0]")?.toString() ?? "0";
-		const numberOfOptionsMax =
-			formData.get("numberOfOptions[1]")?.toString() ?? "5";
+		const numberOfOptionsMin = formData.get("numberOfOptions[0]")?.toString();
+		const numberOfOptionsMax = formData.get("numberOfOptions[1]")?.toString();
 		const noVote = formData.get("noVote");
 
 		return {
 			moderatorName,
 			voterOptions,
-			numberOfOptions: [
-				parseInt(numberOfOptionsMin),
-				parseInt(numberOfOptionsMax),
-			],
+			numberOfOptions:
+				numberOfOptionsMin && numberOfOptionsMax
+					? [parseInt(numberOfOptionsMin), parseInt(numberOfOptionsMax)]
+					: defaultRangeSelect,
 			noVote: noVote ? noVote === "yes" : false,
 		};
 	}
@@ -126,7 +128,7 @@ export function getDefaultValues() {
 
 		return {
 			voterOptions: "fibonacci",
-			numberOfOptions: [0, 5],
+			numberOfOptions: defaultRangeSelect,
 			noVote: false,
 		};
 	})();

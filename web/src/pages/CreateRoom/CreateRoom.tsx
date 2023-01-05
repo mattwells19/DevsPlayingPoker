@@ -10,6 +10,7 @@ import {
 	getFormValues,
 	getDefaultValues,
 	availableOptions,
+	defaultRangeSelect,
 } from "./CreateRoom.utils";
 import {
 	nameSchema,
@@ -150,9 +151,9 @@ const CreateRoom: Component = () => {
 								availableOptions[optionsSelect()][0]
 							}, max: ${availableOptions[optionsSelect()].slice(-1)})`}
 							min={0}
-							max={15}
+							max={14}
 							step={1}
-							value={defaults.formValues.numberOfOptions ?? undefined}
+							value={defaults.formValues.numberOfOptions ?? defaultRangeSelect}
 						/>
 
 						<fieldset>
