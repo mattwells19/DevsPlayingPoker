@@ -1,10 +1,17 @@
-import { numberPatternSchema, rightSizeSchema } from "./CreateRoom.schemas";
+import type { RoomSchema } from "@/shared-types";
+import {
+	CreateRoomFields,
+	numberPatternSchema,
+	NumberRange,
+	rightSizeSchema,
+} from "./CreateRoom.schemas";
 
-export type VoterOptions = "" | "fibonacci" | "linear" | "yesNo";
-
-export const availableOptions: Record<VoterOptions, Array<string>> = {
-	"": [],
+export const availableOptions: Record<
+	CreateRoomFields["voterOptions"],
+	RoomSchema["options"]
+> = {
 	fibonacci: [
+		"0.5",
 		"1",
 		"2",
 		"3",
@@ -19,7 +26,6 @@ export const availableOptions: Record<VoterOptions, Array<string>> = {
 		"233",
 		"377",
 		"610",
-		"987",
 	],
 	linear: [
 		"1",
@@ -42,18 +48,25 @@ export const availableOptions: Record<VoterOptions, Array<string>> = {
 };
 
 export function getOptions(
-	optionsSelect: VoterOptions,
-	numberOfOptions: number | null,
+	optionsSelect: CreateRoomFields["voterOptions"],
+	numberOfOptions: CreateRoomFields["numberOfOptions"],
 ): Array<string> {
 	const options = availableOptions[optionsSelect];
-	return numberOfOptions ? options.slice(0, numberOfOptions) : options;
+	return numberOfOptions
+		? // slice doesn't include the last index, but we need it so +1 to include it
+		  options.slice(numberOfOptions[0], numberOfOptions[1] + 1)
+		: options;
 }
 
-export function getFormValues(form: HTMLFormElement) {
+export const defaultRangeSelect: NumberRange = [0, 5];
+
+export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 	const formData = new FormData(form);
 
 	const moderatorName = formData.get("moderatorName") as string;
-	const voterOptions = formData.get("voterOptions") as VoterOptions;
+	const voterOptions = formData.get(
+		"voterOptions",
+	) as CreateRoomFields["voterOptions"];
 
 	if (voterOptions === "yesNo") {
 		return {
@@ -63,13 +76,17 @@ export function getFormValues(form: HTMLFormElement) {
 			noVote: false,
 		};
 	} else {
-		const numberOfOptions = formData.get("numberOfOptions")?.toString();
+		const numberOfOptionsMin = formData.get("numberOfOptions[0]")?.toString();
+		const numberOfOptionsMax = formData.get("numberOfOptions[1]")?.toString();
 		const noVote = formData.get("noVote");
 
 		return {
 			moderatorName,
 			voterOptions,
-			numberOfOptions: numberOfOptions ? parseInt(numberOfOptions, 10) : 8,
+			numberOfOptions:
+				numberOfOptionsMin && numberOfOptionsMax
+					? [parseInt(numberOfOptionsMin), parseInt(numberOfOptionsMax)]
+					: defaultRangeSelect,
 			noVote: noVote ? noVote === "yes" : false,
 		};
 	}
@@ -86,7 +103,9 @@ export function safeJSONParse<T>(value: string): T | undefined {
 export function getDefaultValues() {
 	const name = localStorage.getItem("name") ?? "";
 
-	const formValues = (() => {
+	const formValues = ((): Zod.infer<
+		typeof numberPatternSchema | typeof rightSizeSchema
+	> => {
 		const rawSavedFormValues = localStorage.getItem("newRoomFields");
 		const parsedSavedFormValues = rawSavedFormValues
 			? safeJSONParse(rawSavedFormValues)
@@ -107,7 +126,11 @@ export function getDefaultValues() {
 			return rightSizeSchemaCheck.data;
 		}
 
-		return undefined;
+		return {
+			voterOptions: "fibonacci",
+			numberOfOptions: defaultRangeSelect,
+			noVote: false,
+		};
 	})();
 
 	const list = (() => {

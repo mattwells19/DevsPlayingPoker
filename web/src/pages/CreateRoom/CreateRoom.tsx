@@ -1,33 +1,35 @@
 import { Component, createEffect, createSignal, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
+import RangeSlider from "./components/RangeSlider";
 import post from "@/utils/post";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
 import styles from "./CreateRoom.module.scss";
 import {
 	getOptions,
-	VoterOptions,
 	getFormValues,
 	getDefaultValues,
+	availableOptions,
+	defaultRangeSelect,
 } from "./CreateRoom.utils";
-import { nameSchema, optionsSchemaMap } from "./CreateRoom.schemas";
+import {
+	nameSchema,
+	optionsSchemaMap,
+	CreateRoomFields,
+} from "./CreateRoom.schemas";
 
 const CreateRoom: Component = () => {
 	const defaults = getDefaultValues();
 	let formRef: HTMLFormElement;
 	const [list, setList] = createSignal<string>(defaults.list);
-	const [optionsSelect, setOptionsSelect] = createSignal<VoterOptions>(
-		defaults.formValues?.voterOptions ?? "",
-	);
+	const [optionsSelect, setOptionsSelect] = createSignal<
+		CreateRoomFields["voterOptions"]
+	>(defaults.formValues.voterOptions);
 	const [error, setError] = createSignal<string | null>(null);
 	const navigate = useNavigate();
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
-
-		if (formData.voterOptions === "") {
-			return;
-		}
 
 		const schemaCheck = optionsSchemaMap[formData.voterOptions]
 			.extend(nameSchema)
@@ -69,11 +71,6 @@ const CreateRoom: Component = () => {
 			return;
 		}
 
-		if (optionsSelect() === "") {
-			setList("");
-			return;
-		}
-
 		const options = getOptions(optionsSelect(), formData.numberOfOptions);
 
 		if (formData.noVote) {
@@ -85,11 +82,6 @@ const CreateRoom: Component = () => {
 
 	createEffect(() => {
 		const formData = getFormValues(formRef);
-
-		if (optionsSelect() === "") {
-			setList("");
-			return;
-		}
 
 		const options = getOptions(optionsSelect(), formData.numberOfOptions);
 
@@ -143,9 +135,8 @@ const CreateRoom: Component = () => {
 							id="voterOptions"
 							name="voterOptions"
 							required
-							value={defaults.formValues?.voterOptions ?? ""}
+							value={defaults.formValues.voterOptions}
 						>
-							<option value="">Select options</option>
 							<option value="fibonacci">Fibonacci</option>
 							<option value="linear">Linear</option>
 							<option value="yesNo">Yes/No</option>
@@ -153,20 +144,17 @@ const CreateRoom: Component = () => {
 					</div>
 
 					<Show when={optionsSelect() !== "yesNo"}>
-						<div>
-							<label for="numberOfOptions">
-								Number of options (min: 2, max: 15)
-							</label>
-							<input
-								type="range"
-								id="numberOfOptions"
-								name="numberOfOptions"
-								min="2"
-								max="15"
-								step="1"
-								value={defaults.formValues?.numberOfOptions ?? undefined}
-							/>
-						</div>
+						<RangeSlider
+							id="numberOfOptions"
+							name="numberOfOptions"
+							label={`Number of options (min: ${
+								availableOptions[optionsSelect()][0]
+							}, max: ${availableOptions[optionsSelect()].slice(-1)})`}
+							min={0}
+							max={14}
+							step={1}
+							value={defaults.formValues.numberOfOptions ?? defaultRangeSelect}
+						/>
 
 						<fieldset>
 							<legend>Include no-vote option?</legend>
@@ -176,7 +164,7 @@ const CreateRoom: Component = () => {
 									type="radio"
 									name="noVote"
 									value="yes"
-									checked={defaults.formValues && defaults.formValues.noVote}
+									checked={defaults.formValues.noVote}
 								/>
 								Yes
 							</label>
@@ -186,7 +174,7 @@ const CreateRoom: Component = () => {
 									type="radio"
 									name="noVote"
 									value="no"
-									checked={!defaults.formValues || !defaults.formValues.noVote}
+									checked={!defaults.formValues.noVote}
 								/>
 								No
 							</label>
