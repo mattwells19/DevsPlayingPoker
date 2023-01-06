@@ -17,8 +17,10 @@ import {
 	optionsSchemaMap,
 	CreateRoomFields,
 } from "./CreateRoom.schemas";
+import { useIntl } from "@/i18n";
 
 const CreateRoom: Component = () => {
+	const t = useIntl();
 	const defaults = getDefaultValues();
 	let formRef: HTMLFormElement;
 	const [list, setList] = createSignal<string>(defaults.list);
@@ -107,7 +109,7 @@ const CreateRoom: Component = () => {
 				>
 					<div>
 						<label for="moderatorName">
-							Your name
+							{t("yourName")}
 							<span class={styles.required}>*</span>
 						</label>
 						<input
@@ -128,7 +130,7 @@ const CreateRoom: Component = () => {
 
 					<div>
 						<label for="voterOptions">
-							What options would you like voters to have to choose from?
+							{t("voterOptions")}
 							<span class={styles.required}>*</span>
 						</label>
 						<select
@@ -137,9 +139,9 @@ const CreateRoom: Component = () => {
 							required
 							value={defaults.formValues.voterOptions}
 						>
-							<option value="fibonacci">Fibonacci</option>
-							<option value="linear">Linear</option>
-							<option value="yesNo">Yes/No</option>
+							<option value="fibonacci">{t("fibonacci")}</option>
+							<option value="linear">{t("linear")}</option>
+							<option value="yesNo">{t("yesNo")}</option>
 						</select>
 					</div>
 
@@ -147,9 +149,10 @@ const CreateRoom: Component = () => {
 						<RangeSlider
 							id="numberOfOptions"
 							name="numberOfOptions"
-							label={`Number of options (min: ${
-								availableOptions[optionsSelect()][0]
-							}, max: ${availableOptions[optionsSelect()].slice(-1)})`}
+							label={t("numberOfOptions", {
+								min: availableOptions[optionsSelect()][0],
+								max: availableOptions[optionsSelect()].slice(-1),
+							})}
 							min={0}
 							max={14}
 							step={1}
@@ -157,7 +160,7 @@ const CreateRoom: Component = () => {
 						/>
 
 						<fieldset>
-							<legend>Include no-vote option?</legend>
+							<legend>{t("includeNoVote")}</legend>
 
 							<label class={styles.radio}>
 								<input
@@ -166,7 +169,7 @@ const CreateRoom: Component = () => {
 									value="yes"
 									checked={defaults.formValues.noVote}
 								/>
-								Yes
+								{t("yes")}
 							</label>
 
 							<label class={styles.radio}>
@@ -176,13 +179,13 @@ const CreateRoom: Component = () => {
 									value="no"
 									checked={!defaults.formValues.noVote}
 								/>
-								No
+								{t("no")}
 							</label>
 						</fieldset>
 					</Show>
 
 					<dl class={styles.finalPreview}>
-						<dt>Final preview</dt>
+						<dt>{t("finalPreview")}</dt>
 						<dd>{list}</dd>
 					</dl>
 
@@ -191,10 +194,12 @@ const CreateRoom: Component = () => {
 					</div>
 
 					<Show when={error()} keyed>
-						{(errorMsg) => <p class={styles.error}>Error: {errorMsg}</p>}
+						{(errorMsg) => (
+							<p class={styles.error}>{t("errorWithMsg", { msg: errorMsg })}</p>
+						)}
 					</Show>
 
-					<Button type="submit">Done</Button>
+					<Button type="submit">{t("done")}</Button>
 				</form>
 			</main>
 		</>

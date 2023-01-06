@@ -3,7 +3,7 @@ import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
-import { useIntl } from "@/i18n";
+import { IntlKey, useIntl } from "@/i18n";
 
 const Landing: Component = () => {
 	const t = useIntl();
@@ -11,7 +11,7 @@ const Landing: Component = () => {
 		Array(4).fill(null);
 	const navigate = useNavigate();
 
-	const [error, setError] = createSignal<string | null>(null);
+	const [error, setError] = createSignal<IntlKey | null>(null);
 
 	const handleInputChange = (formElement: EventTarget & HTMLFormElement) => {
 		const formData = new FormData(formElement);
@@ -29,10 +29,10 @@ const Landing: Component = () => {
 						navigate(`/room/${roomCode}`);
 						break;
 					case 204:
-						setError("A room does not exist with that code. Try again.");
+						setError("roomDoesNotExist");
 						break;
 					case 429:
-						setError("Too many attempts. Please wait and try again later.");
+						setError("tooManyAttempts");
 						break;
 				}
 			});
@@ -111,7 +111,7 @@ const Landing: Component = () => {
 						</form>
 						<div class={styles.errorMsg}>
 							<Show when={error()} keyed>
-								{(errorMsg) => <p aria-live="polite">{errorMsg}</p>}
+								{(errorMsg) => <p aria-live="polite">{t(errorMsg)}</p>}
 							</Show>
 						</div>
 					</section>

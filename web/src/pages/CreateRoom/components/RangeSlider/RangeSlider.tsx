@@ -1,13 +1,13 @@
 import * as rangeSlider from "@zag-js/range-slider";
 import { normalizeProps, useMachine } from "@zag-js/solid";
-import { createMemo, Component } from "solid-js";
+import { createMemo, Component, JSXElement } from "solid-js";
 import type { NumberRange } from "../../CreateRoom.schemas";
 import styles from "./RangeSlider.module.scss";
 
 interface RangeSliderProps {
 	id: string;
 	name: string;
-	label: string;
+	label: JSXElement;
 	value?: NumberRange;
 	min?: number;
 	max?: number;

@@ -8,6 +8,7 @@ import VoterOptionsMenu, {
 import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
+import { IntlKey, useIntl } from "@/i18n";
 
 interface VoterTableProps {
 	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
@@ -19,10 +20,10 @@ export const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.low]: "😰",
 };
 
-export const ConfidenceTextMap: Record<ConfidenceValue, string> = {
-	[ConfidenceValue.high]: "High confidence",
-	[ConfidenceValue.medium]: "Medium confidence",
-	[ConfidenceValue.low]: "Low confidence",
+export const ConfidenceTextMap: Record<ConfidenceValue, IntlKey> = {
+	[ConfidenceValue.high]: "highConfidence",
+	[ConfidenceValue.medium]: "mediumConfidence",
+	[ConfidenceValue.low]: "lowConfidence",
 };
 
 function formatSelection(selection: string | null): string {
@@ -34,6 +35,7 @@ function formatSelection(selection: string | null): string {
 }
 
 const VoterTable: Component<VoterTableProps> = (props) => {
+	const t = useIntl();
 	const [optionConfirmation, setOptionConfirmation] = createSignal<{
 		action: VoterClickAction;
 		voter: Voter;
@@ -48,9 +50,9 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 				<table class={styles.voterTable}>
 					<thead>
 						<tr>
-							<th colspan="2">Voters</th>
-							<th>Voted</th>
-							<th>Confidence</th>
+							<th colspan="2">{t("voters")}</th>
+							<th>{t("voted")}</th>
+							<th>{t("confidence")}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -78,9 +80,11 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 									</td>
 									<td
 										title={
-											voter.confidence !== null
-												? ConfidenceTextMap[voter.confidence]
-												: "Waiting for selection."
+											t(
+												voter.confidence !== null
+													? ConfidenceTextMap[voter.confidence]
+													: "waitingForSelection",
+											) as string
 										}
 									>
 										{voter.confidence !== null
@@ -95,7 +99,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						<tr>
 							<Switch>
 								<Match when={room.roomData.state === "Voting"}>
-									<td colspan="4">Voting in progress</td>
+									<td colspan="4">{t("votingInProgress")}</td>
 								</Match>
 								<Match
 									when={
@@ -106,9 +110,11 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 									}
 								>
 									<td colspan="4">
-										{room.roomData.voters.length > 0
-											? "Waiting to start voting"
-											: "Waiting for people to join"}
+										{t(
+											room.roomData.voters.length > 0
+												? "waitingToStartVoting"
+												: "waitingForVoters",
+										)}
 									</td>
 								</Match>
 								<Match
@@ -119,7 +125,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 										)
 									}
 								>
-									<td colspan="4">No votes were cast.</td>
+									<td colspan="4">{t("noVotes")}</td>
 								</Match>
 								<Match when={room.roomData.state === "Results"}>
 									<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
