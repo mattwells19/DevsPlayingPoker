@@ -21,6 +21,8 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 
 				const currCount = modeCounter.get(selectionNum) ?? 0;
 				const newCount = currCount + 1;
+				modeCounter.set(selectionNum, newCount);
+
 				const currModeCount = modeCounter.get(acc.mode) ?? -1;
 
 				return {
