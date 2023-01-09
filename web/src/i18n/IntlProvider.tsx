@@ -1,39 +1,21 @@
-import {
-	Component,
-	createContext,
-	createResource,
-	JSXElement,
-	Show,
-	useContext,
-} from "solid-js";
-import type * as messages from "./translations/en.json";
+import { Component, createResource, JSXElement, Show } from "solid-js";
+import { IntlContextValue, IntlMessages, IntlContext } from "./IntlContext";
 import { bold, dynamicInlineValue } from "./formatters";
 
 /**
  * Inspired by: https://github.com/formatjs/formatjs/blob/main/packages/react-intl/examples/StaticTypeSafetyAndCodeSplitting/intlHelpers.tsx
  */
 
-export type IntlMessages = typeof messages;
-export type IntlKey = Exclude<keyof IntlMessages, `_${string}_`>;
-
-export type SupportedLocale = "en" | "es";
+export type SupportedLocale = "en";
 
 export function importMessages(locale: SupportedLocale): Promise<IntlMessages> {
 	switch (locale) {
 		case "en":
-		case "es":
 			return import(`./translations/${locale}.json`);
 		default:
 			throw new Error("Invalid locale.");
 	}
 }
-
-type IntlContextValue = (
-	key: IntlKey,
-	values?: Record<string, any>,
-) => string | NonNullable<JSXElement>;
-
-const IntlContext = createContext<IntlContextValue>(() => "");
 
 interface IntlProviderProps {
 	locale: SupportedLocale;
@@ -68,5 +50,3 @@ const IntlProvider: Component<IntlProviderProps> = (props) => {
 };
 
 export default IntlProvider;
-
-export const useIntl = () => useContext(IntlContext);

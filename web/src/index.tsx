@@ -1,22 +1,16 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import { Component, createSignal } from "solid-js";
+import type { Component } from "solid-js";
 import { Router } from "solid-app-router";
-import IntlProvider, { SupportedLocale } from "./i18n/IntlProvider";
+import IntlProvider from "./i18n";
 import App from "./App";
 
 import "./index.scss";
 
 const Index: Component = () => {
-	const [locale, setLocale] = createSignal<SupportedLocale>("en");
 	return (
-		<IntlProvider locale={locale()}>
+		<IntlProvider locale="en">
 			<Router>
-				<button
-					onClick={() => setLocale((prev) => (prev === "es" ? "en" : "es"))}
-				>
-					Toggle Locale
-				</button>
 				<App />
 			</Router>
 		</IntlProvider>
