@@ -3,12 +3,12 @@ import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
 import { useRoom } from "../../RoomContext";
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 
 interface VoterViewProps {}
 
 const VoterView: Component<VoterViewProps> = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const room = useRoom();
 	const currentVoter = () =>
 		room.roomData.voters.find((voter) => voter.id === room.currentUserId);

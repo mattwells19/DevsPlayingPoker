@@ -1,49 +1,67 @@
-import { Component, createResource, JSXElement, Show } from "solid-js";
-import { IntlContextValue, IntlMessages, IntlContext } from "./IntlContext";
-import { bold, dynamicInlineValue } from "./formatters";
-
-/**
- * Inspired by: https://github.com/formatjs/formatjs/blob/main/packages/react-intl/examples/StaticTypeSafetyAndCodeSplitting/intlHelpers.tsx
- */
+import {
+	createMemo,
+	createResource,
+	mergeProps,
+	on,
+	ParentComponent,
+	Show,
+} from "solid-js";
+import { IntlContext } from "./IntlContext";
+import { createIntlCache, createIntl } from "@formatjs/intl";
+import { createMutable } from "solid-js/store";
+import type { IntlConfig, IntlMessages } from "./types";
 
 export type SupportedLocale = "en";
 
 export function importMessages(locale: SupportedLocale): Promise<IntlMessages> {
 	switch (locale) {
 		case "en":
-			return import(`./translations/${locale}.json`);
+			// see README for why this is this way
+			return import.meta.env.DEV
+				? import(`./translations/${locale}.json`)
+				: fetch(`/translations/${locale}.json`).then((res) => res.json());
 		default:
 			throw new Error("Invalid locale.");
 	}
 }
 
-interface IntlProviderProps {
+// If we add any more defaults to the IntlConfig consider extracting to a separate file
+const defaultRichTextElements: IntlConfig["defaultRichTextElements"] = {
+	b: (chunks) => <b>{chunks}</b>,
+};
+
+interface IntlProviderProps extends Omit<IntlConfig, "messages"> {
 	locale: SupportedLocale;
-	children: JSXElement;
 }
 
-const IntlProvider: Component<IntlProviderProps> = (props) => {
-	const [t] = createResource<IntlContextValue, SupportedLocale>(
+const IntlProvider: ParentComponent<IntlProviderProps> = (props) => {
+	const cache = createMutable(createIntlCache());
+
+	const [messages] = createResource<IntlMessages, SupportedLocale>(
 		() => props.locale,
-		(locale) =>
-			importMessages(locale).then((messages) => (key, values) => {
-				if (!Object.hasOwn(messages, key)) {
-					console.warn(`Missing tranlsation for key: '${key}'.`);
-					return "💩";
-				}
+		(locale) => importMessages(locale),
+	);
 
-				let msg: ReturnType<IntlContextValue> = messages[key];
-				msg = dynamicInlineValue(msg, values);
-				msg = bold(msg) ?? msg;
-
-				return msg;
-			}),
+	const intl = createMemo(
+		on(messages, (messages) => {
+			const config = mergeProps(props, {
+				messages,
+				defaultRichTextElements,
+			});
+			return createIntl(config, cache);
+		}),
 	);
 
 	return (
-		<Show when={t()} fallback={<h1>Loading translations</h1>} keyed>
-			{(t) => (
-				<IntlContext.Provider value={t}>{props.children}</IntlContext.Provider>
+		<Show
+			when={messages() && intl() ? intl() : null}
+			fallback={<h1>Loading translations</h1>}
+			keyed
+		>
+			{(intl) => (
+				<IntlContext.Provider value={intl}>
+					{props.children}
+				</IntlContext.Provider>
 			)}
 		</Show>
 	);

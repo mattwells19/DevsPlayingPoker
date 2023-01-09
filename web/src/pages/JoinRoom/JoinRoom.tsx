@@ -1,12 +1,12 @@
 import Button from "@/components/Button";
 import Header from "@/components/Header";
-import { IntlKey, useIntl } from "@/i18n";
+import { IntlKey, useFormatMessage } from "@/i18n";
 import { useNavigate, useParams } from "solid-app-router";
 import { Component, createSignal, Show } from "solid-js";
 import styles from "./JoinRoom.module.scss";
 
 const JoinRoom: Component = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const navigate = useNavigate();
 	const { roomCode } = useParams();
 

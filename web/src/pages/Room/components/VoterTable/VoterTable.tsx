@@ -8,7 +8,7 @@ import VoterOptionsMenu, {
 import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
-import { IntlKey, useIntl } from "@/i18n";
+import { IntlKey, useFormatMessage } from "@/i18n";
 
 interface VoterTableProps {
 	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
@@ -35,7 +35,7 @@ function formatSelection(selection: string | null): string {
 }
 
 const VoterTable: Component<VoterTableProps> = (props) => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const [optionConfirmation, setOptionConfirmation] = createSignal<{
 		action: VoterClickAction;
 		voter: Voter;

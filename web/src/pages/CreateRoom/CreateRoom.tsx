@@ -17,10 +17,10 @@ import {
 	optionsSchemaMap,
 	CreateRoomFields,
 } from "./CreateRoom.schemas";
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 
 const CreateRoom: Component = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const defaults = getDefaultValues();
 	let formRef: HTMLFormElement;
 	const [list, setList] = createSignal<string>(defaults.list);

@@ -9,11 +9,11 @@ import "./index.scss";
 
 const Index: Component = () => {
 	return (
-		<IntlProvider locale="en">
-			<Router>
+		<Router>
+			<IntlProvider locale="en">
 				<App />
-			</Router>
-		</IntlProvider>
+			</IntlProvider>
+		</Router>
 	);
 };
 

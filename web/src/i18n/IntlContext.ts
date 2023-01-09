@@ -1,14 +1,22 @@
-import { createContext, JSXElement, useContext } from "solid-js";
-import type * as messages from "./translations/en.json";
+import { createContext, useContext } from "solid-js";
+import { IntlKey, IntlShape } from "./types";
 
-export type IntlMessages = typeof messages;
-export type IntlKey = Exclude<keyof IntlMessages, `_${string}_`>;
+export const IntlContext = createContext<IntlShape | null>(null);
 
-export type IntlContextValue = (
+export const useIntl = (): IntlShape => {
+	const ctx = useContext(IntlContext);
+	if (!ctx) throw new Error("Oops, missing that IntlProvider it seems.");
+	return ctx;
+};
+
+type FormatMessageFn = (
 	key: IntlKey,
-	values?: Record<string, any>,
-) => string | NonNullable<JSXElement>;
+	values?: Parameters<IntlShape["formatMessage"]>[1],
+) => ReturnType<IntlShape["formatMessage"]>;
 
-export const IntlContext = createContext<IntlContextValue>(() => "");
+export const useFormatMessage = (): FormatMessageFn => {
+	const intl = useContext(IntlContext);
+	if (!intl) return () => "💩";
 
-export const useIntl = () => useContext(IntlContext);
+	return (key, values) => intl.formatMessage({ id: key }, values);
+};

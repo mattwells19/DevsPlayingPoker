@@ -1,10 +1,10 @@
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 import type { ConfidenceValue, Voter } from "@/shared-types";
 import type { MetricProps } from "../Metric";
 import { ConfidenceEmojiMap, ConfidenceTextMap } from "./VoterTable";
 
 export default function getStats(voters: Array<Voter>): Array<MetricProps> {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const selections = voters.map((voter) => voter.selection);
 
 	const isNumbers = selections.every(

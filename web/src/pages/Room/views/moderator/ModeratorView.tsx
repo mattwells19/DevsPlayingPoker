@@ -9,12 +9,12 @@ import VoterTable from "../../components/VoterTable";
 import styles from "./ModeratorView.module.scss";
 import type { VoterClickAction } from "../../components/VoterTable";
 import { useRoom } from "../../RoomContext";
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 
 interface ModeratorViewProps {}
 
 const ModeratorView: Component<ModeratorViewProps> = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const room = useRoom();
 
 	function handleVoterAction(action: VoterClickAction, voter: Voter) {

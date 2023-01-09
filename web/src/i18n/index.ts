@@ -1,2 +1,3 @@
 export { default } from "./IntlProvider";
-export { useIntl, type IntlKey, type IntlMessages } from "./IntlContext";
+export { useIntl, useFormatMessage } from "./IntlContext";
+export * from "./types";

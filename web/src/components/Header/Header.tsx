@@ -1,4 +1,4 @@
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
 import { Link, useLocation } from "solid-app-router";
 import { ParentComponent, Show } from "solid-js";
@@ -9,7 +9,7 @@ interface HeaderProps {
 }
 
 const Header: ParentComponent<HeaderProps> = (props) => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const location = useLocation();
 
 	return (

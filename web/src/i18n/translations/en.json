@@ -1,6 +1,6 @@
 {
 	"_LANDING_": "",
-	"comeToTheRightPlace": "If you have items you want to effort as fast as possible you've come to the right place.",
+	"comeToTheRightPlace": "If you don't have items you want to effort as fast as possible you've come to the right place.",
 	"enterRoomCodeHere": "Already have a room code? Enter it here",
 	"or": "or",
 	"newRoom": "Start a new room",
@@ -60,8 +60,8 @@
 	"_ROOM_VOTER_TABLE_MODERATOR_OPTIONS": "",
 	"makeModerator": "Make moderator",
 	"kickVoter": "Kick voter",
-	"makeModeratorDesc": "Are you sure you want to remove *{name}* from the room?",
-	"kickVoterDesc": "Are you sure you want to make *{name}* the new moderator? This will turn you into a voter.",
+	"makeModeratorDesc": "Are you sure you want to remove <b>{name}</b> from the room?",
+	"kickVoterDesc": "Are you sure you want to make <b>{name}</b> the new moderator? This will turn you into a voter.",
 	"confirm": "Confirm",
 	"cancel": "Cancel",
 

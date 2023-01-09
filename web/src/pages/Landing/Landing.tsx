@@ -3,10 +3,10 @@ import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
-import { IntlKey, useIntl } from "@/i18n";
+import { IntlKey, useFormatMessage } from "@/i18n";
 
 const Landing: Component = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
 		Array(4).fill(null);
 	const navigate = useNavigate();

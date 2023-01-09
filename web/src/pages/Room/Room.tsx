@@ -18,10 +18,10 @@ import {
 	RoomContextProvider,
 	RoomDetails,
 } from "./RoomContext";
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 
 const RoomCheckWrapper: Component = () => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const navigate = useNavigate();
 	const params = useParams();
 

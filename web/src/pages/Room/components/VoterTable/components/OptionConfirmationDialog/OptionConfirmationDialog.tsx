@@ -6,7 +6,7 @@ import type { VoterClickAction } from "../VoterOptionsMenu";
 import type { Voter } from "@/shared-types";
 import styles from "./OptionConfirmationDialog.module.scss";
 import Button from "@/components/Button";
-import { useIntl } from "@/i18n";
+import { useFormatMessage } from "@/i18n";
 
 interface OptionConfirmationDialogProps {
 	action: VoterClickAction;
@@ -18,7 +18,7 @@ interface OptionConfirmationDialogProps {
 const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 	props,
 ) => {
-	const t = useIntl();
+	const t = useFormatMessage();
 	const [state, send] = useMachine(
 		dialog.machine({
 			id: createUniqueId(),
