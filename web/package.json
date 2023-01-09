@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"build": "npm run i18n && vite build",
 		"serve": "vite preview",
-		"i18n": "formatjs compile-folder --ast --format formatjs-formatter.js src/i18n/translations public/translations"
+		"i18n": "formatjs compile-folder --ast --format src/i18n/formatjs-formatter.js src/i18n/translations public/translations"
 	},
 	"license": "MIT",
 	"devDependencies": {
