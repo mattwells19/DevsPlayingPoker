@@ -19,6 +19,7 @@ import {
 	RoomDetails,
 } from "./RoomContext";
 import { useFormatMessage } from "@/i18n";
+import VotingDescription from "./components/VotingDescription";
 
 const RoomCheckWrapper: Component = () => {
 	const t = useFormatMessage();
@@ -119,12 +120,15 @@ const Room: Component<RoomProps> = (props) => {
 	});
 
 	onCleanup(() => {
-		ws().close(1000);
+		if (ws().readyState === WebSocket.OPEN) {
+			ws().close(1000);
+		}
 	});
 
 	return (
 		<main class={styles.room}>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
+				<VotingDescription />
 				<Show
 					// is the current user the moderator?
 					when={

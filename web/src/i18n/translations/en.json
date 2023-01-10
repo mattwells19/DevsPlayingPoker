@@ -68,5 +68,14 @@
 	"_ROOM_MODERATOR_VIEW_": "",
 	"resetAndStartVoting": "Reset Votes & Start Voting",
 	"startVoting": "Start Voting",
-	"stopVoting": "Stop Voting"
+	"stopVoting": "Stop Voting",
+
+	"_ROOM_VOTING_DESCRIPTION_": "",
+	"votingDesc": "Description of what the room is voting on.",
+	"votingDescHelperText": "No more than 300 characters and no more than 6 lines.",
+	"update": "Update",
+	"whatWereVotingOn": "What we're voting on",
+	"edit": "Edit",
+	"clear": "Clear",
+	"addVotingDesc": "Add voting description"
 }

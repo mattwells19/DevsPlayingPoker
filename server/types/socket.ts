@@ -45,6 +45,11 @@ export interface KickedEvent {
 	event: "Kicked";
 }
 
+export interface VotingDescriptionEvent {
+	event: "UpdateVotingDescription";
+	value: string;
+}
+
 /**
  * Events triggered from the server
  */
@@ -62,6 +67,7 @@ export type WebScoketMessageEvent =
 	| OptionSelectedEvent
 	| StartVotingEvent
 	| StopVotingEvent
-	| KickVoterEvent;
+	| KickVoterEvent
+	| VotingDescriptionEvent;
 
 export type WebSocketEvent = WebSocketTriggeredEvent | WebScoketMessageEvent;

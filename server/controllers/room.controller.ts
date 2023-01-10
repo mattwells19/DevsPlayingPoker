@@ -1,4 +1,5 @@
-import { OpineRequest, OpineResponse } from "../deps.ts";
+import type { OpineRequest, OpineResponse } from "../deps.ts";
+import type { RoomSchema } from "../types/schemas.ts";
 import db from "../utils/db.ts";
 import generateRoomCode from "../utils/generateRoomCode.ts";
 
@@ -9,7 +10,7 @@ type OpineController<ResBody = unknown> = (
 
 export interface CreateRoomRequest {
 	moderatorName: string;
-	options: number[];
+	options: RoomSchema["options"];
 }
 
 export const createRoom: OpineController = async (req, res) => {
@@ -22,6 +23,7 @@ export const createRoom: OpineController = async (req, res) => {
 			moderator: null,
 			state: "Results",
 			options,
+			votingDescription: "",
 			voters: [],
 			votingStartedAt: null,
 			lastUpdated: new Date(),

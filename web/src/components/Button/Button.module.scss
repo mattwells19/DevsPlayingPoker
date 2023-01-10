@@ -11,6 +11,7 @@
 
 	&.solid {
 		background-color: var(--primary-orange);
+		border: 2px solid var(--primary-orange);
 
 		&:hover:not(:disabled) {
 			background-color: #e67c3e;
