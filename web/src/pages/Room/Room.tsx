@@ -18,8 +18,10 @@ import {
 	RoomContextProvider,
 	RoomDetails,
 } from "./RoomContext";
+import { useFormatMessage } from "@/i18n";
 
 const RoomCheckWrapper: Component = () => {
+	const t = useFormatMessage();
 	const navigate = useNavigate();
 	const params = useParams();
 
@@ -45,14 +47,14 @@ const RoomCheckWrapper: Component = () => {
 				<button
 					class={styles.roomCodeBtn}
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
-					title="Click to copy code."
+					title={t("copyCode") as string}
 				>
 					<h1>{params.roomCode}</h1>
 				</button>
 			</Header>
 			<Show
 				when={roomExists() && userName ? userName : null}
-				fallback={<h1>Checking room...</h1>}
+				fallback={<h1>{t("checkingRoom")}</h1>}
 				keyed
 			>
 				{(userName) => <Room roomCode={params.roomCode} userName={userName} />}

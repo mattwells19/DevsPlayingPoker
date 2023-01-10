@@ -3,10 +3,12 @@ import OptionCard from "@/components/OptionCard";
 import VoterTable from "../../components/VoterTable";
 import styles from "./VoterView.module.scss";
 import { useRoom } from "../../RoomContext";
+import { useFormatMessage } from "@/i18n";
 
 interface VoterViewProps {}
 
 const VoterView: Component<VoterViewProps> = () => {
+	const t = useFormatMessage();
 	const room = useRoom();
 	const currentVoter = () =>
 		room.roomData.voters.find((voter) => voter.id === room.currentUserId);
@@ -15,7 +17,9 @@ const VoterView: Component<VoterViewProps> = () => {
 		<Switch>
 			<Match when={room.roomData.state === "Results"}>
 				<p class={styles.infoText}>
-					Waiting for {room.roomData.moderator?.name}...
+					{t("waitingForModerator", {
+						moderatorName: room.roomData.moderator?.name,
+					})}
 				</p>
 				<VoterTable />
 			</Match>
@@ -36,8 +40,8 @@ const VoterView: Component<VoterViewProps> = () => {
 				>
 					<legend>
 						{currentVoter()?.selection !== null
-							? "Got it! You can change your mind if you want. Otherwise sit tight."
-							: "Make a selection"}
+							? t("optionSelected")
+							: t("makeSelection")}
 					</legend>
 					<For each={room.roomData.options}>
 						{(option) => (

@@ -38,3 +38,4 @@ cli/tests/.test_coverage/
 /tools/wpt/certs/serial*
 
 www
+web/public/translations

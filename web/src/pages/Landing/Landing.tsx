@@ -3,13 +3,15 @@ import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
+import { IntlKey, useFormatMessage } from "@/i18n";
 
 const Landing: Component = () => {
+	const t = useFormatMessage();
 	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
 		Array(4).fill(null);
 	const navigate = useNavigate();
 
-	const [error, setError] = createSignal<string | null>(null);
+	const [error, setError] = createSignal<IntlKey | null>(null);
 
 	const handleInputChange = (formElement: EventTarget & HTMLFormElement) => {
 		const formData = new FormData(formElement);
@@ -27,10 +29,10 @@ const Landing: Component = () => {
 						navigate(`/room/${roomCode}`);
 						break;
 					case 204:
-						setError("A room does not exist with that code. Try again.");
+						setError("roomDoesNotExist");
 						break;
 					case 429:
-						setError("Too many attempts. Please wait and try again later.");
+						setError("tooManyAttempts");
 						break;
 				}
 			});
@@ -67,14 +69,11 @@ const Landing: Component = () => {
 			<main class={styles.landing}>
 				<section class={styles.copy}>
 					<h1>🃏 Devs Playing Poker</h1>
-					<p>
-						If you have items you want to effort as fast as possible you've come
-						to the right place.
-					</p>
+					<p>{t("comeToTheRightPlace")}</p>
 				</section>
 				<div class={styles.roomOps}>
 					<section class={styles.roomCodeInputs}>
-						<p>Already have a room code? Enter it here</p>
+						<p>{t("enterRoomCodeHere")}</p>
 						<form
 							onInput={(e) => handleInputChange(e.currentTarget)}
 							onPaste={(e) => handlePaste(e)}
@@ -112,18 +111,18 @@ const Landing: Component = () => {
 						</form>
 						<div class={styles.errorMsg}>
 							<Show when={error()} keyed>
-								{(errorMsg) => <p aria-live="polite">{errorMsg}</p>}
+								{(errorMsg) => <p aria-live="polite">{t(errorMsg)}</p>}
 							</Show>
 						</div>
 					</section>
 					<div class={styles.seperator}>
 						<hr />
-						<span>or</span>
+						<span>{t("or")}</span>
 						<hr />
 					</div>
 					<section>
 						<ButtonLink class={styles.btnLink} href="/create-room">
-							Start a new room
+							{t("newRoom")}
 						</ButtonLink>
 					</section>
 				</div>

@@ -20,6 +20,11 @@ router.get("/icons/:fileName", async (req, res) => {
 	return res.sendFile(path);
 });
 
+router.get("/translations/:fileName", async (req, res) => {
+	const path = await Deno.realPath(`./www/translations/${req.params.fileName}`);
+	return res.sendFile(path);
+});
+
 router.get("/site.webmanifest", async (_, res) => {
 	const path = await Deno.realPath("./www/site.webmanifest");
 	return res.sendFile(path);

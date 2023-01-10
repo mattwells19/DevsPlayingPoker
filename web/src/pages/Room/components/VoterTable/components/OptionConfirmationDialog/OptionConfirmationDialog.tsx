@@ -6,6 +6,7 @@ import type { VoterClickAction } from "../VoterOptionsMenu";
 import type { Voter } from "@/shared-types";
 import styles from "./OptionConfirmationDialog.module.scss";
 import Button from "@/components/Button";
+import { useFormatMessage } from "@/i18n";
 
 interface OptionConfirmationDialogProps {
 	action: VoterClickAction;
@@ -17,6 +18,7 @@ interface OptionConfirmationDialogProps {
 const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 	props,
 ) => {
+	const t = useFormatMessage();
 	const [state, send] = useMachine(
 		dialog.machine({
 			id: createUniqueId(),
@@ -33,9 +35,8 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 	const title = (() => {
 		switch (props.action) {
 			case "kickVoter":
-				return "Kick Voter";
 			case "makeModerator":
-				return "Make Moderator";
+				return t(props.action);
 			default:
 				return null;
 		}
@@ -44,19 +45,8 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 	const description = (() => {
 		switch (props.action) {
 			case "kickVoter":
-				return (
-					<span>
-						Are you sure you want to remove <b>{props.voter.name}</b> from the
-						room?
-					</span>
-				);
 			case "makeModerator":
-				return (
-					<span>
-						Are you sure you want to make <b>{props.voter.name}</b> the new
-						moderator? This will turn you into a voter.
-					</span>
-				);
+				return t(`${props.action}Desc`, { name: props.voter.name });
 			default:
 				return null;
 		}
@@ -74,10 +64,10 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 					</Button>
 					<div role="group" onClick={() => api().close()}>
 						<Button variant="solid" onClick={() => props.onConfirm()}>
-							Confirm
+							{t("confirm")}
 						</Button>
 						<Button variant="outline" onClick={() => props.onCancel()}>
-							Cancel
+							{t("cancel")}
 						</Button>
 					</div>
 				</div>

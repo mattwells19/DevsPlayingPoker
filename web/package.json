@@ -5,11 +5,13 @@
 	"scripts": {
 		"start": "vite",
 		"dev": "vite",
-		"build": "vite build",
-		"serve": "vite preview"
+		"build": "npm run i18n && vite build",
+		"serve": "vite preview",
+		"i18n": "formatjs compile-folder --ast --format src/i18n/formatjs-formatter.js src/i18n/translations public/translations"
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@formatjs/cli": "^5.1.12",
 		"@types/node": "^18.11.18",
 		"sass": "^1.57.0",
 		"typescript": "^4.9.4",
@@ -17,6 +19,7 @@
 		"vite-plugin-solid": "^2.5.0"
 	},
 	"dependencies": {
+		"@formatjs/intl": "^2.6.3",
 		"@zag-js/dialog": "^0.2.6",
 		"@zag-js/menu": "^0.3.3",
 		"@zag-js/range-slider": "^0.2.7",

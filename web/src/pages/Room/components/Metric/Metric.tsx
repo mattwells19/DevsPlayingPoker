@@ -1,11 +1,11 @@
 import mergeClassNames from "@/utils/mergeClassNames";
-import { Component, JSX, splitProps } from "solid-js";
+import { Component, JSX, JSXElement, splitProps } from "solid-js";
 import styles from "./Metric.module.scss";
 
 export interface MetricProps
 	extends JSX.TdHTMLAttributes<HTMLTableCellElement> {
-	label: string;
-	value: string | number;
+	label: JSXElement;
+	value: JSXElement;
 }
 
 const Metric: Component<MetricProps> = (props) => {
