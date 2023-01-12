@@ -31,6 +31,8 @@ const RoomCheckWrapper: Component = () => {
 		return;
 	}
 
+	const userId = sessionStorage.getItem("userId");
+
 	const [roomExists] = createResource(params.roomCode, () =>
 		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
 			if (res.status !== 200) {
@@ -57,7 +59,13 @@ const RoomCheckWrapper: Component = () => {
 				fallback={<h1>{t("checkingRoom")}</h1>}
 				keyed
 			>
-				{(userName) => <Room roomCode={params.roomCode} userName={userName} />}
+				{(userName) => (
+					<Room
+						roomCode={params.roomCode}
+						userName={userName}
+						userId={userId}
+					/>
+				)}
 			</Show>
 		</>
 	);
@@ -66,6 +74,7 @@ const RoomCheckWrapper: Component = () => {
 interface RoomProps {
 	roomCode: string;
 	userName: string;
+	userId: string | null;
 }
 
 const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
@@ -76,10 +85,29 @@ const Room: Component<RoomProps> = (props) => {
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
 	const [ws, setWs] = createSignal<WebSocket>(
-		new WebSocket(`${wsPath}/${props.roomCode}`),
+		new WebSocket(
+			`${wsPath}/${props.roomCode}${
+				props.userId ? `?userId=${props.userId}` : ""
+			}`,
+		),
 	);
 
 	createEffect(() => {
+		let lastResponseTimestamp: number | null = null;
+
+		const pingInterval = setInterval(() => {
+			if (
+				!lastResponseTimestamp ||
+				Date.now() - lastResponseTimestamp > 10000
+			) {
+				ws().send("PING");
+			}
+		}, 10 * 1000);
+
+		onCleanup(() => {
+			clearInterval(pingInterval);
+		});
+
 		ws().addEventListener("open", () => {
 			const joinEvent: JoinEvent = {
 				event: "Join",
@@ -89,6 +117,11 @@ const Room: Component<RoomProps> = (props) => {
 		});
 
 		ws().addEventListener("message", (messageEvent) => {
+			lastResponseTimestamp = Date.now();
+			if (messageEvent.data === "PONG") {
+				return;
+			}
+
 			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
@@ -98,10 +131,13 @@ const Room: Component<RoomProps> = (props) => {
 						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
-				case "Connected":
-					sessionStorage.setItem("userId", data.userId);
+				case "Connected": {
+					if (data.userId !== props.userId) {
+						sessionStorage.setItem("userId", data.userId);
+					}
 					setRoomDetails({ currentUserId: data.userId });
 					break;
+				}
 				case "Kicked":
 					navigate("/");
 					break;

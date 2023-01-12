@@ -30,7 +30,7 @@ const defaultRichTextElements: IntlConfig["defaultRichTextElements"] = {
 	b: (chunks) => <b>{chunks}</b>,
 };
 
-interface IntlProviderProps extends Omit<IntlConfig, "messages"> {
+interface IntlProviderProps {
 	locale: SupportedLocale;
 }
 
@@ -44,11 +44,14 @@ const IntlProvider: ParentComponent<IntlProviderProps> = (props) => {
 
 	const intl = createMemo(
 		on(messages, (messages) => {
-			const config = mergeProps(props, {
-				messages,
-				defaultRichTextElements,
-			});
-			return createIntl(config, cache);
+			return createIntl(
+				{
+					locale: props.locale,
+					messages,
+					defaultRichTextElements,
+				},
+				cache,
+			);
 		}),
 	);
 

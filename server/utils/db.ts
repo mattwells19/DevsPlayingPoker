@@ -1,5 +1,5 @@
 import { Collection, Database, IndexOptions, MongoClient } from "../deps.ts";
-import { RoomSchema, SessionSchema } from "../types/schemas.ts";
+import type { RoomSchema } from "../types/schemas.ts";
 
 const RoomCodeIndex: IndexOptions = {
 	key: {
@@ -18,21 +18,10 @@ const StaleRoomIndex: IndexOptions = {
 	name: "StaleRooms",
 };
 
-// automatically remove sessions that have expired based on the maxAge time
-const StaleSessionIndex: IndexOptions = {
-	key: {
-		maxAge: 1,
-	},
-	// setting this to 0 will cause the document to expire at maxAge datetime
-	expireAfterSeconds: 0,
-	name: "StaleSessions",
-};
-
 const RoomIndexes = new Map([
 	["RoomCode", RoomCodeIndex],
 	["StaleRooms", StaleRoomIndex],
 ]);
-const SessionIndexes = new Map([["StaleSessions", StaleSessionIndex]]);
 
 class MongoDb {
 	#db: Database | null = null;
@@ -40,7 +29,6 @@ class MongoDb {
 
 	/* Collections */
 	#rooms: Collection<RoomSchema> | null = null;
-	#sessions: Collection<SessionSchema> | null = null;
 
 	constructor() {}
 
@@ -93,11 +81,9 @@ class MongoDb {
 
 		const collections = await Promise.all([
 			this.#initCollection<RoomSchema>("rooms", RoomIndexes),
-			this.#initCollection<SessionSchema>("sessions", SessionIndexes),
 		]);
 
 		this.#rooms = collections[0];
-		this.#sessions = collections[1];
 	}
 
 	public get rooms(): Collection<RoomSchema> {
@@ -108,16 +94,6 @@ class MongoDb {
 		}
 
 		return this.#rooms;
-	}
-
-	public get sessions(): Collection<SessionSchema> {
-		if (!this.#sessions) {
-			throw new Error(
-				"Looks like you tried to access a collection before running the 'connect' method. You can't do that.",
-			);
-		}
-
-		return this.#sessions;
 	}
 
 	public get initialized(): boolean {

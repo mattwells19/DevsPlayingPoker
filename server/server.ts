@@ -1,7 +1,5 @@
 import { opine, json } from "./deps.ts";
-
 import db from "./utils/db.ts";
-import { handleCookie } from "./middlewares/cookies.ts";
 
 //Import routes
 import SocketRoutes from "./routes/socket.routes.ts";
@@ -12,12 +10,8 @@ import FeRoutes from "./routes/fe.routes.ts";
 const server = opine();
 server.use(json());
 
-// avoid setting cookie when requesting static assets
-server.use("/", FeRoutes);
-
-server.use(handleCookie);
-
 // Use routes
+server.use("/", FeRoutes);
 server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
 

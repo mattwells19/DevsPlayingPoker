@@ -12,9 +12,6 @@ import type {
 	WebScoketMessageEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
-import db from "../utils/db.ts";
-import constants from "../utils/constants.ts";
-import { ObjectId } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
 
 const sockets = new Map<string, WebSocket>();
@@ -366,17 +363,6 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
-const updateSession = (userId: string) => {
-	return db.sessions.updateOne(
-		{ _id: new ObjectId(userId) },
-		{
-			$set: {
-				maxAge: new Date(Date.now() + constants.sessionTimeout),
-			},
-		},
-	);
-};
-
 const eventHandlerMap = new Map<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
@@ -395,7 +381,13 @@ export const handleWs = (
 	roomCode: string,
 ) => {
 	const socketId = getSocketId(userId, roomCode);
-	const userAlreadyExists = sockets.has(socketId);
+
+	const prevUserSocket = sockets.get(socketId);
+	const userAlreadyExists = !!prevUserSocket;
+	if (prevUserSocket && prevUserSocket.readyState === WebSocket.OPEN) {
+		prevUserSocket.close();
+	}
+
 	sockets.set(socketId, socket);
 
 	socket.addEventListener("open", () => {
@@ -430,8 +422,11 @@ export const handleWs = (
 	socket.addEventListener(
 		"message",
 		async (event: MessageEvent<string>): Promise<void> => {
+			if (event.data === "PING") {
+				return socket.send("PONG");
+			}
+
 			const data = JSON.parse(event.data) as WebScoketMessageEvent;
-			await updateSession(userId);
 
 			const roomData = await rooms.findByRoomCode(roomCode);
 			if (!roomData) return;
