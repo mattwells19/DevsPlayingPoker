@@ -88,7 +88,7 @@ class MongoDb {
 		if (!DB_URL) throw new Error("Problem importing from .env");
 
 		const client = new MongoClient();
-		this.#db = await client.connect(`${DB_URL}/devs_playing_poker`);
+		this.#db = await client.connect(DB_URL);
 		this.#collectionList = await this.#db.listCollectionNames();
 
 		const collections = await Promise.all([
