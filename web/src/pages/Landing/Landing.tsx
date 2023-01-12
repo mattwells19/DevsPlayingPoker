@@ -3,15 +3,16 @@ import { useNavigate } from "solid-app-router";
 import { ButtonLink } from "@/components/Button";
 import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
-import { IntlKey, useFormatMessage } from "@/i18n";
+import { IntlKey, useIntl } from "@/i18n";
 
 const Landing: Component = () => {
-	const t = useFormatMessage();
-	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
-		Array(4).fill(null);
+	const intl = useIntl();
 	const navigate = useNavigate();
 
 	const [error, setError] = createSignal<IntlKey | null>(null);
+
+	const roomCodeInputsRefs: Array<HTMLInputElement | null> =
+		Array(4).fill(null);
 
 	const handleInputChange = (formElement: EventTarget & HTMLFormElement) => {
 		const formData = new FormData(formElement);
@@ -69,11 +70,11 @@ const Landing: Component = () => {
 			<main class={styles.landing}>
 				<section class={styles.copy}>
 					<h1>🃏 Devs Playing Poker</h1>
-					<p>{t("comeToTheRightPlace")}</p>
+					<p>{intl.t("comeToTheRightPlace")}</p>
 				</section>
 				<div class={styles.roomOps}>
 					<section class={styles.roomCodeInputs}>
-						<p>{t("enterRoomCodeHere")}</p>
+						<p>{intl.t("enterRoomCodeHere")}</p>
 						<form
 							onInput={(e) => handleInputChange(e.currentTarget)}
 							onPaste={(e) => handlePaste(e)}
@@ -111,18 +112,18 @@ const Landing: Component = () => {
 						</form>
 						<div class={styles.errorMsg}>
 							<Show when={error()} keyed>
-								{(errorMsg) => <p aria-live="polite">{t(errorMsg)}</p>}
+								{(errorMsg) => <p aria-live="polite">{intl.t(errorMsg)}</p>}
 							</Show>
 						</div>
 					</section>
 					<div class={styles.seperator}>
 						<hr />
-						<span>{t("or")}</span>
+						<span>{intl.t("or")}</span>
 						<hr />
 					</div>
 					<section>
 						<ButtonLink class={styles.btnLink} href="/create-room">
-							{t("newRoom")}
+							{intl.t("newRoom")}
 						</ButtonLink>
 					</section>
 				</div>

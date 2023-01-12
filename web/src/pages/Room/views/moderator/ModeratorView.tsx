@@ -9,12 +9,12 @@ import VoterTable from "../../components/VoterTable";
 import styles from "./ModeratorView.module.scss";
 import type { VoterClickAction } from "../../components/VoterTable";
 import { useRoom } from "../../RoomContext";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 
 interface ModeratorViewProps {}
 
 const ModeratorView: Component<ModeratorViewProps> = () => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const room = useRoom();
 
 	function handleVoterAction(action: VoterClickAction, voter: Voter) {
@@ -47,7 +47,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 						onClick={() => room.dispatchEvent({ event: "StartVoting" })}
 						disabled={room.roomData.voters.length === 0}
 					>
-						{t(
+						{intl.t(
 							room.roomData.voters.some((voter) => voter.selection !== null)
 								? "resetAndStartVoting"
 								: "startVoting",
@@ -59,7 +59,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 						class={styles.moderatorBtn}
 						onClick={() => room.dispatchEvent({ event: "StopVoting" })}
 					>
-						{t("stopVoting")}
+						{intl.t("stopVoting")}
 					</Button>
 				</Match>
 			</Switch>

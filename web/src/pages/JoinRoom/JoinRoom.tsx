@@ -1,12 +1,12 @@
 import Button from "@/components/Button";
 import Header from "@/components/Header";
-import { IntlKey, useFormatMessage } from "@/i18n";
+import { IntlKey, useIntl } from "@/i18n";
 import { useNavigate, useParams } from "solid-app-router";
 import { Component, createSignal, Show } from "solid-js";
 import styles from "./JoinRoom.module.scss";
 
 const JoinRoom: Component = () => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const navigate = useNavigate();
 	const { roomCode } = useParams();
 
@@ -39,7 +39,7 @@ const JoinRoom: Component = () => {
 						handleSubmit(e.currentTarget);
 					}}
 				>
-					<label for="name">{t("name")}</label>
+					<label for="name">{intl.t("name")}</label>
 					<input
 						id="name"
 						name="name"
@@ -54,9 +54,9 @@ const JoinRoom: Component = () => {
 						aria-invalid={Boolean(errorMsg())}
 					/>
 					<Show when={errorMsg()} keyed>
-						{(msg) => <p id="name-error-msg">{t(msg)}</p>}
+						{(msg) => <p id="name-error-msg">{intl.t(msg)}</p>}
 					</Show>
-					<Button type="submit">{t("done")}</Button>
+					<Button type="submit">{intl.t("done")}</Button>
 				</form>
 			</main>
 		</>

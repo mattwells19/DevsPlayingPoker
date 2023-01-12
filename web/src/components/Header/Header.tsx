@@ -1,4 +1,4 @@
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
 import { Link, useLocation } from "solid-app-router";
 import { ParentComponent, Show } from "solid-js";
@@ -9,7 +9,7 @@ interface HeaderProps {
 }
 
 const Header: ParentComponent<HeaderProps> = (props) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const location = useLocation();
 
 	return (
@@ -18,7 +18,7 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 				<Show when={location.pathname !== "/"}>
 					<Link href="/">
 						<span aria-hidden>🏠</span>
-						{t("home")}
+						{intl.t("home")}
 					</Link>
 				</Show>
 			</div>
@@ -34,7 +34,7 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 					);
 				}}
 			>
-				{t("toggleTheme")}
+				{intl.t("toggleTheme")}
 			</button>
 		</header>
 	);

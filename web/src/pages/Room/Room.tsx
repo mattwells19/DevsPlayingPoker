@@ -18,11 +18,11 @@ import {
 	RoomContextProvider,
 	RoomDetails,
 } from "./RoomContext";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 
 const RoomCheckWrapper: Component = () => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const navigate = useNavigate();
 	const params = useParams();
 
@@ -32,14 +32,16 @@ const RoomCheckWrapper: Component = () => {
 		return;
 	}
 
-	const [roomExists] = createResource(params.roomCode, () =>
-		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
-			if (res.status !== 200) {
-				navigate("/");
-				return false;
-			}
-			return true;
-		}),
+	const [roomExists] = createResource(
+		() => params.roomCode,
+		(roomCode) =>
+			fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then((res) => {
+				if (res.status !== 200) {
+					navigate("/");
+					return false;
+				}
+				return true;
+			}),
 	);
 
 	return (
@@ -48,14 +50,14 @@ const RoomCheckWrapper: Component = () => {
 				<button
 					class={styles.roomCodeBtn}
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
-					title={t("copyCode") as string}
+					title={intl.t("copyCode") as string}
 				>
 					<h1>{params.roomCode}</h1>
 				</button>
 			</Header>
 			<Show
 				when={roomExists() && userName ? userName : null}
-				fallback={<h1>{t("checkingRoom")}</h1>}
+				fallback={<h1>{intl.t("checkingRoom")}</h1>}
 				keyed
 			>
 				{(userName) => <Room roomCode={params.roomCode} userName={userName} />}
@@ -74,6 +76,7 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
 const Room: Component<RoomProps> = (props) => {
 	const navigate = useNavigate();
+
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
 	const [ws, setWs] = createSignal<WebSocket>(

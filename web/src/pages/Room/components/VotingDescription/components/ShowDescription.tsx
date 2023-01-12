@@ -1,5 +1,5 @@
 import Button from "@/components/Button";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 import { Component, createEffect, JSXElement, Show } from "solid-js";
 import { useRoom } from "../../../RoomContext";
 import styles from "../VotingDescription.module.scss";
@@ -25,7 +25,7 @@ function formatStringWithUrl(str: string): JSXElement {
 }
 
 const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const room = useRoom();
 	let detailsRef: HTMLDetailsElement | null = null;
 
@@ -56,7 +56,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 								d="M8.25 4.5l7.5 7.5-7.5 7.5"
 							/>
 						</svg>
-						<p>{t("whatWereVotingOn")}</p>
+						<p>{intl.t("whatWereVotingOn")}</p>
 						<Show
 							when={
 								room.roomData.moderator?.id === room.currentUserId &&
@@ -70,7 +70,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 										props.onStartEditing();
 									}}
 								>
-									<Button type="submit">{t("edit")}</Button>
+									<Button type="submit">{intl.t("edit")}</Button>
 								</form>
 								<form
 									onSubmit={(e) => {
@@ -82,7 +82,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 									}}
 								>
 									<Button type="submit" variant="outline">
-										{t("clear")}
+										{intl.t("clear")}
 									</Button>
 								</form>
 							</div>
@@ -106,7 +106,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 					}}
 				>
 					<Button type="submit" variant="outline">
-						{t("addVotingDesc")}
+						{intl.t("addVotingDesc")}
 					</Button>
 				</form>
 			</Show>

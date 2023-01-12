@@ -3,7 +3,7 @@ import { useRoom } from "../../../RoomContext";
 import zod from "zod";
 import styles from "../VotingDescription.module.scss";
 import Button from "@/components/Button";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 
 const votingDescSchema = zod
 	.string()
@@ -12,7 +12,7 @@ const votingDescSchema = zod
 	.refine((val) => val.split("\n").length - 1 < 6);
 
 const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const room = useRoom();
 	let textareaRef: HTMLTextAreaElement | null = null;
 
@@ -49,7 +49,7 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 				}
 			}}
 		>
-			<label for="votingDesc">{t("votingDesc")}</label>
+			<label for="votingDesc">{intl.t("votingDesc")}</label>
 			<textarea
 				id="votingDesc"
 				name="votingDesc"
@@ -62,12 +62,12 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 				{room.roomData.votingDescription}
 			</textarea>
 			<p class={styles.helpText} id="votingDesc-helper-text">
-				{t("votingDescHelperText")}
+				{intl.t("votingDescHelperText")}
 			</p>
 			<div role="group" class={styles.btnGroup}>
-				<Button type="submit">{t("update")}</Button>
+				<Button type="submit">{intl.t("update")}</Button>
 				<Button type="button" variant="outline" onClick={props.onStopEditing}>
-					{t("cancel")}
+					{intl.t("cancel")}
 				</Button>
 			</div>
 		</form>

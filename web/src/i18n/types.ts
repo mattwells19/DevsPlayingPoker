@@ -5,6 +5,8 @@ import type {
 import type { JSXElement } from "solid-js";
 import type * as messages from "./translations/en.json";
 
+export type SupportedLocale = "en";
+
 export type ResolvedIntlConfig = CoreResolvedIntlConfig<JSXElement>;
 export type IntlShape = CoreIntlShape<JSXElement>;
 export type IntlConfig = Partial<
