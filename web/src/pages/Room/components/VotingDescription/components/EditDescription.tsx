@@ -23,12 +23,6 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 		}
 	});
 
-	createEffect(() => {
-		if (room.roomData.state !== "Results") {
-			props.onStopEditing();
-		}
-	});
-
 	return (
 		<form
 			class={styles.editForm}

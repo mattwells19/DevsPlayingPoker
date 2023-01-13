@@ -15,13 +15,16 @@
 
 		&:hover:not(:disabled) {
 			background-color: #e67c3e;
+			border-color: #e67c3e;
 			cursor: pointer;
 		}
 		&:active:not(:disabled) {
 			background-color: #d1733c;
+			border-color: #d1733c;
 		}
 		&:disabled {
 			background-color: #ce6c33c8;
+			border-color: #ce6c33c8;
 			cursor: not-allowed;
 		}
 	}

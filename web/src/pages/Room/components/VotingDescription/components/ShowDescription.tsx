@@ -27,12 +27,18 @@ function formatStringWithUrl(str: string): JSXElement {
 const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
+
 	let detailsRef: HTMLDetailsElement | null = null;
+	let prevVotingDescription = "";
 
 	createEffect(() => {
-		if (detailsRef) {
+		if (
+			detailsRef &&
+			room.roomData.votingDescription !== prevVotingDescription
+		) {
 			detailsRef.open = true;
 		}
+		prevVotingDescription = room.roomData.votingDescription;
 	});
 
 	const formattedDescription = () =>

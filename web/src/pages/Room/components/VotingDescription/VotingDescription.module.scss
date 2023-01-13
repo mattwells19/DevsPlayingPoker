@@ -64,11 +64,20 @@
 
 			p {
 				flex-grow: 1;
+				// little bit of headroom to prevent shift from formGroup buttons
+				margin: 3px 0;
 			}
 
-			&:hover,
+			&:hover:not(:has(.formGroup:hover)),
 			&:focus {
 				background-color: var(--alpha-orange);
+			}
+
+			// firefox doesn't support has 😒
+			@supports (-moz-appearance: none) {
+				&:hover {
+					background-color: var(--alpha-orange);
+				}
 			}
 		}
 
