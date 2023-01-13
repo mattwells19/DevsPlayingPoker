@@ -49,6 +49,10 @@
 		}
 
 		summary {
+			&::-webkit-details-marker {
+				display: none;
+			}
+
 			font-size: 1.25rem;
 			font-weight: 700;
 			border-radius: inherit;
@@ -88,6 +92,10 @@
 			padding: 1rem;
 			height: auto;
 			border-top: 1px solid var(--border-gray);
+
+			a {
+				color: rgb(153, 125, 235);
+			}
 		}
 	}
 
