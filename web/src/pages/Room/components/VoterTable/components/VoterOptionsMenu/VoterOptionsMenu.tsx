@@ -4,7 +4,7 @@ import { Component, createMemo, createUniqueId } from "solid-js";
 import type { Voter } from "@/shared-types";
 import styles from "./VoterOptionsMenu.module.scss";
 import { Portal } from "solid-js/web";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 
 export type VoterClickAction = "makeModerator" | "kickVoter";
 
@@ -14,7 +14,7 @@ interface VoterOptionsMenuProps {
 }
 
 const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const [state, send] = useMachine(
 		menu.machine({
 			id: createUniqueId(),
@@ -40,13 +40,13 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 							<span class={styles.itemIcon} aria-hidden="true">
 								👑
 							</span>
-							{t("makeModerator")}
+							{intl.t("makeModerator")}
 						</li>
 						<li {...api().getItemProps({ id: "kickVoter" })}>
 							<span class={styles.itemIcon} aria-hidden="true">
 								🥾
 							</span>
-							{t("kickVoter")}
+							{intl.t("kickVoter")}
 						</li>
 					</ul>
 				</div>

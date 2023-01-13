@@ -17,18 +17,21 @@ import {
 	optionsSchemaMap,
 	CreateRoomFields,
 } from "./CreateRoom.schemas";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 
 const CreateRoom: Component = () => {
-	const t = useFormatMessage();
+	const intl = useIntl();
+	const navigate = useNavigate();
+
 	const defaults = getDefaultValues();
-	let formRef: HTMLFormElement;
+
+	const [error, setError] = createSignal<string | null>(null);
 	const [list, setList] = createSignal<string>(defaults.list);
 	const [optionsSelect, setOptionsSelect] = createSignal<
 		CreateRoomFields["voterOptions"]
 	>(defaults.formValues.voterOptions);
-	const [error, setError] = createSignal<string | null>(null);
-	const navigate = useNavigate();
+
+	let formRef: HTMLFormElement;
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
 		const formData = getFormValues(form);
@@ -109,7 +112,7 @@ const CreateRoom: Component = () => {
 				>
 					<div>
 						<label for="moderatorName">
-							{t("yourName")}
+							{intl.t("yourName")}
 							<span class={styles.required}>*</span>
 						</label>
 						<input
@@ -130,7 +133,7 @@ const CreateRoom: Component = () => {
 
 					<div>
 						<label for="voterOptions">
-							{t("voterOptions")}
+							{intl.t("voterOptions")}
 							<span class={styles.required}>*</span>
 						</label>
 						<select
@@ -139,9 +142,9 @@ const CreateRoom: Component = () => {
 							required
 							value={defaults.formValues.voterOptions}
 						>
-							<option value="fibonacci">{t("fibonacci")}</option>
-							<option value="linear">{t("linear")}</option>
-							<option value="yesNo">{t("yesNo")}</option>
+							<option value="fibonacci">{intl.t("fibonacci")}</option>
+							<option value="linear">{intl.t("linear")}</option>
+							<option value="yesNo">{intl.t("yesNo")}</option>
 						</select>
 					</div>
 
@@ -149,7 +152,7 @@ const CreateRoom: Component = () => {
 						<RangeSlider
 							id="numberOfOptions"
 							name="numberOfOptions"
-							label={t("numberOfOptions", {
+							label={intl.t("numberOfOptions", {
 								min: availableOptions[optionsSelect()][0],
 								max: availableOptions[optionsSelect()].slice(-1),
 							})}
@@ -160,7 +163,7 @@ const CreateRoom: Component = () => {
 						/>
 
 						<fieldset>
-							<legend>{t("includeNoVote")}</legend>
+							<legend>{intl.t("includeNoVote")}</legend>
 
 							<label class={styles.radio}>
 								<input
@@ -169,7 +172,7 @@ const CreateRoom: Component = () => {
 									value="yes"
 									checked={defaults.formValues.noVote}
 								/>
-								{t("yes")}
+								{intl.t("yes")}
 							</label>
 
 							<label class={styles.radio}>
@@ -179,13 +182,13 @@ const CreateRoom: Component = () => {
 									value="no"
 									checked={!defaults.formValues.noVote}
 								/>
-								{t("no")}
+								{intl.t("no")}
 							</label>
 						</fieldset>
 					</Show>
 
 					<dl class={styles.finalPreview}>
-						<dt>{t("finalPreview")}</dt>
+						<dt>{intl.t("finalPreview")}</dt>
 						<dd>{list}</dd>
 					</dl>
 
@@ -195,11 +198,13 @@ const CreateRoom: Component = () => {
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (
-							<p class={styles.error}>{t("errorWithMsg", { msg: errorMsg })}</p>
+							<p class={styles.error}>
+								{intl.t("errorWithMsg", { msg: errorMsg })}
+							</p>
 						)}
 					</Show>
 
-					<Button type="submit">{t("done")}</Button>
+					<Button type="submit">{intl.t("done")}</Button>
 				</form>
 			</main>
 		</>

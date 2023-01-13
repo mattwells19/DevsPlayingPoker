@@ -8,7 +8,7 @@ import VoterOptionsMenu, {
 import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
-import { IntlKey, useFormatMessage } from "@/i18n";
+import { IntlKey, useIntl } from "@/i18n";
 
 interface VoterTableProps {
 	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
@@ -35,7 +35,7 @@ function formatSelection(selection: string | null): string {
 }
 
 const VoterTable: Component<VoterTableProps> = (props) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const [optionConfirmation, setOptionConfirmation] = createSignal<{
 		action: VoterClickAction;
 		voter: Voter;
@@ -50,9 +50,9 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 				<table class={styles.voterTable}>
 					<thead>
 						<tr>
-							<th colspan="2">{t("voters")}</th>
-							<th>{t("voted")}</th>
-							<th>{t("confidence")}</th>
+							<th colspan="2">{intl.t("voters")}</th>
+							<th>{intl.t("voted")}</th>
+							<th>{intl.t("confidence")}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -80,7 +80,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 									</td>
 									<td
 										title={
-											t(
+											intl.t(
 												voter.confidence !== null
 													? ConfidenceTextMap[voter.confidence]
 													: "waitingForSelection",
@@ -99,7 +99,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						<tr>
 							<Switch>
 								<Match when={room.roomData.state === "Voting"}>
-									<td colspan="4">{t("votingInProgress")}</td>
+									<td colspan="4">{intl.t("votingInProgress")}</td>
 								</Match>
 								<Match
 									when={
@@ -110,7 +110,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 									}
 								>
 									<td colspan="4">
-										{t(
+										{intl.t(
 											room.roomData.voters.length > 0
 												? "waitingToStartVoting"
 												: "waitingForVoters",
@@ -125,7 +125,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 										)
 									}
 								>
-									<td colspan="4">{t("noVotes")}</td>
+									<td colspan="4">{intl.t("noVotes")}</td>
 								</Match>
 								<Match when={room.roomData.state === "Results"}>
 									<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
