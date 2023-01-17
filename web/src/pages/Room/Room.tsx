@@ -83,26 +83,34 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
 const Room: Component<RoomProps> = (props) => {
 	const navigate = useNavigate();
+	const wsUrl = () => {
+		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
+		if (props.userId) {
+			wsUrl.searchParams.set("userId", props.userId);
+		}
+		return wsUrl;
+	};
 
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
-	const [ws, setWs] = createSignal<WebSocket>(
-		new WebSocket(
-			`${wsPath}/${props.roomCode}${
-				props.userId ? `?userId=${props.userId}` : ""
-			}`,
-		),
-	);
+	const [ws, setWs] = createSignal<WebSocket>(new WebSocket(wsUrl()));
 
 	createEffect(() => {
 		let lastResponseTimestamp: number | null = null;
+		let ponged = true;
 
 		const pingInterval = setInterval(() => {
 			if (
 				!lastResponseTimestamp ||
 				Date.now() - lastResponseTimestamp > 10000
 			) {
-				ws().send("PING");
+				// if our last ping didn't get a pong then we must've disconnected
+				if (!ponged) {
+					ws().close(3002, "Ping didn't receive a pong.");
+				} else {
+					ponged = false;
+					ws().send("PING");
+				}
 			}
 		}, 10 * 1000);
 
@@ -121,6 +129,7 @@ const Room: Component<RoomProps> = (props) => {
 		ws().addEventListener("message", (messageEvent) => {
 			lastResponseTimestamp = Date.now();
 			if (messageEvent.data === "PONG") {
+				ponged = true;
 				return;
 			}
 
@@ -151,7 +160,7 @@ const Room: Component<RoomProps> = (props) => {
 		ws().addEventListener("close", (closeEvent) => {
 			// 1000 means closed normally
 			if (closeEvent.code !== 1000) {
-				setWs(new WebSocket(`${wsPath}/${props.roomCode}`));
+				setWs(new WebSocket(wsUrl()));
 			}
 		});
 	});
