@@ -18,10 +18,11 @@ import {
 	RoomContextProvider,
 	RoomDetails,
 } from "./RoomContext";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
+import VotingDescription from "./components/VotingDescription";
 
 const RoomCheckWrapper: Component = () => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const navigate = useNavigate();
 	const params = useParams();
 
@@ -49,14 +50,14 @@ const RoomCheckWrapper: Component = () => {
 				<button
 					class={styles.roomCodeBtn}
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
-					title={t("copyCode") as string}
+					title={intl.t("copyCode") as string}
 				>
 					<h1>{params.roomCode}</h1>
 				</button>
 			</Header>
 			<Show
 				when={roomExists() && userName ? userName : null}
-				fallback={<h1>{t("checkingRoom")}</h1>}
+				fallback={<h1>{intl.t("checkingRoom")}</h1>}
 				keyed
 			>
 				{(userName) => (
@@ -82,6 +83,7 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
 const Room: Component<RoomProps> = (props) => {
 	const navigate = useNavigate();
+
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
 	const [ws, setWs] = createSignal<WebSocket>(
@@ -155,12 +157,15 @@ const Room: Component<RoomProps> = (props) => {
 	});
 
 	onCleanup(() => {
-		ws().close(1000);
+		if (ws().readyState === WebSocket.OPEN) {
+			ws().close(1000);
+		}
 	});
 
 	return (
 		<main class={styles.room}>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
+				<VotingDescription />
 				<Show
 					// is the current user the moderator?
 					when={

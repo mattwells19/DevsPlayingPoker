@@ -1,10 +1,10 @@
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 import type { ConfidenceValue, Voter } from "@/shared-types";
 import type { MetricProps } from "../Metric";
 import { ConfidenceEmojiMap, ConfidenceTextMap } from "./VoterTable";
 
 export default function getStats(voters: Array<Voter>): Array<MetricProps> {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const selections = voters.map((voter) => voter.selection);
 
 	const isNumbers = selections.every(
@@ -53,13 +53,13 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 		);
 
 		return [
-			{ label: t("low"), value: numStats.low.toString() },
-			{ label: t("high"), value: numStats.high.toString() },
-			{ label: t("mode"), value: numStats.mode.toString() },
+			{ label: intl.t("low"), value: numStats.low.toString() },
+			{ label: intl.t("high"), value: numStats.high.toString() },
+			{ label: intl.t("mode"), value: numStats.mode.toString() },
 			{
-				label: t("confidence"),
+				label: intl.t("confidence"),
 				value: ConfidenceEmojiMap[avgConfidence],
-				title: t(ConfidenceTextMap[avgConfidence]) as string,
+				title: intl.t(ConfidenceTextMap[avgConfidence]) as string,
 			},
 		];
 	}
@@ -106,12 +106,12 @@ export default function getStats(voters: Array<Voter>): Array<MetricProps> {
 			{
 				label: "DNV",
 				value: voters.length - voterCount,
-				title: t("didNotVote") as string,
+				title: intl.t("didNotVote") as string,
 			},
 			{
-				label: t("confidence"),
+				label: intl.t("confidence"),
 				value: ConfidenceEmojiMap[avgConfidence],
-				title: t(ConfidenceTextMap[avgConfidence]) as string,
+				title: intl.t(ConfidenceTextMap[avgConfidence]) as string,
 			},
 		];
 	}

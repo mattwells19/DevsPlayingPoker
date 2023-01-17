@@ -6,7 +6,7 @@ import type { VoterClickAction } from "../VoterOptionsMenu";
 import type { Voter } from "@/shared-types";
 import styles from "./OptionConfirmationDialog.module.scss";
 import Button from "@/components/Button";
-import { useFormatMessage } from "@/i18n";
+import { useIntl } from "@/i18n";
 
 interface OptionConfirmationDialogProps {
 	action: VoterClickAction;
@@ -18,7 +18,7 @@ interface OptionConfirmationDialogProps {
 const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 	props,
 ) => {
-	const t = useFormatMessage();
+	const intl = useIntl();
 	const [state, send] = useMachine(
 		dialog.machine({
 			id: createUniqueId(),
@@ -36,7 +36,7 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 		switch (props.action) {
 			case "kickVoter":
 			case "makeModerator":
-				return t(props.action);
+				return intl.t(props.action);
 			default:
 				return null;
 		}
@@ -46,7 +46,7 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 		switch (props.action) {
 			case "kickVoter":
 			case "makeModerator":
-				return t(`${props.action}Desc`, { name: props.voter.name });
+				return intl.t(`${props.action}Desc`, { name: props.voter.name });
 			default:
 				return null;
 		}
@@ -64,10 +64,10 @@ const OptionConfirmationDialog: Component<OptionConfirmationDialogProps> = (
 					</Button>
 					<div role="group" onClick={() => api().close()}>
 						<Button variant="solid" onClick={() => props.onConfirm()}>
-							{t("confirm")}
+							{intl.t("confirm")}
 						</Button>
 						<Button variant="outline" onClick={() => props.onCancel()}>
-							{t("cancel")}
+							{intl.t("cancel")}
 						</Button>
 					</div>
 				</div>

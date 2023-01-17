@@ -10,8 +10,10 @@ import type {
 	StopVotingEvent,
 	KickVoterEvent,
 	WebScoketMessageEvent,
+	VotingDescriptionEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
+import { zod } from "../deps.ts";
 import * as rooms from "../models/rooms.ts";
 
 const sockets = new Map<string, WebSocket>();
@@ -335,6 +337,32 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 	}
 };
 
+// taken from EditDescription.tsx
+const votingDescSchema = zod
+	.string()
+	.trim()
+	.max(300)
+	.refine((val) => val.split("\n").length - 1 < 6);
+
+const handleVotingDescription: EventFunction<VotingDescriptionEvent> = async (
+	roomData,
+	_,
+	{ value },
+) => {
+	// will throw if parsing fails
+	votingDescSchema.parse(value);
+
+	const updatedRoomData = await rooms.updateById(roomData._id, {
+		$set: {
+			votingDescription: value,
+		},
+	});
+
+	if (!updatedRoomData) return;
+
+	sendRoomData(updatedRoomData);
+};
+
 /**
  * Middlewares
  */
@@ -373,6 +401,7 @@ const eventHandlerMap = new Map<
 	["OptionSelected", [validateVoter, handleOptionSelected]],
 	["ModeratorChange", [validateModerator, handleModeratorChange]],
 	["KickVoter", [validateModerator, handleKickVoter]],
+	["UpdateVotingDescription", [validateModerator, handleVotingDescription]],
 ]);
 
 export const handleWs = (

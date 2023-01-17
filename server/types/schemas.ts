@@ -27,6 +27,7 @@ export interface RoomSchema {
 	_id: ObjectId;
 	state: "Voting" | "Results";
 	roomCode: string;
+	votingDescription: string;
 	moderator: User | null;
 	options: string[];
 	voters: Voter[];

@@ -15,4 +15,4 @@ export {
 	type IndexOptions,
 	type UpdateFilter,
 } from "https://deno.land/x/mongo@v0.30.1/mod.ts";
-export { z as zod } from "https://deno.land/x/zod@v3.16.1/mod.ts";
+export { z as zod } from "https://deno.land/x/zod@v3.20.2/mod.ts";

@@ -1,17 +1,19 @@
 import {
-	createMemo,
+	createComputed,
+	createContext,
 	createResource,
-	mergeProps,
-	on,
 	ParentComponent,
-	Show,
+	useContext,
 } from "solid-js";
-import { IntlContext } from "./IntlContext";
 import { createIntlCache, createIntl } from "@formatjs/intl";
-import { createMutable } from "solid-js/store";
-import type { IntlConfig, IntlMessages } from "./types";
-
-export type SupportedLocale = "en";
+import { createMutable, createStore } from "solid-js/store";
+import type {
+	IntlConfig,
+	IntlKey,
+	IntlMessages,
+	IntlShape,
+	SupportedLocale,
+} from "./types";
 
 export function importMessages(locale: SupportedLocale): Promise<IntlMessages> {
 	switch (locale) {
@@ -30,44 +32,50 @@ const defaultRichTextElements: IntlConfig["defaultRichTextElements"] = {
 	b: (chunks) => <b>{chunks}</b>,
 };
 
+interface IntlContextValue {
+	t: (
+		key: IntlKey,
+		values?: Parameters<IntlShape["formatMessage"]>[1],
+	) => ReturnType<IntlShape["formatMessage"]>;
+}
+
+const [intl, setIntl] = createStore<IntlContextValue>({
+	t: () => "Loading...",
+});
+const IntlContext = createContext(intl);
+const cache = createMutable(createIntlCache());
+
 interface IntlProviderProps {
 	locale: SupportedLocale;
 }
 
 const IntlProvider: ParentComponent<IntlProviderProps> = (props) => {
-	const cache = createMutable(createIntlCache());
-
 	const [messages] = createResource<IntlMessages, SupportedLocale>(
 		() => props.locale,
 		(locale) => importMessages(locale),
 	);
 
-	const intl = createMemo(
-		on(messages, (messages) => {
-			return createIntl(
+	createComputed(() => {
+		if (messages()) {
+			const intlShape = createIntl(
 				{
 					locale: props.locale,
-					messages,
+					messages: messages()!,
 					defaultRichTextElements,
 				},
 				cache,
 			);
-		}),
-	);
+
+			setIntl({
+				t: (key, values) => intlShape.formatMessage({ id: key }, values),
+			});
+		}
+	});
 
 	return (
-		<Show
-			when={messages() && intl() ? intl() : null}
-			fallback={<h1>Loading translations</h1>}
-			keyed
-		>
-			{(intl) => (
-				<IntlContext.Provider value={intl}>
-					{props.children}
-				</IntlContext.Provider>
-			)}
-		</Show>
+		<IntlContext.Provider value={intl}>{props.children}</IntlContext.Provider>
 	);
 };
 
 export default IntlProvider;
+export const useIntl = () => useContext(IntlContext)!;
