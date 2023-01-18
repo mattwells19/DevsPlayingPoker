@@ -2,6 +2,7 @@ export {
 	opine,
 	json,
 	Router,
+	serveStatic,
 	type OpineRequest,
 	type OpineResponse,
 	type NextFunction,

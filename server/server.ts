@@ -1,4 +1,4 @@
-import { opine, json } from "./deps.ts";
+import { opine, json, serveStatic } from "./deps.ts";
 import db from "./utils/db.ts";
 
 //Import routes
@@ -10,8 +10,27 @@ import FeRoutes from "./routes/fe.routes.ts";
 const server = opine();
 server.use(json());
 
+server.use((_, res, next) => {
+	res
+		.setHeader(
+			"Content-Security-Policy",
+			"default-src 'self'; style-src 'self' 'unsafe-inline'",
+		)
+		.setHeader("Referrer-Policy", "same-origin")
+		.setHeader("X-Content-Type-Options", "nosniff")
+		.setHeader(
+			"Strict-Transport-Security",
+			"max-age=31536000; includeSubDomains",
+		)
+		.setHeader("X-Frame-Options", "SAMEORIGIN")
+		.setHeader("X-XSS-Protection", "1; mode=block");
+
+	next();
+});
+
 // Use routes
 server.use("/", FeRoutes);
+server.use(serveStatic("www"));
 server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
 
