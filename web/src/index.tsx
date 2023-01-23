@@ -5,6 +5,7 @@ import { Router } from "solid-app-router";
 import IntlProvider from "./i18n";
 import App from "./App";
 
+import "./interpretTheme";
 import "./index.scss";
 
 const Index: Component = () => {

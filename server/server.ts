@@ -1,7 +1,5 @@
-import { opine, json } from "./deps.ts";
-
+import { opine, json, serveStatic } from "./deps.ts";
 import db from "./utils/db.ts";
-import { handleCookie } from "./middlewares/cookies.ts";
 
 //Import routes
 import SocketRoutes from "./routes/socket.routes.ts";
@@ -12,12 +10,28 @@ import FeRoutes from "./routes/fe.routes.ts";
 const server = opine();
 server.use(json());
 
-// avoid setting cookie when requesting static assets
-server.use("/", FeRoutes);
+server.use((_, res, next) => {
+	res
+		// TODO: Causes issues in Safari. Needs further investigation.
+		// .setHeader(
+		// 	"Content-Security-Policy",
+		// 	"default-src 'self'; style-src 'self' 'unsafe-inline'",
+		// )
+		.setHeader("Referrer-Policy", "same-origin")
+		.setHeader("X-Content-Type-Options", "nosniff")
+		.setHeader(
+			"Strict-Transport-Security",
+			"max-age=31536000; includeSubDomains",
+		)
+		.setHeader("X-Frame-Options", "SAMEORIGIN")
+		.setHeader("X-XSS-Protection", "1; mode=block");
 
-server.use(handleCookie);
+	next();
+});
 
 // Use routes
+server.use("/", FeRoutes);
+server.use(serveStatic("www"));
 server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
 

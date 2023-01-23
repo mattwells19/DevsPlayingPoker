@@ -34,9 +34,3 @@ export interface RoomSchema {
 	votingStartedAt: Date | null;
 	lastUpdated: Date;
 }
-
-export interface SessionSchema {
-	_id: ObjectId;
-	maxAge: Date;
-	environment: "local" | "test" | "prod";
-}
