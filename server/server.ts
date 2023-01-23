@@ -12,10 +12,11 @@ server.use(json());
 
 server.use((_, res, next) => {
 	res
-		.setHeader(
-			"Content-Security-Policy",
-			"default-src 'self'; style-src 'self' 'unsafe-inline'",
-		)
+		// TODO: Causes issues in Safari. Needs further investigation.
+		// .setHeader(
+		// 	"Content-Security-Policy",
+		// 	"default-src 'self'; style-src 'self' 'unsafe-inline'",
+		// )
 		.setHeader("Referrer-Policy", "same-origin")
 		.setHeader("X-Content-Type-Options", "nosniff")
 		.setHeader(
