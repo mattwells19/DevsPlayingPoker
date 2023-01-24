@@ -66,7 +66,9 @@ const Landing: Component = () => {
 
 	return (
 		<>
-			<Header />
+			<Header
+				onSaveName={(new_name) => localStorage.setItem("name", new_name)}
+			/>
 			<main class={styles.landing}>
 				<section class={styles.copy}>
 					<h1>🃏 Devs Playing Poker</h1>

@@ -21,20 +21,14 @@
 		}
 	}
 
-	& > .themeBtn {
-		display: block;
-		width: fit-content;
+	.settingsDrawerTrigger {
+		justify-self: flex-end;
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
+		color: inherit;
 
-		cursor: pointer;
-
-		margin-left: auto;
-		padding: 0.25rem 0.5rem;
-
-		border-radius: 5px;
-		border: 1px solid var(--border-gray);
-
-		background-color: var(--elevated-background);
-		color: var(--primary-text-color);
-		font-size: small;
+		display: grid;
+		place-items: center;
 	}
 }

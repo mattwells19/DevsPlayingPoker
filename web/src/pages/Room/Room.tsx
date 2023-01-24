@@ -21,6 +21,10 @@ import {
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 
+const [updateNameFn, setUpdateNameFn] = createSignal<
+	((name: string) => void) | undefined
+>();
+
 const RoomCheckWrapper: Component = () => {
 	const intl = useIntl();
 	const navigate = useNavigate();
@@ -46,7 +50,7 @@ const RoomCheckWrapper: Component = () => {
 
 	return (
 		<>
-			<Header>
+			<Header onSaveName={updateNameFn()}>
 				<button
 					class={styles.roomCodeBtn}
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
@@ -169,6 +173,13 @@ const Room: Component<RoomProps> = (props) => {
 		if (ws().readyState === WebSocket.OPEN) {
 			ws().close(1000);
 		}
+	});
+
+	setUpdateNameFn(() => (new_name) => {
+		roomDetails.dispatchEvent({
+			event: "ChangeName",
+			value: new_name,
+		});
 	});
 
 	return (

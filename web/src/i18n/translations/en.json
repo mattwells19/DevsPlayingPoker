@@ -77,5 +77,10 @@
 	"whatWereVotingOn": "What we're voting on",
 	"edit": "Edit",
 	"clear": "Clear",
-	"addVotingDesc": "Add voting description"
+	"addVotingDesc": "Add voting description",
+
+	"_SETTINGS_DRAWER_": "",
+	"openSettingsDrawer": "Open settings drawer.",
+	"closeSettingsDrawer": "Close settings drawer.",
+	"saveName": "Save Name"
 }
