@@ -20,6 +20,7 @@ import {
 } from "./RoomContext";
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
+import toast from "solid-toast";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -41,6 +42,9 @@ const RoomCheckWrapper: Component = () => {
 	const [roomExists] = createResource(params.roomCode, () =>
 		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
 			if (res.status !== 200) {
+				toast.error(
+					intl.t("thatRoomDoesntExist", { roomCode: params.roomCode }),
+				);
 				navigate("/");
 				return false;
 			}
@@ -86,7 +90,9 @@ const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
 const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
 const Room: Component<RoomProps> = (props) => {
+	const intl = useIntl();
 	const navigate = useNavigate();
+
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
 		if (props.userId) {
@@ -154,6 +160,7 @@ const Room: Component<RoomProps> = (props) => {
 					break;
 				}
 				case "Kicked":
+					toast(intl.t("youWereKicked"), { icon: "🥾" });
 					navigate("/");
 					break;
 				default:
@@ -180,6 +187,8 @@ const Room: Component<RoomProps> = (props) => {
 			event: "ChangeName",
 			value: new_name,
 		});
+		localStorage.setItem("name", new_name);
+		toast.success(intl.t("nameUpdated"));
 	});
 
 	return (

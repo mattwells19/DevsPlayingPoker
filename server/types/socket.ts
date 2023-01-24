@@ -50,6 +50,11 @@ export interface VotingDescriptionEvent {
 	value: string;
 }
 
+export interface ChangeNameEvent {
+	event: "ChangeName";
+	value: string;
+}
+
 /**
  * Events triggered from the server
  */
@@ -68,6 +73,7 @@ export type WebScoketMessageEvent =
 	| StartVotingEvent
 	| StopVotingEvent
 	| KickVoterEvent
-	| VotingDescriptionEvent;
+	| VotingDescriptionEvent
+	| ChangeNameEvent;
 
 export type WebSocketEvent = WebSocketTriggeredEvent | WebScoketMessageEvent;

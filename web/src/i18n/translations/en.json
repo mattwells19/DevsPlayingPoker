@@ -34,6 +34,9 @@
 	"connecting": "Connecting...",
 	"checkingRoom": "Checking room...",
 	"copyCode": "Click to copy code.",
+	"thatRoomDoesntExist": "Room with code <b>{roomCode}</b> does not exist.",
+	"youWereKicked": "You were kicked.",
+	"nameUpdated": "Name updated.",
 
 	"_ROOM_VOTER_VIEW_": "",
 	"waitingForModerator": "Waiting for {moderatorName}...",

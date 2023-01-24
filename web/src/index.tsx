@@ -2,6 +2,7 @@
 import { render } from "solid-js/web";
 import type { Component } from "solid-js";
 import { Router } from "solid-app-router";
+import { Toaster } from "solid-toast";
 import IntlProvider from "./i18n";
 import App from "./App";
 
@@ -13,6 +14,7 @@ const Index: Component = () => {
 		<IntlProvider locale="en">
 			<Router>
 				<App />
+				<Toaster position="top-center" toastOptions={{ className: "toast" }} />
 			</Router>
 		</IntlProvider>
 	);
