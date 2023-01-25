@@ -1,8 +1,7 @@
-import { useNavigate, useParams } from "solid-app-router";
+import { Navigate, useNavigate, useParams } from "solid-app-router";
 import {
 	Component,
 	createEffect,
-	createResource,
 	createSignal,
 	onCleanup,
 	Show,
@@ -26,31 +25,12 @@ const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
 >();
 
-const RoomCheckWrapper: Component = () => {
+const Room: Component = () => {
 	const intl = useIntl();
-	const navigate = useNavigate();
 	const params = useParams();
 
 	const userName = localStorage.getItem("name");
-	if (!userName) {
-		navigate(`/join/${params.roomCode}`);
-		return;
-	}
-
 	const userId = sessionStorage.getItem("userId");
-
-	const [roomExists] = createResource(params.roomCode, () =>
-		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
-			if (res.status !== 200) {
-				toast.error(
-					intl.t("thatRoomDoesntExist", { roomCode: params.roomCode }),
-				);
-				navigate("/");
-				return false;
-			}
-			return true;
-		}),
-	);
 
 	return (
 		<>
@@ -64,12 +44,12 @@ const RoomCheckWrapper: Component = () => {
 				</button>
 			</Header>
 			<Show
-				when={roomExists() && userName ? userName : null}
-				fallback={<h1>{intl.t("checkingRoom")}</h1>}
+				when={userName}
+				fallback={<Navigate href={`/join/${params.roomCode}`} />}
 				keyed
 			>
 				{(userName) => (
-					<Room
+					<RoomContent
 						roomCode={params.roomCode}
 						userName={userName}
 						userId={userId}
@@ -80,7 +60,7 @@ const RoomCheckWrapper: Component = () => {
 	);
 };
 
-interface RoomProps {
+interface RoomContentProps {
 	roomCode: string;
 	userName: string;
 	userId: string | null;
@@ -89,7 +69,7 @@ interface RoomProps {
 const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
 const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
-const Room: Component<RoomProps> = (props) => {
+const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
 	const navigate = useNavigate();
 
@@ -153,6 +133,13 @@ const Room: Component<RoomProps> = (props) => {
 					});
 					break;
 				case "Connected": {
+					if (!data.roomExists) {
+						toast.error(
+							intl.t("thatRoomDoesntExist", { roomCode: props.roomCode }),
+						);
+						return navigate("/");
+					}
+
 					if (data.userId !== props.userId) {
 						sessionStorage.setItem("userId", data.userId);
 					}
@@ -209,4 +196,4 @@ const Room: Component<RoomProps> = (props) => {
 	);
 };
 
-export default RoomCheckWrapper;
+export default Room;

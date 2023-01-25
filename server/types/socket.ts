@@ -3,6 +3,7 @@ import type { RoomSchema } from "./schemas.ts";
 export interface ConnectEvent {
 	event: "Connected";
 	userId: string;
+	roomExists: boolean;
 }
 
 export interface RoomUpdateEvent {

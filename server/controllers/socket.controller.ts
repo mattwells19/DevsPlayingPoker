@@ -473,10 +473,13 @@ export const handleWs = (
 
 	sockets.set(socketId, socket);
 
-	socket.addEventListener("open", () => {
+	socket.addEventListener("open", async () => {
+		const roomExists = await rooms.findByRoomCode(roomCode);
+
 		const connectEvent: ConnectEvent = {
 			event: "Connected",
 			userId,
+			roomExists: !!roomExists,
 		};
 		socket.send(JSON.stringify(connectEvent));
 	});
