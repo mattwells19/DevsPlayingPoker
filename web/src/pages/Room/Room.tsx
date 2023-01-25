@@ -30,7 +30,6 @@ const Room: Component = () => {
 	const params = useParams();
 
 	const userName = localStorage.getItem("name");
-	const userId = sessionStorage.getItem("userId");
 
 	return (
 		<>
@@ -49,11 +48,7 @@ const Room: Component = () => {
 				keyed
 			>
 				{(userName) => (
-					<RoomContent
-						roomCode={params.roomCode}
-						userName={userName}
-						userId={userId}
-					/>
+					<RoomContent roomCode={params.roomCode} userName={userName} />
 				)}
 			</Show>
 		</>
@@ -63,7 +58,6 @@ const Room: Component = () => {
 interface RoomContentProps {
 	roomCode: string;
 	userName: string;
-	userId: string | null;
 }
 
 const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
@@ -72,11 +66,12 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
 	const navigate = useNavigate();
+	const savedUserId = sessionStorage.getItem("userId");
 
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
-		if (props.userId) {
-			wsUrl.searchParams.set("userId", props.userId);
+		if (savedUserId) {
+			wsUrl.searchParams.set("userId", savedUserId);
 		}
 		return wsUrl;
 	};
@@ -140,7 +135,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 						return navigate("/");
 					}
 
-					if (data.userId !== props.userId) {
+					if (data.userId !== savedUserId) {
 						sessionStorage.setItem("userId", data.userId);
 					}
 					setRoomDetails({ currentUserId: data.userId });
