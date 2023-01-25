@@ -71,7 +71,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 					&#10005;
 				</Button>
 				<div class={styles.themeSelect}>
-					<label for="theme-select">Theme</label>
+					<label for="theme-select">{intl.t("theme")}</label>
 					<select
 						id="theme-select"
 						name="theme-select"
@@ -79,11 +79,11 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						value={localStorage.getItem("theme") ?? "system"}
 						onChange={handleThemeChange}
 					>
-						<option value="system">System Setting</option>
-						<option value="light">Light</option>
-						<option value="dark">Dark</option>
+						<option value="system">{intl.t("system")}</option>
+						<option value="light">{intl.t("light")}</option>
+						<option value="dark">{intl.t("dark")}</option>
 					</select>
-					<p id="theme-select-helptext">Saves automatically.</p>
+					<p id="theme-select-helptext">{intl.t("savesAutomatically")}</p>
 				</div>
 				<Show when={props.onSaveName}>
 					<form

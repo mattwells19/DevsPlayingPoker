@@ -9,7 +9,6 @@
 
 	"_HEADER_": "",
 	"home": "Home",
-	"toggleTheme": "Toggle Theme",
 
 	"_JOIN_ROOM_": "",
 	"name": "Name",
@@ -85,5 +84,10 @@
 	"_SETTINGS_DRAWER_": "",
 	"openSettingsDrawer": "Open settings drawer.",
 	"closeSettingsDrawer": "Close settings drawer.",
-	"saveName": "Save Name"
+	"saveName": "Save Name",
+	"theme": "Theme",
+	"system": "System Setting",
+	"light": "Light",
+	"dark": "Dark",
+	"savesAutomatically": "Saves automatically."
 }
