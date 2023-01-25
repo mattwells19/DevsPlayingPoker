@@ -58,6 +58,7 @@
 		padding: 0.5rem 0.75rem;
 		width: 100%;
 		margin: 0.5rem 0px 0.5rem 0px;
+		border: 2px solid var(--border-gray);
 	}
 
 	p {
@@ -72,6 +73,28 @@
 	}
 }
 
-button.themeBtn {
-	padding: 0.5rem;
+.themeSelect {
+	label {
+		display: block;
+		font-weight: 600;
+	}
+
+	select,
+	option {
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		width: 100%;
+		margin: 0.5rem 0px 0.5rem 0px;
+		border: 2px solid var(--border-gray);
+		color: inherit;
+	}
+
+	option {
+		background-color: var(--elevated-background);
+		color: var(--primary-text-color);
+	}
+
+	p {
+		color: var(--secondary-text-color);
+	}
 }

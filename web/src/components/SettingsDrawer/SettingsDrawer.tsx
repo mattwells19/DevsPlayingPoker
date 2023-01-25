@@ -1,6 +1,7 @@
 import { IntlKey, useIntl } from "@/i18n";
 import {
 	createSignal,
+	JSX,
 	onCleanup,
 	onMount,
 	ParentComponent,
@@ -32,6 +33,28 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 		onCleanup(() => document.removeEventListener("keyup", escClose));
 	});
 
+	const handleThemeChange: JSX.EventHandlerUnion<HTMLSelectElement, Event> = (
+		e,
+	) => {
+		const selection = e.currentTarget.value;
+
+		if (selection === "system") {
+			localStorage.setItem("theme", "system");
+
+			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+				document.body.classList.add("dark");
+			} else {
+				document.body.classList.remove("dark");
+			}
+		} else if (selection === "light") {
+			localStorage.setItem("theme", "light");
+			document.body.classList.remove("dark");
+		} else if (selection === "dark") {
+			localStorage.setItem("theme", "dark");
+			document.body.classList.add("dark");
+		}
+	};
+
 	return (
 		<div
 			class={styles.backdrop}
@@ -47,20 +70,21 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 				>
 					&#10005;
 				</Button>
-				<Button
-					variant="outline"
-					class={styles.themeBtn}
-					type="button"
-					onClick={() => {
-						document.body.classList.toggle("dark");
-						localStorage.setItem(
-							"theme",
-							document.body.classList.contains("dark") ? "dark" : "light",
-						);
-					}}
-				>
-					{intl.t("toggleTheme")}
-				</Button>
+				<div class={styles.themeSelect}>
+					<label for="theme-select">Theme</label>
+					<select
+						id="theme-select"
+						name="theme-select"
+						aria-describedby="theme-select-helptext"
+						value={localStorage.getItem("theme") ?? "system"}
+						onChange={handleThemeChange}
+					>
+						<option value="system">System Setting</option>
+						<option value="light">Light</option>
+						<option value="dark">Dark</option>
+					</select>
+					<p id="theme-select-helptext">Saves automatically.</p>
+				</div>
 				<Show when={props.onSaveName}>
 					<form
 						class={styles.nameForm}
