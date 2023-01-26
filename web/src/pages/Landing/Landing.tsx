@@ -1,7 +1,5 @@
 import { Component, createSignal, For, JSX, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
-import { ButtonLink } from "@/components/Button";
-import styles from "./Landing.module.scss";
 import Header from "@/components/Header";
 import { IntlKey, useIntl } from "@/i18n";
 
@@ -69,21 +67,23 @@ const Landing: Component = () => {
 			<Header
 				onSaveName={(new_name) => localStorage.setItem("name", new_name)}
 			/>
-			<main class={styles.landing}>
-				<section class={styles.copy}>
-					<h1>🃏 Devs Playing Poker</h1>
-					<p>{intl.t("comeToTheRightPlace")}</p>
+			<main class="max-w-md m-auto flex flex-col">
+				<section class="text-center my-8 mx-0 py-0 px-2">
+					<h1 class="text-5xl leading-snug font-bold">🃏 Devs Playing Poker</h1>
+					<p class="text-xl mt-9">{intl.t("comeToTheRightPlace")}</p>
 				</section>
-				<div class={styles.roomOps}>
-					<section class={styles.roomCodeInputs}>
-						<p>{intl.t("enterRoomCodeHere")}</p>
+				<div class="mt-12">
+					<section class="text-center">
+						<p class="mt-8 mb-4">{intl.t("enterRoomCodeHere")}</p>
 						<form
 							onInput={(e) => handleInputChange(e.currentTarget)}
 							onPaste={(e) => handlePaste(e)}
+							class="flex gap-1 justify-center"
 						>
 							<For each={[0, 1, 2, 3]}>
 								{(index) => (
 									<input
+										class="input input-bordered w-12 h-12 uppercase text-center"
 										id={`roomCode-${index + 1}`}
 										name="roomCode"
 										aria-label={`Room Code letter ${index + 1}`}
@@ -112,21 +112,25 @@ const Landing: Component = () => {
 								)}
 							</For>
 						</form>
-						<div class={styles.errorMsg}>
+						<div class="h-4 grid place-items-center">
 							<Show when={error()} keyed>
-								{(errorMsg) => <p aria-live="polite">{intl.t(errorMsg)}</p>}
+								{(errorMsg) => (
+									<p aria-live="polite" class="my-4 mx-0 text-errorTextColor">
+										{intl.t(errorMsg)}
+									</p>
+								)}
 							</Show>
 						</div>
 					</section>
-					<div class={styles.seperator}>
-						<hr />
+					<div class="flex gap-4 items-center mt-8 mb-12 mx-0">
+						<div class="divider flex-grow" />
 						<span>{intl.t("or")}</span>
-						<hr />
+						<div class="divider flex-grow" />
 					</div>
-					<section>
-						<ButtonLink class={styles.btnLink} href="/create-room">
+					<section class="flex justify-center">
+						<a href="/create-room" class="btn">
 							{intl.t("newRoom")}
-						</ButtonLink>
+						</a>
 					</section>
 				</div>
 			</main>

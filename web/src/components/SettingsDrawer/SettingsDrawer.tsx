@@ -44,15 +44,19 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 
 			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
 				document.body.classList.add("dark");
+				document.documentElement.setAttribute("data-theme", "dark");
 			} else {
 				document.body.classList.remove("dark");
+				document.documentElement.setAttribute("data-theme", "light");
 			}
 		} else if (selection === "light") {
 			localStorage.setItem("theme", "light");
 			document.body.classList.remove("dark");
+			document.documentElement.setAttribute("data-theme", "light");
 		} else if (selection === "dark") {
 			localStorage.setItem("theme", "dark");
 			document.body.classList.add("dark");
+			document.documentElement.setAttribute("data-theme", "dark");
 		}
 	};
 
