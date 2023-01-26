@@ -128,7 +128,7 @@ const Landing: Component = () => {
 						<div class="divider flex-grow" />
 					</div>
 					<section class="flex justify-center">
-						<a href="/create-room" class="btn">
+						<a href="/create-room" class="btn btn-primary">
 							{intl.t("newRoom")}
 						</a>
 					</section>
