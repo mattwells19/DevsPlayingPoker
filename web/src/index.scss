@@ -72,6 +72,17 @@ hr {
 	overflow: visible;
 }
 
+// solid-toast uses inline styles 🙄
+.toast {
+	background-color: var(--elevated-background) !important;
+	color: var(--primary-text-color) !important;
+
+	& [role="status"] {
+		// the default is flex which removes spaces for formatted elements
+		display: block !important;
+	}
+}
+
 @keyframes flipIn {
 	from {
 		scale: 0.9;

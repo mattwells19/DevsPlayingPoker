@@ -1,8 +1,7 @@
-import { useNavigate, useParams } from "solid-app-router";
+import { Navigate, useNavigate, useParams } from "solid-app-router";
 import {
 	Component,
 	createEffect,
-	createResource,
 	createSignal,
 	onCleanup,
 	Show,
@@ -20,33 +19,21 @@ import {
 } from "./RoomContext";
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
+import toast from "solid-toast";
 
-const RoomCheckWrapper: Component = () => {
+const [updateNameFn, setUpdateNameFn] = createSignal<
+	((name: string) => void) | undefined
+>();
+
+const Room: Component = () => {
 	const intl = useIntl();
-	const navigate = useNavigate();
 	const params = useParams();
 
 	const userName = localStorage.getItem("name");
-	if (!userName) {
-		navigate(`/join/${params.roomCode}`);
-		return;
-	}
-
-	const userId = sessionStorage.getItem("userId");
-
-	const [roomExists] = createResource(params.roomCode, () =>
-		fetch(`/api/v1/rooms/${params.roomCode}/checkRoomExists`).then((res) => {
-			if (res.status !== 200) {
-				navigate("/");
-				return false;
-			}
-			return true;
-		}),
-	);
 
 	return (
 		<>
-			<Header>
+			<Header onSaveName={updateNameFn()}>
 				<button
 					class={styles.roomCodeBtn}
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
@@ -56,37 +43,35 @@ const RoomCheckWrapper: Component = () => {
 				</button>
 			</Header>
 			<Show
-				when={roomExists() && userName ? userName : null}
-				fallback={<h1>{intl.t("checkingRoom")}</h1>}
+				when={userName}
+				fallback={<Navigate href={`/join/${params.roomCode}`} />}
 				keyed
 			>
 				{(userName) => (
-					<Room
-						roomCode={params.roomCode}
-						userName={userName}
-						userId={userId}
-					/>
+					<RoomContent roomCode={params.roomCode} userName={userName} />
 				)}
 			</Show>
 		</>
 	);
 };
 
-interface RoomProps {
+interface RoomContentProps {
 	roomCode: string;
 	userName: string;
-	userId: string | null;
 }
 
 const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
 const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
-const Room: Component<RoomProps> = (props) => {
+const RoomContent: Component<RoomContentProps> = (props) => {
+	const intl = useIntl();
 	const navigate = useNavigate();
+	const savedUserId = sessionStorage.getItem("userId");
+
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
-		if (props.userId) {
-			wsUrl.searchParams.set("userId", props.userId);
+		if (savedUserId) {
+			wsUrl.searchParams.set("userId", savedUserId);
 		}
 		return wsUrl;
 	};
@@ -143,13 +128,21 @@ const Room: Component<RoomProps> = (props) => {
 					});
 					break;
 				case "Connected": {
-					if (data.userId !== props.userId) {
+					if (!data.roomExists) {
+						toast.error(
+							intl.t("thatRoomDoesntExist", { roomCode: props.roomCode }),
+						);
+						return navigate("/");
+					}
+
+					if (data.userId !== savedUserId) {
 						sessionStorage.setItem("userId", data.userId);
 					}
 					setRoomDetails({ currentUserId: data.userId });
 					break;
 				}
 				case "Kicked":
+					toast(intl.t("youWereKicked"), { icon: "🥾" });
 					navigate("/");
 					break;
 				default:
@@ -171,6 +164,15 @@ const Room: Component<RoomProps> = (props) => {
 		}
 	});
 
+	setUpdateNameFn(() => (new_name) => {
+		roomDetails.dispatchEvent({
+			event: "ChangeName",
+			value: new_name,
+		});
+		localStorage.setItem("name", new_name);
+		toast.success(intl.t("nameUpdated"));
+	});
+
 	return (
 		<main class={styles.room}>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
@@ -189,4 +191,4 @@ const Room: Component<RoomProps> = (props) => {
 	);
 };
 
-export default RoomCheckWrapper;
+export default Room;

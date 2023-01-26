@@ -1,0 +1,107 @@
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes slideIn {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+.backdrop {
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.25);
+	overflow: hidden;
+	inset: 0;
+	animation: fadeIn 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.drawer {
+	width: 20rem;
+	padding: 1rem;
+	position: absolute;
+	top: 0;
+	height: 100vh;
+	right: 0;
+	background-color: var(--elevated-background);
+
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	animation: slideIn 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
+
+	.closeBtn {
+		color: var(--primary-text-color);
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
+		margin-left: auto;
+	}
+}
+
+.nameForm {
+	label {
+		display: block;
+		font-weight: 600;
+
+		&::after {
+			content: " *";
+			color: var(--error-text-color);
+		}
+	}
+
+	input {
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		width: 100%;
+		margin: 0.5rem 0px 0.5rem 0px;
+		border: 2px solid var(--border-gray);
+		background-color: var(--main-background);
+	}
+
+	p {
+		color: var(--error-text-color);
+		margin: 0px;
+	}
+
+	button {
+		display: block;
+		width: 100%;
+		padding: 0.5rem;
+	}
+}
+
+.themeSelect {
+	label {
+		display: block;
+		font-weight: 600;
+	}
+
+	select,
+	option {
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		width: 100%;
+		margin: 0.5rem 0px 0.5rem 0px;
+		border: 2px solid var(--border-gray);
+		color: inherit;
+		background-color: var(--main-background);
+	}
+
+	option {
+		background-color: var(--elevated-background);
+		color: var(--primary-text-color);
+	}
+
+	p {
+		color: var(--secondary-text-color);
+	}
+}

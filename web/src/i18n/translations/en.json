@@ -9,7 +9,6 @@
 
 	"_HEADER_": "",
 	"home": "Home",
-	"toggleTheme": "Toggle Theme",
 
 	"_JOIN_ROOM_": "",
 	"name": "Name",
@@ -34,6 +33,9 @@
 	"connecting": "Connecting...",
 	"checkingRoom": "Checking room...",
 	"copyCode": "Click to copy code.",
+	"thatRoomDoesntExist": "Room with code <b>{roomCode}</b> does not exist.",
+	"youWereKicked": "You were kicked.",
+	"nameUpdated": "Name updated.",
 
 	"_ROOM_VOTER_VIEW_": "",
 	"waitingForModerator": "Waiting for {moderatorName}...",
@@ -77,5 +79,15 @@
 	"whatWereVotingOn": "What we're voting on",
 	"edit": "Edit",
 	"clear": "Clear",
-	"addVotingDesc": "Add voting description"
+	"addVotingDesc": "Add voting description",
+
+	"_SETTINGS_DRAWER_": "",
+	"openSettingsDrawer": "Open settings drawer.",
+	"closeSettingsDrawer": "Close settings drawer.",
+	"saveName": "Save Name",
+	"theme": "Theme",
+	"system": "System Setting",
+	"light": "Light",
+	"dark": "Dark",
+	"savesAutomatically": "Saves automatically."
 }

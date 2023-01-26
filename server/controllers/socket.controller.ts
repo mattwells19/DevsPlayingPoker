@@ -11,6 +11,7 @@ import type {
 	KickVoterEvent,
 	WebScoketMessageEvent,
 	VotingDescriptionEvent,
+	ChangeNameEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
 import { zod } from "../deps.ts";
@@ -363,6 +364,45 @@ const handleVotingDescription: EventFunction<VotingDescriptionEvent> = async (
 	sendRoomData(updatedRoomData);
 };
 
+const handleChangeName: EventFunction<ChangeNameEvent> = async (
+	roomData,
+	{ userId },
+	data,
+) => {
+	const updatedRoomData = await (() => {
+		if (roomData.moderator?.id === userId) {
+			return rooms.updateById(roomData._id, {
+				$set: {
+					moderator: {
+						...roomData.moderator,
+						name: data.value,
+					},
+				},
+			});
+		} else {
+			const updatedVoters = roomData.voters.map((voter) => {
+				if (voter.id === userId) {
+					return {
+						...voter,
+						name: data.value,
+					};
+				}
+				return voter;
+			});
+
+			return rooms.updateById(roomData._id, {
+				$set: {
+					voters: updatedVoters,
+				},
+			});
+		}
+	})();
+
+	if (!updatedRoomData) return;
+
+	sendRoomData(updatedRoomData);
+};
+
 /**
  * Middlewares
  */
@@ -391,6 +431,19 @@ const validateVoter: EventFunction<WebScoketMessageEvent> = (
 	}
 };
 
+const validateInRoom: EventFunction<WebScoketMessageEvent> = (...params) => {
+	const isModerator = !validateModerator(...params);
+	if (isModerator) return;
+
+	const isVoter = !validateVoter(...params);
+	if (isVoter) return;
+
+	return {
+		message:
+			"This command can only be executed by someone in the specified room which you are not.",
+	};
+};
+
 const eventHandlerMap = new Map<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
@@ -402,6 +455,7 @@ const eventHandlerMap = new Map<
 	["ModeratorChange", [validateModerator, handleModeratorChange]],
 	["KickVoter", [validateModerator, handleKickVoter]],
 	["UpdateVotingDescription", [validateModerator, handleVotingDescription]],
+	["ChangeName", [validateInRoom, handleChangeName]],
 ]);
 
 export const handleWs = (
@@ -419,10 +473,13 @@ export const handleWs = (
 
 	sockets.set(socketId, socket);
 
-	socket.addEventListener("open", () => {
+	socket.addEventListener("open", async () => {
+		const roomExists = await rooms.findByRoomCode(roomCode);
+
 		const connectEvent: ConnectEvent = {
 			event: "Connected",
 			userId,
+			roomExists: !!roomExists,
 		};
 		socket.send(JSON.stringify(connectEvent));
 	});
