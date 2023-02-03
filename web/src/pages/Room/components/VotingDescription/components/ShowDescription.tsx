@@ -1,5 +1,5 @@
-import Button from "@/components/Button";
 import { useIntl } from "@/i18n";
+import mergeClassNames from "@/utils/mergeClassNames";
 import { Component, createEffect, JSXElement, Show } from "solid-js";
 import { useRoom } from "../../../RoomContext";
 import styles from "../VotingDescription.module.scss";
@@ -16,7 +16,12 @@ function formatStringWithUrl(str: string): JSXElement {
 	return (
 		<>
 			{formatStringWithUrl(bits[0])}
-			<a href={fullUrl} target="_blank" referrerPolicy="no-referrer">
+			<a
+				href={fullUrl}
+				target="_blank"
+				referrerPolicy="no-referrer"
+				class="link text-secondary dark:text-accent"
+			>
 				{fullUrl}
 			</a>
 			{formatStringWithUrl(bits[1])}
@@ -45,16 +50,26 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 		formatStringWithUrl(room.roomData.votingDescription);
 
 	return (
-		<section class={styles.showDesc}>
+		<section class="my-10">
 			<Show when={room.roomData.votingDescription}>
-				<details open ref={(el) => (detailsRef = el)}>
-					<summary>
+				<details
+					open
+					ref={(el) => (detailsRef = el)}
+					class="border border-base-content border-opacity-50 rounded-lg my-2 group"
+				>
+					<summary
+						class={mergeClassNames(
+							styles.showDescSummary,
+							"rounded-lg group-open:rounded-b-none py-2 px-4 flex items-center cursor-pointer",
+						)}
+					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke-width="2.5"
 							stroke="currentColor"
+							class="w-4 mr-2 group-open:rotate-90"
 						>
 							<path
 								stroke-linecap="round"
@@ -62,21 +77,27 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 								d="M8.25 4.5l7.5 7.5-7.5 7.5"
 							/>
 						</svg>
-						<p>{intl.t("whatWereVotingOn")}</p>
+						<p class="flex-grow text-xl font-bold">
+							{intl.t("whatWereVotingOn")}
+						</p>
 						<Show
 							when={
 								room.roomData.moderator?.id === room.currentUserId &&
 								room.roomData.state === "Results"
 							}
 						>
-							<div class={styles.formGroup}>
+							<div
+								class={mergeClassNames(styles.formGroup, "inline-flex gap-2")}
+							>
 								<form
 									onSubmit={(e) => {
 										e.preventDefault();
 										props.onStartEditing();
 									}}
 								>
-									<Button type="submit">{intl.t("edit")}</Button>
+									<button type="submit" class="btn btn-primary btn-sm">
+										{intl.t("edit")}
+									</button>
 								</form>
 								<form
 									onSubmit={(e) => {
@@ -87,14 +108,16 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 										});
 									}}
 								>
-									<Button type="submit" variant="outline">
+									<button type="submit" class="btn btn-ghost btn-sm">
 										{intl.t("clear")}
-									</Button>
+									</button>
 								</form>
 							</div>
 						</Show>
 					</summary>
-					<pre>{formattedDescription()}</pre>
+					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-base-content border-opacity-50 font-sans">
+						{formattedDescription()}
+					</pre>
 				</details>
 			</Show>
 			<Show
@@ -105,15 +128,15 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 				}
 			>
 				<form
-					class={styles.addDescForm}
 					onSubmit={(e) => {
 						e.preventDefault();
 						props.onStartEditing();
 					}}
+					class="flex justify-center"
 				>
-					<Button type="submit" variant="outline">
+					<button type="submit" class="btn btn-accent btn-sm btn-outline">
 						{intl.t("addVotingDesc")}
-					</Button>
+					</button>
 				</form>
 			</Show>
 		</section>

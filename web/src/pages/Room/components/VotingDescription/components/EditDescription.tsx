@@ -1,8 +1,6 @@
 import { Component, createEffect } from "solid-js";
 import { useRoom } from "../../../RoomContext";
 import zod from "zod";
-import styles from "../VotingDescription.module.scss";
-import Button from "@/components/Button";
 import { useIntl } from "@/i18n";
 
 const votingDescSchema = zod
@@ -25,7 +23,7 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 
 	return (
 		<form
-			class={styles.editForm}
+			class="form-control my-10"
 			onSubmit={(e) => {
 				e.preventDefault();
 				const formData = new FormData(e.currentTarget);
@@ -43,10 +41,13 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 				}
 			}}
 		>
-			<label for="votingDesc">{intl.t("votingDesc")}</label>
+			<label for="votingDesc" class="label">
+				{intl.t("votingDesc")}
+			</label>
 			<textarea
 				id="votingDesc"
 				name="votingDesc"
+				class="textarea textarea-bordered"
 				rows="3"
 				maxLength="300"
 				autofocus
@@ -55,14 +56,20 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 			>
 				{room.roomData.votingDescription}
 			</textarea>
-			<p class={styles.helpText} id="votingDesc-helper-text">
+			<p class="label label-text-alt" id="votingDesc-helper-text">
 				{intl.t("votingDescHelperText")}
 			</p>
-			<div role="group" class={styles.btnGroup}>
-				<Button type="submit">{intl.t("update")}</Button>
-				<Button type="button" variant="outline" onClick={props.onStopEditing}>
+			<div role="group" class="flex justify-end gap-2">
+				<button type="submit" class="btn btn-primary btn-sm">
+					{intl.t("update")}
+				</button>
+				<button
+					type="button"
+					class="btn btn-ghost btn-sm"
+					onClick={props.onStopEditing}
+				>
 					{intl.t("cancel")}
-				</Button>
+				</button>
 			</div>
 		</form>
 	);

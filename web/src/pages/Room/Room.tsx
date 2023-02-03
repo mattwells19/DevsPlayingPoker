@@ -7,7 +7,6 @@ import {
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import styles from "./Room.module.scss";
 import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
 import ModeratorView from "./views/moderator";
 import VoterView from "./views/voter/VoterView";
@@ -35,11 +34,11 @@ const Room: Component = () => {
 		<>
 			<Header onSaveName={updateNameFn()}>
 				<button
-					class={styles.roomCodeBtn}
+					class="btn btn-ghost"
 					onClick={() => navigator.clipboard.writeText(params.roomCode)}
 					title={intl.t("copyCode") as string}
 				>
-					<h1>{params.roomCode}</h1>
+					<h1 class="text-4xl font-bold">{params.roomCode}</h1>
 				</button>
 			</Header>
 			<Show
@@ -174,7 +173,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	});
 
 	return (
-		<main class={styles.room}>
+		<main class="max-w-lg m-auto">
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
 				<Show
