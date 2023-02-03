@@ -115,7 +115,7 @@ const Landing: Component = () => {
 						<div class="h-4 grid place-items-center">
 							<Show when={error()} keyed>
 								{(errorMsg) => (
-									<p aria-live="polite" class="my-4 mx-0 text-errorTextColor">
+									<p aria-live="polite" class="my-4 mx-0 text-error">
 										{intl.t(errorMsg)}
 									</p>
 								)}

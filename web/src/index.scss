@@ -63,9 +63,9 @@ video {
 }
 
 // solid-toast uses inline styles 🙄
-.toast {
-	background-color: var(--elevated-background) !important;
-	color: var(--primary-text-color) !important;
+.toast-overrides {
+	background-color: hsl(var(--bc)) !important;
+	color: hsl(var(--b1)) !important;
 
 	& [role="status"] {
 		// the default is flex which removes spaces for formatted elements
