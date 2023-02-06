@@ -72,4 +72,9 @@ video {
 	& :where(thead, tfoot) :where(th, td) {
 		background-color: transparent;
 	}
+
+	th,
+	td {
+		border: none;
+	}
 }

@@ -21,13 +21,19 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 				</button>
 				<ul class="menu bg-slate-100 dark:bg-base-300 rounded-box shadow-lg dropdown-content">
 					<li class="flex gap-1 transition-colors">
-						<label tabIndex="0" for="confirmation-makeModerator">
+						<label
+							tabIndex="0"
+							for={`confirmation-${props.voter.id}-makeModerator`}
+						>
 							<span aria-hidden="true">👑</span>
 							{intl.t("makeModerator")}
 						</label>
 					</li>
 					<li class="flex gap-1 transition-colors">
-						<label tabIndex="0" for="confirmation-kickVoter">
+						<label
+							tabIndex="0"
+							for={`confirmation-${props.voter.id}-kickVoter`}
+						>
 							<span aria-hidden="true">🥾</span>
 							{intl.t("kickVoter")}
 						</label>
@@ -35,14 +41,16 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 				</ul>
 			</div>
 			<OptionConfirmationDialog
-				action="makeModerator"
+				id={`confirmation-${props.voter.id}-makeModerator`}
+				title={intl.t("makeModerator")}
+				description={intl.t("makeModeratorDesc", { name: props.voter.name })}
 				onConfirm={() => props.onOptionSelect("makeModerator", props.voter)}
-				voter={props.voter}
 			/>
 			<OptionConfirmationDialog
-				action="kickVoter"
+				id={`confirmation-${props.voter.id}-kickVoter`}
+				title={intl.t("kickVoter")}
+				description={intl.t("kickVoterDesc", { name: props.voter.name })}
 				onConfirm={() => props.onOptionSelect("kickVoter", props.voter)}
-				voter={props.voter}
 			/>
 		</>
 	);
