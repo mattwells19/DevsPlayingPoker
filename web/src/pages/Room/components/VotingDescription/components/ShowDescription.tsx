@@ -134,7 +134,10 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 					}}
 					class="flex justify-center"
 				>
-					<button type="submit" class="btn btn-accent btn-sm btn-outline">
+					<button
+						type="submit"
+						class="btn btn-sm btn-secondary dark:btn-accent btn-outline dark:btn-outline"
+					>
 						{intl.t("addVotingDesc")}
 					</button>
 				</form>

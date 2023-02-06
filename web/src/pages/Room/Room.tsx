@@ -8,8 +8,8 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
-import ModeratorView from "./views/moderator";
-import VoterView from "./views/voter/VoterView";
+import ModeratorView from "./views/ModeratorView";
+import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
 import {
 	defaultRoomDetails,
@@ -173,7 +173,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	});
 
 	return (
-		<main class="max-w-lg m-auto">
+		<main class="max-w-[30rem] m-auto">
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
 				<Show

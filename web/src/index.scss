@@ -83,3 +83,24 @@ video {
 		opacity: 1;
 	}
 }
+
+/** Component Overrides **/
+.btn {
+	animation: none;
+
+	&:active {
+		transform: scale(0.99);
+		transition: transform linear 50ms;
+	}
+}
+
+.table {
+	th:first-child {
+		position: relative;
+		z-index: -1;
+	}
+
+	& :where(thead, tfoot) :where(th, td) {
+		background-color: transparent;
+	}
+}
