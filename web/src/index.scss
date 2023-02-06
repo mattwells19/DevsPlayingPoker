@@ -41,6 +41,8 @@ video {
 	font-size: 100%;
 }
 
+/** Component Overrides **/
+
 // solid-toast uses inline styles 🙄
 .toast-overrides {
 	background-color: hsl(var(--bc)) !important;
@@ -52,18 +54,6 @@ video {
 	}
 }
 
-@keyframes flipIn {
-	from {
-		scale: 0.9;
-		opacity: 0;
-	}
-	to {
-		scale: 1;
-		opacity: 1;
-	}
-}
-
-/** Component Overrides **/
 .btn {
 	animation: none;
 
