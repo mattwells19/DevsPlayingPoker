@@ -1,6 +1,6 @@
 import { Component, For, Match, Switch } from "solid-js";
 import { ConfidenceValue, Voter } from "@/shared-types";
-import Metric from "../Metric";
+import Metric from "./components/Metric";
 import VoterOptionsMenu, {
 	VoterClickAction,
 } from "./components/VoterOptionsMenu";
@@ -39,9 +39,9 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 	const stats = () => getStats(room.roomData.voters);
 
 	return (
-		<div class="border border-base-content border-opacity-50 rounded-lg">
+		<div class="border border-base-content border-opacity-20 rounded-lg">
 			<table class="table w-full">
-				<thead class="border-b border-base-content border-opacity-50">
+				<thead class="border-b border-base-content border-opacity-20">
 					<tr>
 						<th colspan="2" class="z-0 relative">
 							{intl.t("voters")}
@@ -91,7 +91,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						)}
 					</For>
 				</tbody>
-				<tfoot class="text-center border-t border-base-content border-opacity-50">
+				<tfoot class="text-center border-t border-base-content border-opacity-20">
 					<tr>
 						<Switch>
 							<Match when={room.roomData.state === "Voting"}>

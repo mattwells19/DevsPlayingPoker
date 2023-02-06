@@ -34,8 +34,7 @@
 		width: var(--slider-thumb-size);
 		height: var(--slider-thumb-size);
 		border-radius: 999px;
-		background: var(--elevated-background);
-		border: 1px solid var(--border-gray);
+		background: hsl(var(--bc));
 	}
 
 	[data-scope="slider"][data-part="thumb"]:focus {
@@ -44,7 +43,7 @@
 	}
 
 	[data-scope="slider"][data-part="track"] {
-		background: rgba(0, 0, 0, 0.2);
+		background: hsl(var(--b2));
 		border-radius: 9999px;
 	}
 	[data-scope="slider"][data-part="track"][data-orientation="horizontal"] {

@@ -33,13 +33,19 @@ const Room: Component = () => {
 	return (
 		<>
 			<Header onSaveName={updateNameFn()}>
-				<button
-					class="btn btn-ghost"
-					onClick={() => navigator.clipboard.writeText(params.roomCode)}
-					title={intl.t("copyCode") as string}
+				<span
+					class="tooltip tooltip-right"
+					data-tip={intl.t("copyCode") as string}
 				>
-					<h1 class="text-4xl font-bold">{params.roomCode}</h1>
-				</button>
+					<button
+						type="button"
+						class="btn btn-ghost"
+						onClick={() => navigator.clipboard.writeText(params.roomCode)}
+						aria-label={intl.t("copyCode") as string}
+					>
+						<h1 class="text-4xl font-bold">{params.roomCode}</h1>
+					</button>
+				</span>
 			</Header>
 			<Show
 				when={userName}

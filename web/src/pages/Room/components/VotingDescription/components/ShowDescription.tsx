@@ -55,7 +55,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 				<details
 					open
 					ref={(el) => (detailsRef = el)}
-					class="border border-base-content border-opacity-50 rounded-lg my-2 group"
+					class="border border-base-content border-opacity-20 rounded-lg my-2 group"
 				>
 					<summary
 						class={mergeClassNames(
@@ -115,7 +115,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 							</div>
 						</Show>
 					</summary>
-					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-base-content border-opacity-50 font-sans">
+					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-base-content border-opacity-20 font-sans">
 						{formattedDescription()}
 					</pre>
 				</details>

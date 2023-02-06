@@ -36,7 +36,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 	};
 
 	return (
-		<span class={styles.optionContainer}>
+		<label for={`option-${props.value}`} class={styles.option}>
 			<input
 				id={`option-${props.value}`}
 				type="radio"
@@ -45,7 +45,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 				checked={props.selected}
 				title={cornerText()}
 			/>
-			<label for={`option-${props.value}`}>
+			<span aria-hidden="true">
 				<svg
 					width="158"
 					height="221"
@@ -53,12 +53,31 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<rect width="158" height="221" rx="8" fill="white" />
-					<rect x="1" y="1" width="156" height="219" rx="7" />
-					<text x="15" y="208" fill="black" text-anchor="start">
+					<rect width="158" height="221" rx="8" class="fill-base-200" />
+					<rect
+						x="1"
+						y="1"
+						width="156"
+						height="219"
+						rx="7"
+						class={styles.faceLayer}
+					/>
+					<text
+						x="15"
+						y="208"
+						fill="black"
+						text-anchor="start"
+						class="fill-current"
+					>
 						{cornerText()}
 					</text>
-					<text x="143" y="25" fill="black" text-anchor="end">
+					<text
+						x="143"
+						y="25"
+						fill="black"
+						text-anchor="end"
+						class="fill-current"
+					>
 						{cornerText()}
 					</text>
 					<Show
@@ -69,7 +88,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 								fill="black"
 								text-anchor="middle"
 								font-weight="bold"
-								style="font-size: 5rem"
+								class="fill-current text-[5rem]"
 							>
 								{props.value}
 							</text>
@@ -79,8 +98,8 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 						<NoVoteIcon />
 					</Show>
 				</svg>
-			</label>
-		</span>
+			</span>
+		</label>
 	);
 };
 
