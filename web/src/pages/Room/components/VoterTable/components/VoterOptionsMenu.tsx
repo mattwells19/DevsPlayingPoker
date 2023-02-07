@@ -19,7 +19,7 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 				<button class="w-full overflow-hidden text-ellipsis text-left underline">
 					{props.voter.name}
 				</button>
-				<ul class="menu bg-slate-100 dark:bg-base-300 rounded-box shadow-lg dropdown-content">
+				<ul class="menu bg-slate-100 dark:bg-base-100 rounded-md shadow-lg dropdown-content">
 					<li class="flex gap-1 transition-colors">
 						<label
 							tabIndex="0"

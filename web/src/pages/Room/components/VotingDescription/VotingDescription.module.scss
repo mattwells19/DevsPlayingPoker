@@ -5,13 +5,13 @@
 
 	&:hover:not(:has(.formGroup:hover)),
 	&:focus {
-		background-color: hsl(var(--b3));
+		background-color: hsl(var(--a) / 0.15);
 	}
 
 	// firefox doesn't support has 😒
 	@supports (-moz-appearance: none) {
 		&:hover {
-			background-color: hsl(var(--b3));
+			background-color: hsl(var(--a) / 0.15);
 		}
 	}
 }

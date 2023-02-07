@@ -35,7 +35,12 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<rect width="158" height="221" rx="8" class="fill-base-200" />
+					<rect
+						width="158"
+						height="221"
+						rx="8"
+						class="fill-slate-50 dark:fill-base-300"
+					/>
 					<rect
 						x="1"
 						y="1"

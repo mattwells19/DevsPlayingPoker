@@ -169,7 +169,7 @@ const CreateRoom: Component = () => {
 									name="noVote"
 									value="yes"
 									checked={defaults.formValues.noVote}
-									class="radio radio-sm radio-secondary dark:radio-accent"
+									class="radio radio-sm radio-primary"
 								/>
 								{intl.t("yes")}
 							</label>
@@ -180,7 +180,7 @@ const CreateRoom: Component = () => {
 									name="noVote"
 									value="no"
 									checked={!defaults.formValues.noVote}
-									class="radio radio-sm radio-secondary dark:radio-accent"
+									class="radio radio-sm radio-primary"
 								/>
 								{intl.t("no")}
 							</label>

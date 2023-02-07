@@ -39,13 +39,11 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 	const stats = () => getStats(room.roomData.voters);
 
 	return (
-		<div class="border border-base-content border-opacity-20 rounded-lg">
-			<table class="table w-full">
+		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 ">
+			<table class="table w-full bg-slate-50 dark:bg-base-300">
 				<thead class="border-b border-base-content border-opacity-20">
 					<tr>
-						<th colspan="2" class="z-0 relative">
-							{intl.t("voters")}
-						</th>
+						<th colspan="2">{intl.t("voters")}</th>
 						<th class="text-center">{intl.t("voted")}</th>
 						<th class="text-center">{intl.t("confidence")}</th>
 					</tr>
@@ -53,7 +51,7 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 				<tbody>
 					<For each={room.roomData.voters}>
 						{(voter) => (
-							<tr>
+							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
 								<td colspan="2">
 									{props.onVoterAction ? (
 										<VoterOptionsMenu

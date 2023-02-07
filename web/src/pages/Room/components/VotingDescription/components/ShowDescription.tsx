@@ -56,12 +56,12 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 				<details
 					open
 					ref={(el) => (detailsRef = el)}
-					class="border border-base-content border-opacity-20 rounded-lg my-2 group"
+					class="bg-slate-50 dark:bg-base-300 shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 rounded-lg my-2 group"
 				>
 					<summary
 						class={mergeClassNames(
 							styles.showDescSummary,
-							"rounded-lg group-open:rounded-b-none py-2 px-4 flex items-center cursor-pointer",
+							"rounded-lg group-open:rounded-b-none py-2 px-4 flex items-center cursor-pointer transition-colors",
 						)}
 					>
 						<Icon
@@ -128,10 +128,7 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 					}}
 					class="flex justify-center"
 				>
-					<button
-						type="submit"
-						class="btn btn-sm btn-secondary dark:btn-accent btn-outline dark:btn-outline"
-					>
+					<button type="submit" class="btn btn-sm btn-outline">
 						{intl.t("addVotingDesc")}
 					</button>
 				</form>
