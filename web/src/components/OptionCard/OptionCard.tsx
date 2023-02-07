@@ -1,30 +1,12 @@
 import { Component, Show } from "solid-js";
 import type { RoomSchema } from "@/shared-types";
 import styles from "./OptionCard.module.scss";
+import Icon from "../Icon";
 
 interface OptionCardProps {
 	value: RoomSchema["options"][0];
 	selected: boolean;
 }
-
-const NoVoteIcon = () => (
-	<svg
-		width="80"
-		height="80"
-		x="39"
-		y="69"
-		transform-origin="center"
-		viewBox="0 0 100 100"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<path
-			d="M23.5349 18.9717L81.612 77.0488M94 50C94 74.3005 74.3005 94 50 94C25.6995 94 6 74.3005 6 50C6 25.6995 25.6995 6 50 6C74.3005 6 94 25.6995 94 50Z"
-			stroke="currentColor"
-			stroke-width="11"
-		/>
-	</svg>
-);
 
 const OptionCard: Component<OptionCardProps> = (props) => {
 	const cornerText = () => {
@@ -95,7 +77,15 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 						}
 						when={props.value === "N/A"}
 					>
-						<NoVoteIcon />
+						<Icon
+							name="no-vote"
+							width="80"
+							height="80"
+							x="39"
+							y="69"
+							transform-origin="center"
+							fill="none"
+						/>
 					</Show>
 				</svg>
 			</span>

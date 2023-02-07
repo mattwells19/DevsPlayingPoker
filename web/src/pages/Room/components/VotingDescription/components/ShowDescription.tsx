@@ -1,6 +1,7 @@
 import { useIntl } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
 import { Component, createEffect, JSXElement, Show } from "solid-js";
+import Icon from "@/components/Icon";
 import { useRoom } from "../../../RoomContext";
 import styles from "../VotingDescription.module.scss";
 
@@ -63,20 +64,13 @@ const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
 							"rounded-lg group-open:rounded-b-none py-2 px-4 flex items-center cursor-pointer",
 						)}
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
+						<Icon
+							name="caret-down"
 							fill="none"
-							viewBox="0 0 24 24"
 							stroke-width="2.5"
 							stroke="currentColor"
-							class="w-4 mr-2 group-open:rotate-90"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M8.25 4.5l7.5 7.5-7.5 7.5"
-							/>
-						</svg>
+							class="w-4 h-4 mr-2 group-open:rotate-90"
+						/>
 						<p class="flex-grow text-xl font-bold">
 							{intl.t("whatWereVotingOn")}
 						</p>
