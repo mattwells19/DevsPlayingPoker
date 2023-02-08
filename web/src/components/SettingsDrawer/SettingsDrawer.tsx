@@ -8,8 +8,7 @@ import {
 	Show,
 } from "solid-js";
 import { Portal } from "solid-js/web";
-import Button from "../Button";
-import styles from "./SettingsDrawer.module.scss";
+import Icon from "../Icon";
 
 export interface SettingsDrawerActions {
 	onSaveName?: (name: string) => void;
@@ -44,49 +43,62 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 
 			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
 				document.body.classList.add("dark");
+				document.documentElement.setAttribute("data-theme", "dark");
 			} else {
 				document.body.classList.remove("dark");
+				document.documentElement.setAttribute("data-theme", "light");
 			}
 		} else if (selection === "light") {
 			localStorage.setItem("theme", "light");
 			document.body.classList.remove("dark");
+			document.documentElement.setAttribute("data-theme", "light");
 		} else if (selection === "dark") {
 			localStorage.setItem("theme", "dark");
 			document.body.classList.add("dark");
+			document.documentElement.setAttribute("data-theme", "dark");
 		}
 	};
 
 	return (
 		<Portal>
 			<Show when={props.isOpen}>
-				<div class={styles.backdrop} onClick={props.onClose}>
-					<aside class={styles.drawer} onClick={(e) => e.stopPropagation()}>
-						<Button
-							variant="ghost"
+				<div
+					onClick={props.onClose}
+					class="absolute bg-black/25 inset-0 overflow-hidden"
+				>
+					<aside
+						onClick={(e) => e.stopPropagation()}
+						class="w-full max-w-xs p-4 absolute top-0 right-0 h-full flex flex-col gap-8 bg-base-100 animate-[slideIn_200ms_ease-in-out]"
+					>
+						<button
 							onClick={props.onClose}
-							class={styles.closeBtn}
 							title={intl.t("closeSettingsDrawer") as string}
+							class="btn btn-square btn-ghost btn-primary ml-auto"
 						>
 							&#10005;
-						</Button>
-						<div class={styles.themeSelect}>
-							<label for="theme-select">{intl.t("theme")}</label>
+						</button>
+						<div class="form-control">
+							<label for="theme-select" class="label">
+								{intl.t("theme")}
+							</label>
 							<select
 								id="theme-select"
 								name="theme-select"
 								aria-describedby="theme-select-helptext"
 								value={localStorage.getItem("theme") ?? "system"}
 								onChange={handleThemeChange}
+								class="select select-bordered"
 							>
 								<option value="system">{intl.t("system")}</option>
 								<option value="light">{intl.t("light")}</option>
 								<option value="dark">{intl.t("dark")}</option>
 							</select>
-							<p id="theme-select-helptext">{intl.t("savesAutomatically")}</p>
+							<p id="theme-select-helptext" class="label label-text-alt">
+								{intl.t("savesAutomatically")}
+							</p>
 						</div>
 						<Show when={props.onSaveName}>
 							<form
-								class={styles.nameForm}
 								onSubmit={(e) => {
 									e.preventDefault();
 									const formData = new FormData(e.currentTarget);
@@ -103,25 +115,41 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 
 									props.onSaveName!(name);
 								}}
+								class="form-control"
 							>
-								<label for="name">{intl.t("name")}</label>
-								<input
-									id="name"
-									name="name"
-									type="text"
-									required
-									minLength="1"
-									maxLength="10"
-									autofocus
-									value={localStorage.getItem("name") ?? ""}
-									onInput={() => setErrorMsg(null)}
-									aria-describedby="name-error-msg"
-									aria-invalid={Boolean(errorMsg())}
-								/>
+								<label for="name" class="label">
+									{intl.t("name")}
+								</label>
+								<div class="input-group w-full">
+									<input
+										id="name"
+										name="name"
+										type="text"
+										required
+										minLength="1"
+										maxLength="10"
+										autofocus
+										value={localStorage.getItem("name") ?? ""}
+										onInput={() => setErrorMsg(null)}
+										aria-describedby="name-error-msg"
+										aria-invalid={Boolean(errorMsg())}
+										class="input input-bordered w-full"
+									/>
+									<button
+										type="submit"
+										title={intl.t("saveName") as string}
+										class="btn btn-primary btn-square"
+									>
+										<Icon name="save" fill="none" class="w-6 h-6" />
+									</button>
+								</div>
 								<Show when={errorMsg()} keyed>
-									{(msg) => <p id="name-error-msg">{intl.t(msg)}</p>}
+									{(msg) => (
+										<p id="name-error-msg" class="text-error">
+											{intl.t(msg)}
+										</p>
+									)}
 								</Show>
-								<Button type="submit">{intl.t("saveName")}</Button>
 							</form>
 						</Show>
 					</aside>

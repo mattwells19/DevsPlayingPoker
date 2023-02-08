@@ -7,10 +7,9 @@ import {
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import styles from "./Room.module.scss";
 import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
-import ModeratorView from "./views/moderator";
-import VoterView from "./views/voter/VoterView";
+import ModeratorView from "./views/ModeratorView";
+import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
 import {
 	defaultRoomDetails,
@@ -34,13 +33,19 @@ const Room: Component = () => {
 	return (
 		<>
 			<Header onSaveName={updateNameFn()}>
-				<button
-					class={styles.roomCodeBtn}
-					onClick={() => navigator.clipboard.writeText(params.roomCode)}
-					title={intl.t("copyCode") as string}
+				<span
+					class="tooltip tooltip-right"
+					data-tip={intl.t("copyCode") as string}
 				>
-					<h1>{params.roomCode}</h1>
-				</button>
+					<button
+						type="button"
+						class="btn btn-ghost"
+						onClick={() => navigator.clipboard.writeText(params.roomCode)}
+						aria-label={intl.t("copyCode") as string}
+					>
+						<h1 class="text-4xl font-bold">{params.roomCode}</h1>
+					</button>
+				</span>
 			</Header>
 			<Show
 				when={userName}
@@ -174,7 +179,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	});
 
 	return (
-		<main class={styles.room}>
+		<main class="max-w-[30rem] m-auto">
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
 				<Show

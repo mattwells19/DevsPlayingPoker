@@ -1,11 +1,9 @@
-import { Component, createSignal, For, Match, Show, Switch } from "solid-js";
+import { Component, For, Match, Switch } from "solid-js";
 import { ConfidenceValue, Voter } from "@/shared-types";
-import Metric from "../Metric";
-import styles from "./VoterTable.module.scss";
+import Metric from "./components/Metric";
 import VoterOptionsMenu, {
 	VoterClickAction,
 } from "./components/VoterOptionsMenu";
-import OptionConfirmationDialog from "./components/OptionConfirmationDialog";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
 import { IntlKey, useIntl } from "@/i18n";
@@ -36,118 +34,101 @@ function formatSelection(selection: string | null): string {
 
 const VoterTable: Component<VoterTableProps> = (props) => {
 	const intl = useIntl();
-	const [optionConfirmation, setOptionConfirmation] = createSignal<{
-		action: VoterClickAction;
-		voter: Voter;
-	} | null>(null);
 	const room = useRoom();
 
 	const stats = () => getStats(room.roomData.voters);
 
 	return (
-		<>
-			<div class={styles.tableContainer}>
-				<table class={styles.voterTable}>
-					<thead>
-						<tr>
-							<th colspan="2">{intl.t("voters")}</th>
-							<th>{intl.t("voted")}</th>
-							<th>{intl.t("confidence")}</th>
-						</tr>
-					</thead>
-					<tbody>
-						<For each={room.roomData.voters}>
-							{(voter) => (
-								<tr>
-									<td colspan="2">
-										{props.onVoterAction ? (
-											<VoterOptionsMenu
-												voter={voter}
-												onVoterClick={(action, voter) =>
-													setOptionConfirmation({ action, voter })
-												}
-											/>
-										) : (
-											<p class={styles.voterName}>{voter.name}</p>
-										)}
-									</td>
-									<td>
-										{room.roomData.state === "Results"
-											? formatSelection(voter.selection)
-											: voter.selection !== null
-											? "✅"
-											: "❌"}
-									</td>
-									<td
-										title={
-											intl.t(
-												voter.confidence !== null
-													? ConfidenceTextMap[voter.confidence]
-													: "waitingForSelection",
-											) as string
-										}
-									>
-										{voter.confidence !== null
-											? ConfidenceEmojiMap[voter.confidence]
-											: "❓"}
-									</td>
-								</tr>
-							)}
-						</For>
-					</tbody>
-					<tfoot>
-						<tr>
-							<Switch>
-								<Match when={room.roomData.state === "Voting"}>
-									<td colspan="4">{intl.t("votingInProgress")}</td>
-								</Match>
-								<Match
-									when={
-										room.roomData.state === "Results" &&
-										room.roomData.voters.every(
-											(voter) => voter.selection === null,
-										)
+		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 ">
+			<table class="table w-full bg-slate-50 dark:bg-base-300">
+				<thead class="border-b border-base-content border-opacity-20">
+					<tr>
+						<th colspan="2">{intl.t("voters")}</th>
+						<th class="text-center">{intl.t("voted")}</th>
+						<th class="text-center">{intl.t("confidence")}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<For each={room.roomData.voters}>
+						{(voter) => (
+							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
+								<td colspan="2">
+									{props.onVoterAction ? (
+										<VoterOptionsMenu
+											voter={voter}
+											onOptionSelect={props.onVoterAction}
+										/>
+									) : (
+										<p class="text-ellipsis overflow-hidden max-w-full">
+											{voter.name}
+										</p>
+									)}
+								</td>
+								<td class="text-center">
+									{room.roomData.state === "Results"
+										? formatSelection(voter.selection)
+										: voter.selection !== null
+										? "✅"
+										: "❌"}
+								</td>
+								<td
+									class="text-center"
+									title={
+										intl.t(
+											voter.confidence !== null
+												? ConfidenceTextMap[voter.confidence]
+												: "waitingForSelection",
+										) as string
 									}
 								>
-									<td colspan="4">
-										{intl.t(
-											room.roomData.voters.length > 0
-												? "waitingToStartVoting"
-												: "waitingForVoters",
-										)}
-									</td>
-								</Match>
-								<Match
-									when={
-										room.roomData.state === "Results" &&
-										room.roomData.voters.every(
-											(voter) => voter.selection === "N/A",
-										)
-									}
-								>
-									<td colspan="4">{intl.t("noVotes")}</td>
-								</Match>
-								<Match when={room.roomData.state === "Results"}>
-									<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
-								</Match>
-							</Switch>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-			{props.onVoterAction ? (
-				<Show when={optionConfirmation()} keyed>
-					{({ action, voter }) => (
-						<OptionConfirmationDialog
-							action={action}
-							voter={voter}
-							onConfirm={() => props.onVoterAction!(action, voter)}
-							onCancel={() => setOptionConfirmation(null)}
-						/>
-					)}
-				</Show>
-			) : null}
-		</>
+									{voter.confidence !== null
+										? ConfidenceEmojiMap[voter.confidence]
+										: "❓"}
+								</td>
+							</tr>
+						)}
+					</For>
+				</tbody>
+				<tfoot class="text-center border-t border-base-content border-opacity-20">
+					<tr>
+						<Switch>
+							<Match when={room.roomData.state === "Voting"}>
+								<td colspan="4">{intl.t("votingInProgress")}</td>
+							</Match>
+							<Match
+								when={
+									room.roomData.state === "Results" &&
+									room.roomData.voters.every(
+										(voter) => voter.selection === null,
+									)
+								}
+							>
+								<td colspan="4">
+									{intl.t(
+										room.roomData.voters.length > 0
+											? "waitingToStartVoting"
+											: "waitingForVoters",
+									)}
+								</td>
+							</Match>
+							<Match
+								when={
+									room.roomData.state === "Results" &&
+									room.roomData.voters.every(
+										(voter) => voter.selection === "N/A",
+									)
+								}
+							>
+								<td colspan="4">{intl.t("noVotes")}</td>
+							</Match>
+							<Match when={room.roomData.state === "Results"}>
+								<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
+							</Match>
+						</Switch>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
 	);
 };
 

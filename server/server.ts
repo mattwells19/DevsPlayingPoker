@@ -1,4 +1,7 @@
-import { opine, json, serveStatic } from "./deps.ts";
+// loads env variables
+import "https://deno.land/std@v0.168.0/dotenv/load.ts";
+
+import { opine, json, serveStatic } from "opine";
 import db from "./utils/db.ts";
 
 //Import routes

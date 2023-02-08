@@ -1,4 +1,4 @@
-import type { OpineRequest, OpineResponse } from "../deps.ts";
+import type { OpineRequest, OpineResponse } from "opine";
 import type { RoomSchema } from "../types/schemas.ts";
 import db from "../utils/db.ts";
 import generateRoomCode from "../utils/generateRoomCode.ts";

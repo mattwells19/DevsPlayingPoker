@@ -1,4 +1,4 @@
-import { Router } from "../deps.ts";
+import { Router } from "opine";
 import { handleWs } from "../controllers/socket.controller.ts";
 
 const router = Router();

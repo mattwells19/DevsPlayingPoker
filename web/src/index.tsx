@@ -14,7 +14,10 @@ const Index: Component = () => {
 		<IntlProvider locale="en">
 			<Router>
 				<App />
-				<Toaster position="top-center" toastOptions={{ className: "toast" }} />
+				<Toaster
+					position="top-center"
+					toastOptions={{ className: "toast-overrides" }}
+				/>
 			</Router>
 		</IntlProvider>
 	);

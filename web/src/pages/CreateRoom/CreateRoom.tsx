@@ -2,9 +2,7 @@ import { Component, createEffect, createSignal, Show } from "solid-js";
 import { useNavigate } from "solid-app-router";
 import RangeSlider from "./components/RangeSlider";
 import post from "@/utils/post";
-import Button from "@/components/Button";
 import Header from "@/components/Header";
-import styles from "./CreateRoom.module.scss";
 import {
 	getOptions,
 	getFormValues,
@@ -100,9 +98,9 @@ const CreateRoom: Component = () => {
 	return (
 		<>
 			<Header />
-			<main class={styles.createRoom}>
+			<main class="max-w-md m-auto">
 				<form
-					class={styles.createRoomForm}
+					class="flex flex-col gap-4"
 					ref={(el) => (formRef = el)}
 					onInput={(e) => handleChange(e.currentTarget)}
 					onSubmit={(e) => {
@@ -110,10 +108,10 @@ const CreateRoom: Component = () => {
 						handleSubmit(e.currentTarget);
 					}}
 				>
-					<div>
-						<label for="moderatorName">
+					<div class="form-control">
+						<label for="moderatorName" class="label justify-start">
 							{intl.t("yourName")}
-							<span class={styles.required}>*</span>
+							<span class="text-error ml-1">*</span>
 						</label>
 						<input
 							autofocus
@@ -124,23 +122,23 @@ const CreateRoom: Component = () => {
 							maxLength="10"
 							type="text"
 							value={defaults.name}
+							class="input input-bordered"
 						/>
 					</div>
 
-					<div class={styles.seperator}>
-						<hr />
-					</div>
+					<div class="divider" />
 
-					<div>
-						<label for="voterOptions">
+					<div class="form-control">
+						<label for="voterOptions" class="label justify-start">
 							{intl.t("voterOptions")}
-							<span class={styles.required}>*</span>
+							<span class="text-error ml-1">*</span>
 						</label>
 						<select
 							id="voterOptions"
 							name="voterOptions"
 							required
 							value={defaults.formValues.voterOptions}
+							class="select select-bordered"
 						>
 							<option value="fibonacci">{intl.t("fibonacci")}</option>
 							<option value="linear">{intl.t("linear")}</option>
@@ -162,49 +160,51 @@ const CreateRoom: Component = () => {
 							value={defaults.formValues.numberOfOptions ?? defaultRangeSelect}
 						/>
 
-						<fieldset>
-							<legend>{intl.t("includeNoVote")}</legend>
+						<fieldset class="form-control">
+							<legend class="label">{intl.t("includeNoVote")}</legend>
 
-							<label class={styles.radio}>
+							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="yes"
 									checked={defaults.formValues.noVote}
+									class="radio radio-sm radio-primary"
 								/>
 								{intl.t("yes")}
 							</label>
 
-							<label class={styles.radio}>
+							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="no"
 									checked={!defaults.formValues.noVote}
+									class="radio radio-sm radio-primary"
 								/>
 								{intl.t("no")}
 							</label>
 						</fieldset>
 					</Show>
 
-					<dl class={styles.finalPreview}>
-						<dt>{intl.t("finalPreview")}</dt>
-						<dd>{list}</dd>
+					<dl class="form-control">
+						<dt class="label">{intl.t("finalPreview")}</dt>
+						<dd class="pl-3">{list}</dd>
 					</dl>
 
-					<div class={styles.seperator}>
-						<hr />
-					</div>
+					<div class="divider after:display-none" />
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (
-							<p class={styles.error}>
+							<p class="text-error">
 								{intl.t("errorWithMsg", { msg: errorMsg })}
 							</p>
 						)}
 					</Show>
 
-					<Button type="submit">{intl.t("done")}</Button>
+					<button class="btn btn-primary" type="submit">
+						{intl.t("done")}
+					</button>
 				</form>
 			</main>
 		</>

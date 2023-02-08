@@ -29,7 +29,7 @@ export function importMessages(locale: SupportedLocale): Promise<IntlMessages> {
 
 // If we add any more defaults to the IntlConfig consider extracting to a separate file
 const defaultRichTextElements: IntlConfig["defaultRichTextElements"] = {
-	b: (chunks) => <b>{chunks}</b>,
+	b: (chunks) => <span class="font-bold">{chunks}</span>,
 };
 
 interface IntlContextValue {

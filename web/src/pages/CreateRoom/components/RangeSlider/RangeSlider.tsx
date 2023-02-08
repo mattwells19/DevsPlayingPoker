@@ -28,16 +28,24 @@ const RangeSlider: Component<RangeSliderProps> = (props) => {
 	return (
 		<div class={styles.slider} {...api().rootProps}>
 			<div>
-				<label {...api().labelProps}>{props.label}</label>
+				<label class="label" {...api().labelProps}>
+					{props.label}
+				</label>
 			</div>
 			<div {...api().controlProps}>
-				<div {...api().trackProps}>
-					<div {...api().rangeProps} />
+				<div class="bg-base-content bg-opacity-10" {...api().trackProps}>
+					<div class="bg-primary" {...api().rangeProps} />
 				</div>
-				<div {...api().getThumbProps(0)}>
+				<div
+					class="bg-white border-2 border-primary dark:bg-base-300"
+					{...api().getThumbProps(0)}
+				>
 					<input {...api().getHiddenInputProps(0)} />
 				</div>
-				<div {...api().getThumbProps(1)}>
+				<div
+					class="bg-white border-2 border-primary dark:bg-base-300"
+					{...api().getThumbProps(1)}
+				>
 					<input {...api().getHiddenInputProps(1)} />
 				</div>
 			</div>

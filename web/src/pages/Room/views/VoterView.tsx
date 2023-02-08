@@ -1,8 +1,7 @@
 import { Component, For, Match, Switch } from "solid-js";
 import OptionCard from "@/components/OptionCard";
-import VoterTable from "../../components/VoterTable";
-import styles from "./VoterView.module.scss";
-import { useRoom } from "../../RoomContext";
+import VoterTable from "../components/VoterTable";
+import { useRoom } from "../RoomContext";
 import { useIntl } from "@/i18n";
 
 interface VoterViewProps {}
@@ -16,7 +15,7 @@ const VoterView: Component<VoterViewProps> = () => {
 	return (
 		<Switch>
 			<Match when={room.roomData.state === "Results"}>
-				<p class={styles.infoText}>
+				<p class="font-semibold mb-4 whitespace-nowrap overflow-hidden text-ellipsis">
 					{intl.t("waitingForModerator", {
 						moderatorName: room.roomData.moderator?.name,
 					})}
@@ -25,7 +24,7 @@ const VoterView: Component<VoterViewProps> = () => {
 			</Match>
 			<Match when={room.roomData.state === "Voting"}>
 				<fieldset
-					class={styles.voterChoices}
+					class="flex flex-wrap gap-2 justify-center"
 					onchange={(e) => {
 						const selection = e.target.hasAttribute("value")
 							? (e.target as HTMLInputElement).value
@@ -38,7 +37,7 @@ const VoterView: Component<VoterViewProps> = () => {
 						});
 					}}
 				>
-					<legend>
+					<legend class="text-lg font-semibold mb-4 text-center w-full">
 						{currentVoter()?.selection !== null
 							? intl.t("optionSelected")
 							: intl.t("makeSelection")}

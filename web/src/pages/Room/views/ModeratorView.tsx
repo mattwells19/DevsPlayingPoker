@@ -4,11 +4,9 @@ import type {
 	ModeratorChangeEvent,
 	Voter,
 } from "@/shared-types";
-import Button from "@/components/Button";
-import VoterTable from "../../components/VoterTable";
-import styles from "./ModeratorView.module.scss";
-import type { VoterClickAction } from "../../components/VoterTable";
-import { useRoom } from "../../RoomContext";
+import VoterTable from "../components/VoterTable";
+import type { VoterClickAction } from "../components/VoterTable";
+import { useRoom } from "../RoomContext";
 import { useIntl } from "@/i18n";
 
 interface ModeratorViewProps {}
@@ -42,8 +40,8 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 		<>
 			<Switch>
 				<Match when={room.roomData.state === "Results"}>
-					<Button
-						class={styles.moderatorBtn}
+					<button
+						class="btn btn-primary w-full mb-4"
 						onClick={() => room.dispatchEvent({ event: "StartVoting" })}
 						disabled={room.roomData.voters.length === 0}
 					>
@@ -52,15 +50,15 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 								? "resetAndStartVoting"
 								: "startVoting",
 						)}
-					</Button>
+					</button>
 				</Match>
 				<Match when={room.roomData.state === "Voting"}>
-					<Button
-						class={styles.moderatorBtn}
+					<button
+						class="btn btn-primary w-full mb-4"
 						onClick={() => room.dispatchEvent({ event: "StopVoting" })}
 					>
 						{intl.t("stopVoting")}
-					</Button>
+					</button>
 				</Match>
 			</Switch>
 			<VoterTable onVoterAction={handleVoterAction} />

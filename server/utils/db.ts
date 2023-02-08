@@ -1,4 +1,4 @@
-import { Collection, Database, IndexOptions, MongoClient } from "../deps.ts";
+import { Collection, Database, IndexOptions, MongoClient } from "mongo";
 import type { RoomSchema } from "../types/schemas.ts";
 
 const RoomCodeIndex: IndexOptions = {

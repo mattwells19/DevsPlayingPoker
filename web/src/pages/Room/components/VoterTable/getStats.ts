@@ -1,6 +1,6 @@
 import { useIntl } from "@/i18n";
 import type { ConfidenceValue, Voter } from "@/shared-types";
-import type { MetricProps } from "../Metric";
+import type { MetricProps } from "./components/Metric";
 import { ConfidenceEmojiMap, ConfidenceTextMap } from "./VoterTable";
 
 export default function getStats(voters: Array<Voter>): Array<MetricProps> {

@@ -1,42 +1,40 @@
-.optionContainer {
-	position: relative;
+label.option {
+	cursor: pointer;
 
-	label {
-		position: relative;
-
-		text {
-			fill: var(--primary-text-color);
-		}
-
-		rect:first-of-type {
-			fill: var(--elevated-background);
-		}
-
-		rect:last-of-type {
-			stroke: var(--border-gray);
-			stroke-opacity: 0.25;
-			stroke-width: 3;
-		}
-
-		&:hover rect:last-of-type,
-		&:focus rect:last-of-type {
-			stroke: var(--primary-orange);
-			stroke-opacity: 1;
-		}
+	&:hover rect.faceLayer {
+		stroke: hsl(var(--p));
+		stroke-opacity: 1;
 	}
 
-	input:checked + label rect:last-of-type {
-		fill: var(--primary-orange);
-		fill-opacity: 0.1;
-
-		stroke: var(--primary-orange);
+	input:focus-visible + span rect.faceLayer {
+		stroke: hsl(var(--p));
 		stroke-opacity: 1;
+		stroke-dasharray: 5;
+	}
+
+	rect.faceLayer {
+		stroke: hsl(var(--bc));
+		stroke-opacity: 0.1;
+		stroke-width: 3;
+	}
+
+	input:checked + span rect.faceLayer {
+		stroke: hsl(var(--p));
+		stroke-opacity: 1;
+		fill: hsl(var(--p));
+		fill-opacity: 0.1;
 	}
 
 	input {
 		appearance: none;
+		border: 0px;
+		clip: rect(0px, 0px, 0px, 0px);
+		height: 1px;
+		width: 1px;
+		margin: -1px;
+		padding: 0px;
+		overflow: hidden;
+		white-space: nowrap;
 		position: absolute;
-		opacity: 0;
-		inset: 0;
 	}
 }
