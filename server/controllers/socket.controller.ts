@@ -14,7 +14,7 @@ import type {
 	ChangeNameEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
-import { zod } from "../deps.ts";
+import { z as zod } from "zod";
 import * as rooms from "../models/rooms.ts";
 
 const sockets = new Map<string, WebSocket>();

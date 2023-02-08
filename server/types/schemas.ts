@@ -1,4 +1,4 @@
-import { ObjectId } from "../deps.ts";
+import { ObjectId } from "mongo";
 
 export interface User {
 	id: string;

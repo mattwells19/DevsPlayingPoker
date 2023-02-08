@@ -1,4 +1,4 @@
-import type { NextFunction, OpineRequest, OpineResponse } from "../deps.ts";
+import type { NextFunction, OpineRequest, OpineResponse } from "opine";
 
 const rateLimitMap = new Map<string, Array<number>>();
 

@@ -1,4 +1,4 @@
-import { Router } from "../deps.ts";
+import { Router } from "opine";
 import { createRoom, checkRoomExists } from "../controllers/room.controller.ts";
 import {
 	validateNewRoom,

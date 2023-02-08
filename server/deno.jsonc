@@ -1,4 +1,9 @@
 {
+	"imports": {
+		"opine": "https://deno.land/x/opine@2.2.0/mod.ts",
+		"mongo": "https://deno.land/x/mongo@v0.30.1/mod.ts",
+		"zod": "https://deno.land/x/zod@v3.20.2/mod.ts"
+	},
 	"lint": {
 		"files": {
 			"exclude": ["www/"]
@@ -6,6 +11,7 @@
 	},
 	"lock": false,
 	"tasks": {
-		"run": "deno run --allow-net --allow-read --allow-env server.ts"
+		"run": "deno run --watch --allow-net --allow-read --allow-env server.ts",
+		"run:deploy": "deno run --allow-net --allow-read --allow-env server.ts"
 	}
 }

@@ -1,4 +1,4 @@
-import { ObjectId, UpdateFilter } from "../deps.ts";
+import { ObjectId, UpdateFilter } from "mongo";
 import type { RoomSchema } from "../types/schemas.ts";
 import db from "../utils/db.ts";
 

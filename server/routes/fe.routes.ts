@@ -1,4 +1,4 @@
-import { Router } from "../deps.ts";
+import { Router } from "opine";
 
 const router = Router();
 
