@@ -3,7 +3,7 @@
 	"short_name": "DPP",
 	"start_url": "/",
 	"display": "standalone",
-	"background_color": "#fafafa",
+	"background_color": "#edf2f4",
 	"theme_color": "#f48241",
 	"scope": ".",
 	"description": "A simple and fast tool to help your scrum team effort tickets as quickly as possible.",
