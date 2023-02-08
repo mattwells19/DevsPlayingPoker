@@ -51,3 +51,4 @@ jobs:
           project: "devs-playing-poker"
           root: server
           entrypoint: "./server.ts"
+          import-map: deno.jsonc
