@@ -17,7 +17,7 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 
 	return (
 		<>
-			<header class={mergeClassNames("navbar w-full", props.class)}>
+			<header class={mergeClassNames("navbar p-0 min-h-0", props.class)}>
 				<div class="navbar-start">
 					<Show when={location.pathname !== "/"}>
 						<Link href="/">
