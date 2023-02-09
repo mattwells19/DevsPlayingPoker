@@ -1,58 +1,80 @@
-import type { Component } from "solid-js";
+import { Component, For } from "solid-js";
+import { Portal } from "solid-js/web";
 import type { Voter } from "@/shared-types";
 import { useIntl } from "@/i18n";
-import OptionConfirmationDialog from "./OptionConfirmationDialog";
 
-export type VoterClickAction = "makeModerator" | "kickVoter";
+const voterActionOptions = ["makeModerator", "kickVoter"] as const;
+export type VoterClickAction = (typeof voterActionOptions)[number];
 
-interface VoterOptionsMenuProps {
+interface VoterOptionsMenuItemProps {
+	action: VoterClickAction;
 	voter: Voter;
-	onOptionSelect: (action: VoterClickAction, voter: Voter) => void;
+	onConfirmAction: () => void;
 }
 
-const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
+const VoterOptionsMenuItem: Component<VoterOptionsMenuItemProps> = (props) => {
 	const intl = useIntl();
+	const menuItemId = () => `confirmation-${props.voter.id}-${props.action}`;
 
 	return (
 		<>
-			<div class="dropdown dropdown-right">
-				<button class="w-full overflow-hidden text-ellipsis text-left underline">
-					{props.voter.name}
-				</button>
-				<ul class="menu bg-slate-100 dark:bg-base-100 rounded-md shadow-lg dropdown-content">
-					<li class="flex gap-1 transition-colors">
-						<label
-							tabIndex="0"
-							for={`confirmation-${props.voter.id}-makeModerator`}
-						>
-							<span aria-hidden="true">👑</span>
-							{intl.t("makeModerator")}
-						</label>
-					</li>
-					<li class="flex gap-1 transition-colors">
-						<label
-							tabIndex="0"
-							for={`confirmation-${props.voter.id}-kickVoter`}
-						>
-							<span aria-hidden="true">🥾</span>
-							{intl.t("kickVoter")}
-						</label>
-					</li>
-				</ul>
-			</div>
-			<OptionConfirmationDialog
-				id={`confirmation-${props.voter.id}-makeModerator`}
-				title={intl.t("makeModerator")}
-				description={intl.t("makeModeratorDesc", { name: props.voter.name })}
-				onConfirm={() => props.onOptionSelect("makeModerator", props.voter)}
-			/>
-			<OptionConfirmationDialog
-				id={`confirmation-${props.voter.id}-kickVoter`}
-				title={intl.t("kickVoter")}
-				description={intl.t("kickVoterDesc", { name: props.voter.name })}
-				onConfirm={() => props.onOptionSelect("kickVoter", props.voter)}
-			/>
+			<li class="flex gap-1 transition-colors">
+				<label tabIndex="0" for={menuItemId()}>
+					<span aria-hidden="true">👑</span>
+					{intl.t(props.action)}
+				</label>
+			</li>
+			<Portal>
+				<input type="checkbox" id={menuItemId()} class="modal-toggle" />
+				<label for={menuItemId()} class="modal cursor-pointer">
+					{/* empty label prevents the background label from being triggered when clicking the modal content */}
+					<label for="" class="modal-box">
+						<h2 class="font-bold text-lg">{intl.t(props.action)}</h2>
+						<p class="py-4">
+							{intl.t(`${props.action}Desc`, { name: props.voter.name })}
+						</p>
+						<div role="group" class="modal-action">
+							<button
+								class="btn btn-primary"
+								onClick={props.onConfirmAction}
+								type="button"
+							>
+								{intl.t("confirm")}
+							</button>
+							<label for={menuItemId()} class="btn btn-ghost">
+								{intl.t("cancel")}
+							</label>
+						</div>
+					</label>
+				</label>
+			</Portal>
 		</>
+	);
+};
+
+interface VoterOptionsMenuProps {
+	voter: Voter;
+	onOptionSelect: (action: VoterClickAction) => void;
+}
+
+const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
+	return (
+		<div class="dropdown dropdown-right">
+			<button class="w-full overflow-hidden text-ellipsis text-left underline">
+				{props.voter.name}
+			</button>
+			<ul class="menu bg-slate-100 dark:bg-base-100 rounded-md shadow-lg dropdown-content">
+				<For each={voterActionOptions}>
+					{(action) => (
+						<VoterOptionsMenuItem
+							action={action}
+							voter={props.voter}
+							onConfirmAction={() => props.onOptionSelect(action)}
+						/>
+					)}
+				</For>
+			</ul>
+		</div>
 	);
 };
 

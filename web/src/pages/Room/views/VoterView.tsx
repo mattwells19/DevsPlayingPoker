@@ -1,8 +1,8 @@
 import { Component, For, Match, Switch } from "solid-js";
-import OptionCard from "@/components/OptionCard";
+import { useIntl } from "@/i18n";
+import OptionCard from "../components/OptionCard";
 import VoterTable from "../components/VoterTable";
 import { useRoom } from "../RoomContext";
-import { useIntl } from "@/i18n";
 
 interface VoterViewProps {}
 

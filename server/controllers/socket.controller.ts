@@ -98,13 +98,13 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 	if (!data.name || data.name.length === 0) {
 		return {
-			message: `Invalid name. Expected a name with length between 1 and 10, but got: '${data.name}'.`,
+			message: `Invalid name. Expected a name with length between 1 and 20, but got: '${data.name}'.`,
 		};
 	}
 
 	const cleansedName = (() => {
-		// max name length of 10 characters (not including potential name counter)
-		const trimmedName = data.name.trim().substring(0, 10);
+		// max name length of 20 characters (not including potential name counter)
+		const trimmedName = data.name.trim().substring(0, 20);
 
 		const allPeopleInRoom = [
 			roomData.moderator?.name,
@@ -342,8 +342,8 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 const votingDescSchema = zod
 	.string()
 	.trim()
-	.max(300)
-	.refine((val) => val.split("\n").length - 1 < 6);
+	.max(1000)
+	.refine((val) => val.split("\n").length - 1 < 10);
 
 const handleVotingDescription: EventFunction<VotingDescriptionEvent> = async (
 	roomData,

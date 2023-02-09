@@ -6,8 +6,8 @@ import { useIntl } from "@/i18n";
 const votingDescSchema = zod
 	.string()
 	.trim()
-	.max(300)
-	.refine((val) => val.split("\n").length - 1 < 6);
+	.max(1000)
+	.refine((val) => val.split("\n").length - 1 < 10);
 
 const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 	const intl = useIntl();
