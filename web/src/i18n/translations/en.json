@@ -14,7 +14,7 @@
 	"name": "Name",
 	"done": "Done",
 	"enterAName": "Please enter a name.",
-	"nameTooLong": "Name too long. Must be no more than 10 characters.",
+	"nameTooLong": "Name too long. Must be no more than 20 characters.",
 
 	"_CREATE_ROOM_": "",
 	"yourName": "Your name",
@@ -30,12 +30,16 @@
 	"errorWithMsg": "Error: {msg}",
 
 	"_ROOM_": "",
-	"connecting": "Connecting...",
+	"connectingToRoom": "Connecting...",
 	"checkingRoom": "Checking room...",
 	"copyCode": "Click to copy code.",
 	"thatRoomDoesntExist": "Room with code <b>{roomCode}</b> does not exist.",
 	"youWereKicked": "You were kicked.",
 	"nameUpdated": "Name updated.",
+	"connected": "Connected",
+	"connecting": "Connecting",
+	"disconnected": "Disconnected",
+	"manualReset": "Manually reset connection",
 
 	"_ROOM_VOTER_VIEW_": "",
 	"waitingForModerator": "Waiting for {moderatorName}...",
@@ -74,7 +78,7 @@
 
 	"_ROOM_VOTING_DESCRIPTION_": "",
 	"votingDesc": "Description of what the room is voting on.",
-	"votingDescHelperText": "No more than 300 characters and no more than 6 lines.",
+	"votingDescHelperText": "No more than 1k characters and no more than 10 lines.",
 	"update": "Update",
 	"whatWereVotingOn": "What we're voting on",
 	"edit": "Edit",

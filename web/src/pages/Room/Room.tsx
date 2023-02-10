@@ -1,5 +1,6 @@
 import { Navigate, useNavigate, useParams } from "solid-app-router";
 import {
+	batch,
 	Component,
 	createEffect,
 	createSignal,
@@ -19,6 +20,7 @@ import {
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
+import Icon from "@/components/Icon";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -72,6 +74,9 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
 	const navigate = useNavigate();
 	const savedUserId = sessionStorage.getItem("userId");
+	const [connStatus, setConnStatus] = createSignal<
+		"connecting" | "connected" | "disconnected"
+	>("connecting");
 
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
@@ -109,6 +114,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 		});
 
 		ws().addEventListener("open", () => {
+			setConnStatus("connecting");
 			const joinEvent: JoinEvent = {
 				event: "Join",
 				name: props.userName,
@@ -143,7 +149,11 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 					if (data.userId !== savedUserId) {
 						sessionStorage.setItem("userId", data.userId);
 					}
-					setRoomDetails({ currentUserId: data.userId });
+
+					batch(() => {
+						setConnStatus("connected");
+						setRoomDetails({ currentUserId: data.userId });
+					});
 					break;
 				}
 				case "Kicked":
@@ -156,6 +166,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 		});
 
 		ws().addEventListener("close", (closeEvent) => {
+			setConnStatus("disconnected");
 			// 1000 means closed normally
 			if (closeEvent.code !== 1000) {
 				setWs(new WebSocket(wsUrl()));
@@ -180,6 +191,20 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 
 	return (
 		<main class="max-w-[30rem] m-auto">
+			<button
+				type="button"
+				class="badge uppercase"
+				classList={{
+					"badge-success": connStatus() === "connected",
+					"badge-warning": connStatus() === "connecting",
+					"badge-error": connStatus() === "disconnected",
+				}}
+				onClick={() => ws().close(3003, "Manual reset.")}
+				title={intl.t("manualReset") as string}
+			>
+				{intl.t(connStatus())}
+				<Icon name="refresh" boxSize="14" class="ml-1" />
+			</button>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
 				<Show

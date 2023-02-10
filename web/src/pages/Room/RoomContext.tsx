@@ -29,7 +29,7 @@ export const RoomContextProvider: ParentComponent<RoomContextProviderProps> = (
 	return (
 		<RoomContext.Provider value={props.roomDetails}>
 			<Show
-				fallback={<p>{intl.t("connecting")}</p>}
+				fallback={<p>{intl.t("connectingToRoom")}</p>}
 				when={
 					props.roomDetails.currentUserId &&
 					props.roomDetails.roomData &&
