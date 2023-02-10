@@ -8,7 +8,11 @@ import {
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
+import type {
+	JoinEvent,
+	RoomSchema,
+	WebSocketTriggeredEvent,
+} from "@/shared-types";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
@@ -135,6 +139,16 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 
 			switch (data.event) {
 				case "RoomUpdate":
+					if (
+						// TODO: why is this type wrong?
+						(data.roomData as RoomSchema).voters.every(
+							(voter) => voter.id !== savedUserId(),
+						)
+					) {
+						// TODO: need to test
+						ws().close(3004, "Connected, but not in room.");
+					}
+
 					setRoomDetails({
 						roomData: data.roomData,
 						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
