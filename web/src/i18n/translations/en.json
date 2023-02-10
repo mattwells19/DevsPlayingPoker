@@ -39,7 +39,7 @@
 	"connected": "Connected",
 	"connecting": "Connecting",
 	"disconnected": "Disconnected",
-	"manualReset": "Manually reset connection",
+	"manualReset": "Reset connection to the room",
 
 	"_ROOM_VOTER_VIEW_": "",
 	"waitingForModerator": "Waiting for {moderatorName}...",

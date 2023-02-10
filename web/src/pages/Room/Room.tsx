@@ -73,15 +73,17 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
 	const navigate = useNavigate();
-	const savedUserId = sessionStorage.getItem("userId");
+	const [savedUserId, setSavedUserId] = createSignal<string | null>(
+		sessionStorage.getItem("userId"),
+	);
 	const [connStatus, setConnStatus] = createSignal<
 		"connecting" | "connected" | "disconnected"
 	>("connecting");
 
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
-		if (savedUserId) {
-			wsUrl.searchParams.set("userId", savedUserId);
+		if (savedUserId()) {
+			wsUrl.searchParams.set("userId", savedUserId()!);
 		}
 		return wsUrl;
 	};
@@ -146,12 +148,13 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 						return navigate("/");
 					}
 
-					if (data.userId !== savedUserId) {
+					if (data.userId !== savedUserId()) {
 						sessionStorage.setItem("userId", data.userId);
 					}
 
 					batch(() => {
 						setConnStatus("connected");
+						setSavedUserId(data.userId);
 						setRoomDetails({ currentUserId: data.userId });
 					});
 					break;
