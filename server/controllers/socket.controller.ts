@@ -124,17 +124,17 @@ type EventFunction<Event extends WebScoketMessageEvent> = (
  */
 const handleJoin: EventFunction<JoinEvent> = async (
 	roomData,
-	{ userId, userAlreadyExists },
+	{ userId },
 	data,
 ) => {
+	// check if the user already exists in the room
 	const userIdExists = (() => {
 		if (roomData.moderator?.id === userId) return true;
 		return roomData.voters.some((voter) => voter.id === userId);
 	})();
 
-	// userAlreadyExists checks if the socket exists
-	// userIdExists checks if the user already exists in the room if the socket did not exist
-	if (userAlreadyExists || userIdExists) {
+	// if they're already in the room, no need to add them again just send an update
+	if (userIdExists) {
 		const socket = sockets.get(getSocketId(userId, roomData.roomCode));
 		const roomUpdateEvent: RoomUpdateEvent = {
 			event: "RoomUpdate",
