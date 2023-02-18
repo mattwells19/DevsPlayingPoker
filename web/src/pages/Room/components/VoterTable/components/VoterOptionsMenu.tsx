@@ -61,9 +61,12 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 
 	return (
 		<div class="dropdown dropdown-right">
-			<button class="w-full overflow-hidden text-ellipsis text-left underline">
+			<label
+				tabIndex="0"
+				class="w-full overflow-hidden text-ellipsis text-left underline cursor-pointer"
+			>
 				{props.voter.name}
-			</button>
+			</label>
 			<ul class="menu bg-slate-100 dark:bg-base-100 rounded-md shadow-lg dropdown-content">
 				<VoterOptionsMenuItem
 					icon="👑"
