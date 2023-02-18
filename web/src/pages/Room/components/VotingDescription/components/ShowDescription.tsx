@@ -30,7 +30,11 @@ function formatStringWithUrl(str: string): JSXElement {
 	);
 }
 
-const ShowDescription: Component<{ onStartEditing: () => void }> = (props) => {
+interface ShowDescriptionProps {
+	onStartEditing: () => void;
+}
+
+const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
 

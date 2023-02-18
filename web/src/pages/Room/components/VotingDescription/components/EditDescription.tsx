@@ -9,7 +9,11 @@ const votingDescSchema = zod
 	.max(1000)
 	.refine((val) => val.split("\n").length - 1 < 10);
 
-const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
+interface EditDescriptionProps {
+	onStopEditing: () => void;
+}
+
+const EditDescription: Component<EditDescriptionProps> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
 	let textareaRef: HTMLTextAreaElement | null = null;
@@ -49,7 +53,7 @@ const EditDescription: Component<{ onStopEditing: () => void }> = (props) => {
 				name="votingDesc"
 				class="textarea textarea-bordered"
 				rows="3"
-				maxLength="300"
+				maxLength="1000"
 				autofocus
 				ref={(el) => (textareaRef = el)}
 				aria-describedby="votingDesc-helper-text"
