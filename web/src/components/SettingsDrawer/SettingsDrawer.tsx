@@ -108,7 +108,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 										setErrorMsg("enterAName");
 										return;
 									}
-									if (name.length > 10) {
+									if (name.length > 20) {
 										setErrorMsg("nameTooLong");
 										return;
 									}
@@ -127,7 +127,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 										type="text"
 										required
 										minLength="1"
-										maxLength="10"
+										maxLength="20"
 										autofocus
 										value={localStorage.getItem("name") ?? ""}
 										onInput={() => setErrorMsg(null)}

@@ -37,7 +37,7 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	}
 	const roomUpdateEvent: RoomUpdateEvent = {
 		event: "RoomUpdate",
-		roomData: roomData,
+		roomData,
 	};
 
 	if (roomData.moderator) {
@@ -59,6 +59,42 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 			voterSock.send(JSON.stringify(roomUpdateEvent));
 		}
 	}
+};
+
+/**
+ * Prevents duplicate names and enforces max name length
+ * @param origName The name to be cleansed
+ * @param roomData The room data to check for duplicate names
+ * @returns The cleansed name
+ */
+const cleanseName = (origName: string, roomData: RoomSchema) => {
+	// max name length of 20 characters (not including potential name counter)
+	const trimmedName = origName.trim().substring(0, 20);
+
+	const allPeopleInRoom = [
+		roomData.moderator?.name,
+		...roomData.voters.map((voter) => voter.name),
+	];
+
+	const isNameAlreadyUsed = (nameToCheck: string) =>
+		allPeopleInRoom.some(
+			(personInRoom) =>
+				personInRoom?.toLowerCase().localeCompare(nameToCheck.toLowerCase()) ===
+				0,
+		);
+
+	let cnt = 1;
+	let newUserName = trimmedName;
+	while (isNameAlreadyUsed(newUserName)) {
+		if (cnt === 10) {
+			throw new Error("Too many duplicate names. Suspected bad behavior.");
+		}
+
+		newUserName = trimmedName + ` (${cnt})`;
+		cnt++;
+	}
+
+	return newUserName;
 };
 
 /**
@@ -88,50 +124,34 @@ type EventFunction<Event extends WebScoketMessageEvent> = (
  */
 const handleJoin: EventFunction<JoinEvent> = async (
 	roomData,
-	{ userId, userAlreadyExists },
+	{ userId },
 	data,
 ) => {
-	if (userAlreadyExists) {
-		sendRoomData(roomData);
+	// check if the user already exists in the room
+	const userIdExists = (() => {
+		if (roomData.moderator?.id === userId) return true;
+		return roomData.voters.some((voter) => voter.id === userId);
+	})();
+
+	// if they're already in the room, no need to add them again just send an update
+	if (userIdExists) {
+		const socket = sockets.get(getSocketId(userId, roomData.roomCode));
+		const roomUpdateEvent: RoomUpdateEvent = {
+			event: "RoomUpdate",
+			roomData,
+		};
+
+		socket?.send(JSON.stringify(roomUpdateEvent));
 		return;
 	}
 
 	if (!data.name || data.name.length === 0) {
 		return {
-			message: `Invalid name. Expected a name with length between 1 and 10, but got: '${data.name}'.`,
+			message: `Invalid name. Expected a name with length between 1 and 20, but got: '${data.name}'.`,
 		};
 	}
 
-	const cleansedName = (() => {
-		// max name length of 10 characters (not including potential name counter)
-		const trimmedName = data.name.trim().substring(0, 10);
-
-		const allPeopleInRoom = [
-			roomData.moderator?.name,
-			...roomData.voters.map((voter) => voter.name),
-		];
-
-		const isNameAlreadyUsed = (nameToCheck: string) =>
-			allPeopleInRoom.some(
-				(personInRoom) =>
-					personInRoom
-						?.toLowerCase()
-						.localeCompare(nameToCheck.toLowerCase()) === 0,
-			);
-
-		let cnt = 1;
-		let newUserName = trimmedName;
-		while (isNameAlreadyUsed(newUserName)) {
-			if (cnt === 10) {
-				throw new Error("Too many duplicate names. Suspected bad behavior.");
-			}
-
-			newUserName = trimmedName + ` (${cnt})`;
-			cnt++;
-		}
-
-		return newUserName;
-	})();
+	const cleansedName = cleanseName(data.name, roomData);
 
 	const isModerator = !roomData.moderator;
 
@@ -342,8 +362,8 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 const votingDescSchema = zod
 	.string()
 	.trim()
-	.max(300)
-	.refine((val) => val.split("\n").length - 1 < 6);
+	.max(1000)
+	.refine((val) => val.split("\n").length - 1 < 10);
 
 const handleVotingDescription: EventFunction<VotingDescriptionEvent> = async (
 	roomData,
@@ -369,13 +389,21 @@ const handleChangeName: EventFunction<ChangeNameEvent> = async (
 	{ userId },
 	data,
 ) => {
+	if (!data.value || data.value.length === 0) {
+		return {
+			message: `Invalid name. Expected a name with length between 1 and 20, but got: '${data.value}'.`,
+		};
+	}
+
+	const cleansedName = cleanseName(data.value, roomData);
+
 	const updatedRoomData = await (() => {
 		if (roomData.moderator?.id === userId) {
 			return rooms.updateById(roomData._id, {
 				$set: {
 					moderator: {
 						...roomData.moderator,
-						name: data.value,
+						name: cleansedName,
 					},
 				},
 			});
@@ -384,7 +412,7 @@ const handleChangeName: EventFunction<ChangeNameEvent> = async (
 				if (voter.id === userId) {
 					return {
 						...voter,
-						name: data.value,
+						name: cleansedName,
 					};
 				}
 				return voter;

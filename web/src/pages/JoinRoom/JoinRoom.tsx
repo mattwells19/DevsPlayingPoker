@@ -18,7 +18,7 @@ const JoinRoom: Component = () => {
 			setErrorMsg("enterAName");
 			return;
 		}
-		if (name.length > 10) {
+		if (name.length > 20) {
 			setErrorMsg("nameTooLong");
 			return;
 		}
@@ -52,7 +52,7 @@ const JoinRoom: Component = () => {
 							class="input input-bordered"
 							required
 							minLength="1"
-							maxLength="10"
+							maxLength="20"
 							autofocus
 							value={localStorage.getItem("name") ?? ""}
 							onInput={() => setErrorMsg(null)}

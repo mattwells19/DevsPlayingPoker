@@ -56,7 +56,9 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 									{props.onVoterAction ? (
 										<VoterOptionsMenu
 											voter={voter}
-											onOptionSelect={props.onVoterAction}
+											onOptionSelect={(action) => {
+												props.onVoterAction!(action, voter);
+											}}
 										/>
 									) : (
 										<p class="text-ellipsis overflow-hidden max-w-full">

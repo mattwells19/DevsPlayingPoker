@@ -1,7 +1,7 @@
 import { Component, Show } from "solid-js";
 import type { RoomSchema } from "@/shared-types";
 import styles from "./OptionCard.module.scss";
-import Icon from "../Icon";
+import Icon from "@/components/Icon";
 
 interface OptionCardProps {
 	value: RoomSchema["options"][0];
