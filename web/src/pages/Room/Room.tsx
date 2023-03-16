@@ -121,11 +121,6 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 
 		ws().addEventListener("open", () => {
 			setConnStatus("connecting");
-			const joinEvent: JoinEvent = {
-				event: "Join",
-				name: props.userName,
-			};
-			ws().send(JSON.stringify(joinEvent));
 		});
 
 		ws().addEventListener("message", (messageEvent) => {
@@ -138,31 +133,6 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
-				case "RoomUpdate": {
-					/**
-					 * There's an edge case when someone rejoins so they're WS is connected but they
-					 * weren't properly added to the room. If the userId isn't found in an update try
-					 * to rejoin
-					 */
-					const eventRoomData: RoomSchema = data.roomData;
-					if (
-						eventRoomData.moderator?.id !== savedUserId() &&
-						eventRoomData.voters.every((voter) => voter.id !== savedUserId())
-					) {
-						setConnStatus("connecting");
-						const joinEvent: JoinEvent = {
-							event: "Join",
-							name: props.userName,
-						};
-						ws().send(JSON.stringify(joinEvent));
-					}
-
-					setRoomDetails({
-						roomData: eventRoomData,
-						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
-					});
-					break;
-				}
 				case "Connected": {
 					if (!data.roomExists) {
 						toast.error(
@@ -175,10 +145,23 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 						sessionStorage.setItem("userId", data.userId);
 					}
 
+					const joinEvent: JoinEvent = {
+						event: "Join",
+						name: props.userName,
+					};
+					ws().send(JSON.stringify(joinEvent));
+
 					batch(() => {
 						setConnStatus("connected");
 						setSavedUserId(data.userId);
 						setRoomDetails({ currentUserId: data.userId });
+					});
+					break;
+				}
+				case "RoomUpdate": {
+					setRoomDetails({
+						roomData: data.roomData,
+						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
 				}
