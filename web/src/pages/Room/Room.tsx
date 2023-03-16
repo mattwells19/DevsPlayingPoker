@@ -71,6 +71,7 @@ interface RoomContentProps {
 	userName: string;
 }
 
+// 🐧 Picking the right protocol
 const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
 const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 
@@ -84,6 +85,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 		"connecting" | "connected" | "disconnected"
 	>("connecting");
 
+	// 🐧 Add context for the WS connection
 	const wsUrl = () => {
 		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
 		if (savedUserId()) {
@@ -94,12 +96,15 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 
 	const [roomDetails, setRoomDetails] =
 		createStore<RoomDetails>(defaultRoomDetails);
+
+	// 🐧 Open the WS connection
 	const [ws, setWs] = createSignal<WebSocket>(new WebSocket(wsUrl()));
 
 	createEffect(() => {
 		let lastResponseTimestamp: number | null = null;
 		let ponged = true;
 
+		// 🐧 Play some table tennis
 		const pingInterval = setInterval(() => {
 			if (
 				!lastResponseTimestamp ||
@@ -121,13 +126,9 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 
 		ws().addEventListener("open", () => {
 			setConnStatus("connecting");
-			const joinEvent: JoinEvent = {
-				event: "Join",
-				name: props.userName,
-			};
-			ws().send(JSON.stringify(joinEvent));
 		});
 
+		// 🐧 Handle incoming messages from the server
 		ws().addEventListener("message", (messageEvent) => {
 			lastResponseTimestamp = Date.now();
 			if (messageEvent.data === "PONG") {
@@ -138,31 +139,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
 
 			switch (data.event) {
-				case "RoomUpdate": {
-					/**
-					 * There's an edge case when someone rejoins so they're WS is connected but they
-					 * weren't properly added to the room. If the userId isn't found in an update try
-					 * to rejoin
-					 */
-					const eventRoomData: RoomSchema = data.roomData;
-					if (
-						eventRoomData.moderator?.id !== savedUserId() &&
-						eventRoomData.voters.every((voter) => voter.id !== savedUserId())
-					) {
-						setConnStatus("connecting");
-						const joinEvent: JoinEvent = {
-							event: "Join",
-							name: props.userName,
-						};
-						ws().send(JSON.stringify(joinEvent));
-					}
-
-					setRoomDetails({
-						roomData: eventRoomData,
-						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
-					});
-					break;
-				}
+				// 🐧 Step 1: Server initiates the handshake on successful connection a CONNECTED event to start the handshake
 				case "Connected": {
 					if (!data.roomExists) {
 						toast.error(
@@ -175,10 +152,25 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 						sessionStorage.setItem("userId", data.userId);
 					}
 
+					// 🐧 Step 2: Now that we know the room is open we respond with a JOIN event to actually add the user to the room
+					const joinEvent: JoinEvent = {
+						event: "Join",
+						name: props.userName,
+					};
+					ws().send(JSON.stringify(joinEvent));
+
 					batch(() => {
 						setConnStatus("connected");
 						setSavedUserId(data.userId);
 						setRoomDetails({ currentUserId: data.userId });
+					});
+					break;
+				}
+				case "RoomUpdate": {
+					// 🐧 Step 3: Server responds to our JOIN event with a broadcast to everyone in the room with the updated room details
+					setRoomDetails({
+						roomData: data.roomData,
+						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
 				}

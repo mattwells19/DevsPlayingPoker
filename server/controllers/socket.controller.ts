@@ -491,6 +491,8 @@ export const handleWs = (
 	userId: string,
 	roomCode: string,
 ) => {
+	// Socket ID is the user ID + the room code.
+	// If the same user joins a different room you get a new connection
 	const socketId = getSocketId(userId, roomCode);
 
 	const prevUserSocket = sockets.get(socketId);
