@@ -1,6 +1,12 @@
 import { Component, JSX, splitProps } from "solid-js";
 
-type IconName = "settings-cog" | "no-vote" | "save" | "caret-down" | "refresh";
+type IconName =
+	| "settings-cog"
+	| "no-vote"
+	| "save"
+	| "caret-down"
+	| "refresh"
+	| "github";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;

@@ -30,6 +30,14 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 				</div>
 				<div class="navbar-center">{componentProps.children}</div>
 				<div class="navbar-end">
+					<a
+						href="https://github.com/lvl-mattwells/DevsPlayingPoker"
+						target="_blank"
+						class="btn btn-ghost btn-square"
+						title="View the source code on Github."
+					>
+						<Icon name="github" boxSize="24" fill="currentColor" />
+					</a>
 					<button
 						type="button"
 						onClick={[setDrawerOpen, true]}

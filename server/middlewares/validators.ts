@@ -41,3 +41,34 @@ export function validateNewRoom(
 
 	next();
 }
+
+export function validateWSOrigin(
+	req: OpineRequest,
+	res: OpineResponse,
+	next: NextFunction,
+) {
+	const origin = req.headers.get("origin");
+	const env = Deno.env.get("ENV") ?? "";
+
+	const isAllowedOrigin = (() => {
+		switch (env) {
+			case "dev":
+				return origin === "http://localhost:5000";
+			case "staging":
+				return (
+					origin.startsWith("https://devs-playing-poker-") &&
+					origin.endsWith(".deno.dev")
+				);
+			case "prod":
+				return origin === "https://devsplayingpoker.com";
+			default:
+				return false;
+		}
+	})();
+
+	if (!isAllowedOrigin) {
+		return res.setStatus(400).end();
+	}
+
+	next();
+}
