@@ -47,21 +47,24 @@ export function validateWSOrigin(
 	res: OpineResponse,
 	next: NextFunction,
 ) {
-	const origin = req.headers.get("origin");
+	const { protocol } = req;
+	const origin = req.get("origin");
 	const env = Deno.env.get("ENV") ?? "";
 
 	const isAllowedOrigin = (() => {
 		switch (env) {
 			case "dev":
-				return origin === "http://localhost:5000";
+				return origin === "http://localhost:5000" && protocol === "http";
 			case "staging":
 				return (
-					origin === "https://devs-playing-poker.deno.dev" ||
-					(origin.startsWith("https://devs-playing-poker-") &&
-						origin.endsWith(".deno.dev"))
+					origin.startsWith("https://devs-playing-poker") &&
+					origin.endsWith(".deno.dev") &&
+					protocol === "https"
 				);
 			case "prod":
-				return origin === "https://devsplayingpoker.com";
+				return (
+					origin === "https://devsplayingpoker.com" && protocol === "https"
+				);
 			default:
 				return false;
 		}
