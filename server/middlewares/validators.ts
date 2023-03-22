@@ -56,8 +56,9 @@ export function validateWSOrigin(
 				return origin === "http://localhost:5000";
 			case "staging":
 				return (
-					origin.startsWith("https://devs-playing-poker-") &&
-					origin.endsWith(".deno.dev")
+					origin === "https://devs-playing-poker.deno.dev" ||
+					(origin.startsWith("https://devs-playing-poker-") &&
+						origin.endsWith(".deno.dev"))
 				);
 			case "prod":
 				return origin === "https://devsplayingpoker.com";
