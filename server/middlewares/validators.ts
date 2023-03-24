@@ -42,30 +42,38 @@ export function validateNewRoom(
 	next();
 }
 
-export function validateWSOrigin(
+export function validateOrigin(
 	req: OpineRequest,
 	res: OpineResponse,
 	next: NextFunction,
 ) {
-	const { protocol } = req;
 	const origin = req.get("origin");
-	const env = Deno.env.get("ENV") ?? "";
+	const env = Deno.env.get("ENV");
 
 	const isAllowedOrigin = (() => {
+		if (!origin) return false;
+
 		switch (env) {
 			case "dev":
-				return origin === "http://localhost:5000" && protocol === "http";
-			case "staging":
-				return (
-					origin.startsWith("https://devs-playing-poker") &&
-					origin.endsWith(".deno.dev") &&
-					protocol === "https"
-				);
+				return origin === "http://localhost:5000";
+			case "staging": {
+				if (origin === "https://devs-playing-poker.deno.dev") {
+					return true;
+				}
+
+				const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID");
+				if (!deploymentId) {
+					return false;
+				}
+
+				return origin === `https://devs-playing-poker-${deploymentId}.deno.dev`;
+			}
 			case "prod":
-				return (
-					origin === "https://devsplayingpoker.com" && protocol === "https"
-				);
+				return origin === "https://devsplayingpoker.com";
 			default:
+				console.warn(
+					"Looks like you haven't set the ENV environment variable correctly.",
+				);
 				return false;
 		}
 	})();

@@ -1,7 +1,7 @@
 import type { OpineRequest, OpineResponse } from "opine";
 import type { RoomSchema } from "../types/schemas.ts";
-import db from "../utils/db.ts";
 import generateRoomCode from "../utils/generateRoomCode.ts";
+import * as rooms from "../models/rooms.ts";
 
 type OpineController<ResBody = unknown> = (
 	req: OpineRequest,
@@ -18,7 +18,7 @@ export const createRoom: OpineController = async (req, res) => {
 
 	try {
 		const roomCode = await generateRoomCode();
-		const room = await db.rooms.insertOne({
+		const room = await rooms.insertRoom({
 			roomCode,
 			moderator: null,
 			state: "Results",
@@ -46,7 +46,7 @@ export const createRoom: OpineController = async (req, res) => {
 };
 
 export const getRoom: OpineController = async (req, res) => {
-	const room = await db.rooms.findOne({ roomCode: req.params.roomCode });
+	const room = await rooms.findByRoomCode(req.params.roomCode);
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
@@ -60,7 +60,7 @@ export const getRoom: OpineController = async (req, res) => {
 };
 
 export const checkRoomExists: OpineController = async (req, res) => {
-	const room = await db.rooms.findOne({ roomCode: req.params.roomCode });
+	const room = await rooms.findByRoomCode(req.params.roomCode);
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
