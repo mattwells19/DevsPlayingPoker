@@ -1,3 +1,4 @@
+import { z as zod } from "zod";
 import type { RoomSchema, User, Voter } from "../types/schemas.ts";
 import type {
 	JoinEvent,
@@ -14,7 +15,6 @@ import type {
 	ChangeNameEvent,
 } from "../types/socket.ts";
 import calculateConfidence from "../utils/calculateConfidence.ts";
-import { z as zod } from "zod";
 import * as rooms from "../models/rooms.ts";
 
 const sockets = new Map<string, WebSocket>();
@@ -203,7 +203,10 @@ const handleLeave = async (
 			});
 		} else {
 			// if the moderator left and there's no one else in the room, delete the room
-			await rooms.deleteById(roomData._id);
+			await rooms.deleteByRoomCode(roomData.roomCode);
+			console.debug(
+				`Deleted room with _id of ${roomData._id} and roomCode of ${roomData.roomCode}`,
+			);
 			return;
 		}
 	} else {

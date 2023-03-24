@@ -1,9 +1,10 @@
 import { Router } from "opine";
 import { handleWs } from "../controllers/socket.controller.ts";
+import { validateOrigin } from "../middlewares/validators.ts";
 
 const router = Router();
 
-router.get("/:roomCode", async (req, res, next) => {
+router.get("/:roomCode", validateOrigin, async (req, res, next) => {
 	if (req.headers.get("upgrade") === "websocket") {
 		const sock = req.upgrade();
 		const userId = req.query.userId ?? crypto.randomUUID();

@@ -1,10 +1,10 @@
-import db from "./db.ts";
+import * as rooms from "../models/rooms.ts";
 
 const generateRoomCode = async (): Promise<string> => {
 	let roomCode = getRandomCode();
 
 	for (let i = 0; i < 5; i++) {
-		const duplicateCode = await db.rooms.findOne({ roomCode });
+		const duplicateCode = await rooms.findByRoomCode(roomCode);
 
 		if (!duplicateCode) return roomCode;
 
