@@ -5,8 +5,20 @@ import { SimpleCache } from "../utils/SimpleCache.ts";
 
 const roomDataCache = new SimpleCache<RoomSchema>();
 
-export const findByRoomCode = (roomCode: string) => {
-	return roomDataCache.get(roomCode) ?? db.rooms.findOne({ roomCode });
+export const findByRoomCode = async (
+	roomCode: string,
+): ReturnType<typeof db.rooms.findOne> => {
+	const cacheHit = roomDataCache.get(roomCode);
+	if (cacheHit) {
+		return cacheHit;
+	}
+
+	const fetchedRoomData = await db.rooms.findOne({ roomCode });
+	if (fetchedRoomData) {
+		roomDataCache.set(fetchedRoomData.roomCode, fetchedRoomData);
+	}
+
+	return fetchedRoomData;
 };
 
 export const updateById = async (
