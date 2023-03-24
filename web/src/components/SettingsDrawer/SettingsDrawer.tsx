@@ -140,7 +140,12 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 										title={intl.t("saveName") as string}
 										class="btn btn-primary btn-square"
 									>
-										<Icon name="save" fill="none" class="w-6 h-6" />
+										<Icon
+											name="save"
+											aria-label={intl.t("saveName") as string}
+											fill="none"
+											class="w-6 h-6"
+										/>
 									</button>
 								</div>
 								<Show when={errorMsg()} keyed>

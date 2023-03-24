@@ -8,11 +8,7 @@ import {
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import type {
-	JoinEvent,
-	RoomSchema,
-	WebSocketTriggeredEvent,
-} from "@/shared-types";
+import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
@@ -24,7 +20,8 @@ import {
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
-import Icon from "@/components/Icon";
+import ConnectionStatusBadge from "./components/ConnectionStatusBadge";
+import ModeratorStatus from "./components/ModeratorStatus";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -199,22 +196,13 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	});
 
 	return (
-		<main class="max-w-[30rem] m-auto">
-			<button
-				type="button"
-				class="badge uppercase"
-				classList={{
-					"badge-success": connStatus() === "connected",
-					"badge-warning": connStatus() === "connecting",
-					"badge-error": connStatus() === "disconnected",
-				}}
-				onClick={() => ws().close(3003, "Manual reset.")}
-				title={intl.t("manualReset") as string}
-			>
-				{intl.t(connStatus())}
-				<Icon name="refresh" boxSize="14" class="ml-1" />
-			</button>
+		<main class="max-w-[30rem] m-auto relative mt-4">
+			<ConnectionStatusBadge
+				connStatus={connStatus()}
+				onReset={() => ws().close(3003, "Manual reset.")}
+			/>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
+				<ModeratorStatus class="absolute right-0 top-0" />
 				<VotingDescription />
 				<Show
 					// is the current user the moderator?

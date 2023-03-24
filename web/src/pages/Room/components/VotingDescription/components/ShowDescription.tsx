@@ -70,6 +70,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 					>
 						<Icon
 							name="caret-down"
+							aria-label="Voting description expanded arrow."
 							fill="none"
 							stroke-width="2.5"
 							stroke="currentColor"

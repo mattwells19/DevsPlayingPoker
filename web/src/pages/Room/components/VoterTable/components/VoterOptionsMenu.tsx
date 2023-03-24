@@ -2,6 +2,7 @@ import { Component, createUniqueId, JSXElement } from "solid-js";
 import { Portal } from "solid-js/web";
 import type { Voter } from "@/shared-types";
 import { useIntl } from "@/i18n";
+import Icon from "@/components/Icon";
 
 const voterActionOptions = ["makeModerator", "kickVoter"] as const;
 export type VoterClickAction = (typeof voterActionOptions)[number];
@@ -60,12 +61,17 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 	const intl = useIntl();
 
 	return (
-		<div class="dropdown dropdown-right">
+		<div class="dropdown dropdown-left">
 			<label
 				tabIndex="0"
-				class="w-full overflow-hidden text-ellipsis text-left underline cursor-pointer"
+				class="btn btn-sm btn-ghost btn-circle text-gray-400"
+				title={intl.t("voterActions") as string}
 			>
-				{props.voter.name}
+				<Icon
+					name="ellipsis-vertical"
+					aria-label={intl.t("voterActions") as string}
+					boxSize="24"
+				/>
 			</label>
 			<ul class="menu bg-slate-100 dark:bg-base-100 rounded-md shadow-lg dropdown-content">
 				<VoterOptionsMenuItem

@@ -9,6 +9,7 @@
 
 	"_HEADER_": "",
 	"home": "Home",
+	"viewGithub": "View the source on Github.",
 
 	"_JOIN_ROOM_": "",
 	"name": "Name",
@@ -30,7 +31,6 @@
 	"errorWithMsg": "Error: {msg}",
 
 	"_ROOM_": "",
-	"connectingToRoom": "Connecting...",
 	"checkingRoom": "Checking room...",
 	"copyCode": "Click to copy code.",
 	"thatRoomDoesntExist": "Room with code <b>{roomCode}</b> does not exist.",
@@ -40,9 +40,10 @@
 	"connecting": "Connecting",
 	"disconnected": "Disconnected",
 	"manualReset": "Reset connection to the room",
+	"youAreTheModerator": "<b>You</b> are the moderator.",
+	"xIsTheModerator": "<b>{moderatorName}</b> is the moderator.",
 
 	"_ROOM_VOTER_VIEW_": "",
-	"waitingForModerator": "Waiting for {moderatorName}...",
 	"optionSelected": "Got it! You can change your mind if you want. Otherwise sit tight.",
 	"makeSelection": "Make a selection",
 
@@ -62,6 +63,7 @@
 	"high": "High",
 	"mode": "Mode",
 	"didNotVote": "Did not vote",
+	"voterActions": "Voter actions",
 
 	"_ROOM_VOTER_TABLE_MODERATOR_OPTIONS": "",
 	"makeModerator": "Make moderator",

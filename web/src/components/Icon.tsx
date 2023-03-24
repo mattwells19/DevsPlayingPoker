@@ -6,10 +6,12 @@ type IconName =
 	| "save"
 	| "caret-down"
 	| "refresh"
-	| "github";
+	| "github"
+	| "ellipsis-vertical";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;
+	"aria-label": string;
 	boxSize?: JSX.SvgSVGAttributes<SVGSVGElement>["width"];
 }
 

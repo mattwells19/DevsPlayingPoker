@@ -34,9 +34,14 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						href="https://github.com/lvl-mattwells/DevsPlayingPoker"
 						target="_blank"
 						class="btn btn-ghost btn-square"
-						title="View the source code on Github."
+						title={intl.t("viewGithub") as string}
 					>
-						<Icon name="github" boxSize="24" fill="currentColor" />
+						<Icon
+							name="github"
+							boxSize="24"
+							fill="currentColor"
+							aria-label={intl.t("viewGithub") as string}
+						/>
 					</a>
 					<button
 						type="button"
@@ -46,6 +51,7 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 					>
 						<Icon
 							name="settings-cog"
+							aria-label={intl.t("openSettingsDrawer") as string}
 							boxSize="24"
 							fill="none"
 							stroke="currentColor"
