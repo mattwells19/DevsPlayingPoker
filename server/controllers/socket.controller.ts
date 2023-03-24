@@ -204,6 +204,9 @@ const handleLeave = async (
 		} else {
 			// if the moderator left and there's no one else in the room, delete the room
 			await rooms.deleteByRoomCode(roomData.roomCode);
+			console.debug(
+				`Deleted room with _id of ${roomData._id} and roomCode of ${roomData.roomCode}`,
+			);
 			return;
 		}
 	} else {

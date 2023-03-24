@@ -29,7 +29,7 @@ export const createRoom: OpineController = async (req, res) => {
 			lastUpdated: new Date(),
 		});
 		console.debug(
-			`Room created with _id of ${room} and roomCode of ${roomCode}`,
+			`Created room with _id of ${room} and roomCode of ${roomCode}`,
 		);
 
 		return res.setStatus(201).json({

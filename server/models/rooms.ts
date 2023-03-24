@@ -6,8 +6,7 @@ import { SimpleCache } from "../utils/SimpleCache.ts";
 const roomDataCache = new SimpleCache<RoomSchema>();
 
 export const findByRoomCode = (roomCode: string) => {
-	const cacheHit = roomDataCache.get(roomCode);
-	return cacheHit ?? db.rooms.findOne({ roomCode });
+	return roomDataCache.get(roomCode) ?? db.rooms.findOne({ roomCode });
 };
 
 export const updateById = async (
