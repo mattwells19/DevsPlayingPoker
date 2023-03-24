@@ -50,12 +50,9 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						class="btn btn-ghost btn-square"
 					>
 						<Icon
-							name="settings-cog"
+							name="user-solid"
 							aria-label={intl.t("openSettingsDrawer") as string}
 							boxSize="24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.5"
 						/>
 					</button>
 				</div>
