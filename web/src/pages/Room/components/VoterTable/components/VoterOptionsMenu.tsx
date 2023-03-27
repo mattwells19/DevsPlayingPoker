@@ -61,10 +61,10 @@ const VoterOptionsMenu: Component<VoterOptionsMenuProps> = (props) => {
 	const intl = useIntl();
 
 	return (
-		<div class="dropdown dropdown-left">
+		<div class="dropdown dropdown-right">
 			<label
 				tabIndex="0"
-				class="btn btn-sm btn-ghost btn-circle text-gray-400"
+				class="btn btn-sm btn-ghost btn-circle text-slate-400 hover:bg-opacity-10"
 				title={intl.t("voterActions") as string}
 			>
 				<Icon
