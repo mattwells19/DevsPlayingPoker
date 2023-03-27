@@ -1,30 +1,23 @@
-import { Navigate, useNavigate, useParams } from "solid-app-router";
+import { Navigate, useParams } from "solid-app-router";
 import {
-	batch,
 	Component,
 	createEffect,
+	createMemo,
+	createSelector,
 	createSignal,
+	on,
 	onCleanup,
 	Show,
 } from "solid-js";
-import { createStore } from "solid-js/store";
-import type {
-	JoinEvent,
-	RoomSchema,
-	WebSocketTriggeredEvent,
-} from "@/shared-types";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
-import {
-	defaultRoomDetails,
-	RoomContextProvider,
-	RoomDetails,
-} from "./RoomContext";
+import { RoomContextProvider } from "./RoomContext";
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
 import Icon from "@/components/Icon";
+import useWs from "./ws";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -71,123 +64,92 @@ interface RoomContentProps {
 	userName: string;
 }
 
-const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
-const wsPath = `${wsProtocol}://${window.location.host}/ws`;
-
 const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
-	const navigate = useNavigate();
-	const [savedUserId, setSavedUserId] = createSignal<string | null>(
-		sessionStorage.getItem("userId"),
-	);
-	const [connStatus, setConnStatus] = createSignal<
-		"connecting" | "connected" | "disconnected"
-	>("connecting");
+	const { ws, connStatus, roomDetails } = useWs({
+		userName: props.userName,
+		roomCode: props.roomCode,
+		initialUserId: sessionStorage.getItem("userId"),
+		onNewUserId: (newUserId) => sessionStorage.setItem("userId", newUserId),
+	});
 
-	const wsUrl = () => {
-		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
-		if (savedUserId()) {
-			wsUrl.searchParams.set("userId", savedUserId()!);
-		}
-		return wsUrl;
+	const isModerator = createSelector(() => roomDetails.roomData.moderator?.id);
+	let broadcaster: BroadcastChannel | null = null;
+	const broadcastCleanup = () => {
+		broadcaster?.postMessage("close");
+		broadcaster?.close();
 	};
-
-	const [roomDetails, setRoomDetails] =
-		createStore<RoomDetails>(defaultRoomDetails);
-	const [ws, setWs] = createSignal<WebSocket>(new WebSocket(wsUrl()));
-
 	createEffect(() => {
-		let lastResponseTimestamp: number | null = null;
-		let ponged = true;
+		if (isModerator(roomDetails.currentUserId) && !broadcaster) {
+			broadcaster = new BroadcastChannel("VotingModerator");
 
-		const pingInterval = setInterval(() => {
-			if (
-				!lastResponseTimestamp ||
-				Date.now() - lastResponseTimestamp > 10000
-			) {
-				// if our last ping didn't get a pong then we must've disconnected
-				if (!ponged) {
-					ws().close(3002, "Ping didn't receive a pong.");
-				} else {
-					ponged = false;
-					ws().send("PING");
-				}
-			}
-		}, 10 * 1000);
-
-		onCleanup(() => {
-			clearInterval(pingInterval);
-		});
-
-		ws().addEventListener("open", () => {
-			setConnStatus("connecting");
-		});
-
-		ws().addEventListener("message", (messageEvent) => {
-			lastResponseTimestamp = Date.now();
-			if (messageEvent.data === "PONG") {
-				ponged = true;
-				return;
-			}
-
-			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
-
-			switch (data.event) {
-				case "Connected": {
-					if (!data.roomExists) {
-						toast.error(
-							intl.t("thatRoomDoesntExist", { roomCode: props.roomCode }),
-						);
-						return navigate("/");
-					}
-
-					if (data.userId !== savedUserId()) {
-						sessionStorage.setItem("userId", data.userId);
-					}
-
-					const joinEvent: JoinEvent = {
-						event: "Join",
-						name: props.userName,
-					};
-					ws().send(JSON.stringify(joinEvent));
-
-					batch(() => {
-						setConnStatus("connected");
-						setSavedUserId(data.userId);
-						setRoomDetails({ currentUserId: data.userId });
+			broadcaster.addEventListener("message", (e) => {
+				if (e.data === "sync") {
+					broadcaster?.postMessage({
+						roomCode: props.roomCode,
+						userName: props.userName,
+						userId: roomDetails.currentUserId,
 					});
-					break;
 				}
-				case "RoomUpdate": {
-					setRoomDetails({
-						roomData: data.roomData,
-						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
-					});
-					break;
-				}
-				case "Kicked":
-					toast(intl.t("youWereKicked"), { icon: "🥾" });
-					navigate("/");
-					break;
-				default:
-					return;
-			}
-		});
-
-		ws().addEventListener("close", (closeEvent) => {
-			setConnStatus("disconnected");
-			// 1000 means closed normally
-			if (closeEvent.code !== 1000) {
-				setWs(new WebSocket(wsUrl()));
-			}
-		});
-	});
-
-	onCleanup(() => {
-		if (ws().readyState === WebSocket.OPEN) {
-			ws().close(1000);
+			});
+		}
+		if (!isModerator(roomDetails.currentUserId) && broadcaster) {
+			broadcastCleanup();
+			window.addEventListener("beforeunload", broadcastCleanup);
 		}
 	});
+	onCleanup(broadcastCleanup);
+
+	// const broadcaster = createMemo<BroadcastChannel | null>(
+	// 	(prevBroadcastChannel) => {
+	// 		if (roomDetails.roomData.moderator?.id !== roomDetails.currentUserId) {
+	// 			if (prevBroadcastChannel) {
+	// 				cleanup();
+	// 				window.removeEventListener("beforeunload", cleanup);
+	// 			}
+	// 			return null;
+	// 		}
+
+	// 		if (prevBroadcastChannel) return prevBroadcastChannel;
+
+	// 		const broadcastChannel = new BroadcastChannel("VotingModerator");
+
+	// 		broadcastChannel.addEventListener("message", (e) => {
+	// 			if (e.data === "sync") {
+	// 				broadcastChannel.postMessage({
+	// 					roomCode: props.roomCode,
+	// 					userName: props.userName,
+	// 					userId: roomDetails.currentUserId,
+	// 				});
+	// 			}
+	// 		});
+
+	// 		cleanup = () => {
+	// 			broadcastChannel.postMessage("close");
+	// 			broadcastChannel.close();
+	// 		};
+
+	// 		return broadcastChannel;
+	// 	},
+	// 	null,
+	// );
+
+	// createEffect((prevConnStatus) => {
+	// 	if (
+	// 		broadcaster() &&
+	// 		prevConnStatus !== "connected" &&
+	// 		connStatus() === "connected"
+	// 	) {
+	// 		broadcaster()?.postMessage({
+	// 			roomCode: props.roomCode,
+	// 			userName: props.userName,
+	// 			userId: roomDetails.currentUserId,
+	// 		});
+	// 	}
+	// 	return connStatus();
+	// }, connStatus());
+
+	// onCleanup(cleanup);
 
 	setUpdateNameFn(() => (new_name) => {
 		roomDetails.dispatchEvent({
@@ -216,6 +178,20 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			</button>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
+				<button
+					type="button"
+					aria-haspopup="true"
+					class="btn"
+					onClick={() =>
+						window.open(
+							"/voting-moderator",
+							"DPP-Voting-Moderator",
+							"popup,width=618,height=1000",
+						)
+					}
+				>
+					Vote
+				</button>
 				<Show
 					// is the current user the moderator?
 					when={

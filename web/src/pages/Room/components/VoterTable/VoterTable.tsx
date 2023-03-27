@@ -1,4 +1,4 @@
-import { Component, For, Match, Switch } from "solid-js";
+import { Component, For, Match, Show, Switch } from "solid-js";
 import { ConfidenceValue, Voter } from "@/shared-types";
 import Metric from "./components/Metric";
 import VoterOptionsMenu, {
@@ -53,18 +53,24 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						{(voter) => (
 							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
 								<td colspan="2">
-									{props.onVoterAction ? (
+									<Show
+										when={
+											props.onVoterAction &&
+											voter.id !== `voter-${room.currentUserId}`
+										}
+										fallback={
+											<p class="text-ellipsis overflow-hidden max-w-full">
+												{voter.name}
+											</p>
+										}
+									>
 										<VoterOptionsMenu
 											voter={voter}
 											onOptionSelect={(action) => {
 												props.onVoterAction!(action, voter);
 											}}
 										/>
-									) : (
-										<p class="text-ellipsis overflow-hidden max-w-full">
-											{voter.name}
-										</p>
-									)}
+									</Show>
 								</td>
 								<td class="text-center">
 									{room.roomData.state === "Results"
