@@ -1,16 +1,12 @@
 import { Component, For, Match, Show, Switch } from "solid-js";
-import { ConfidenceValue, Voter } from "@/shared-types";
+import { ConfidenceValue } from "@/shared-types";
 import Metric from "./components/Metric";
-import VoterOptionsMenu, {
-	VoterClickAction,
-} from "./components/VoterOptionsMenu";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
 import { IntlKey, useIntl } from "@/i18n";
+import KickVoterButton from "./components/KickVoterButton";
 
-interface VoterTableProps {
-	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
-}
+interface VoterTableProps {}
 
 export const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.high]: "💪",
@@ -32,7 +28,7 @@ function formatSelection(selection: string | null): string {
 	return selection;
 }
 
-const VoterTable: Component<VoterTableProps> = (props) => {
+const VoterTable: Component<VoterTableProps> = () => {
 	const intl = useIntl();
 	const room = useRoom();
 
@@ -53,15 +49,10 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						{(voter) => (
 							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
 								<td colspan="2">
-									<div class="flex items-center justify-between">
+									<div class="flex items-center justify-between group">
 										{voter.name}
-										<Show when={props.onVoterAction}>
-											<VoterOptionsMenu
-												voter={voter}
-												onOptionSelect={(action) => {
-													props.onVoterAction!(action, voter);
-												}}
-											/>
+										<Show when={room.userIsModerator}>
+											<KickVoterButton voter={voter} />
 										</Show>
 									</div>
 								</td>

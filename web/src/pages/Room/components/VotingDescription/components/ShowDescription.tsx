@@ -80,10 +80,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 							{intl.t("whatWereVotingOn")}
 						</p>
 						<Show
-							when={
-								room.roomData.moderator?.id === room.currentUserId &&
-								room.roomData.state === "Results"
-							}
+							when={room.userIsModerator && room.roomData.state === "Results"}
 						>
 							<div
 								class={mergeClassNames(styles.formGroup, "inline-flex gap-2")}
@@ -121,7 +118,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 			</Show>
 			<Show
 				when={
-					room.roomData.moderator?.id === room.currentUserId &&
+					room.userIsModerator &&
 					room.roomData.state === "Results" &&
 					!room.roomData.votingDescription
 				}

@@ -158,6 +158,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 				case "RoomUpdate": {
 					setRoomDetails({
 						roomData: data.roomData,
+						userIsModerator: data.roomData.moderator?.id === savedUserId(),
 						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
@@ -204,13 +205,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<ModeratorStatus class="absolute right-0 top-0" />
 				<VotingDescription />
-				<Show
-					// is the current user the moderator?
-					when={
-						roomDetails.roomData.moderator?.id === roomDetails.currentUserId
-					}
-					fallback={<VoterView />}
-				>
+				<Show fallback={<VoterView />} when={roomDetails.userIsModerator}>
 					<ModeratorView />
 				</Show>
 			</RoomContextProvider>

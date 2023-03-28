@@ -3,6 +3,7 @@ import type { RoomSchema, WebScoketMessageEvent } from "@/shared-types";
 
 export interface RoomDetails {
 	currentUserId: string;
+	userIsModerator: boolean;
 	roomData: RoomSchema;
 	dispatchEvent: (event: WebScoketMessageEvent) => void;
 }
@@ -10,6 +11,7 @@ export interface RoomDetails {
 export const defaultRoomDetails: RoomDetails = {
 	currentUserId: "",
 	dispatchEvent: () => null,
+	userIsModerator: false,
 	roomData: {} as RoomSchema,
 };
 
