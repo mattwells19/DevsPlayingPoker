@@ -295,8 +295,11 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 	_,
 	data,
 ) => {
-	const votersWithoutNewModerator = roomData.voters.filter(
-		(voter) => voter.id !== data.newModeratorId,
+	// remove the new moderator and the voting-moderator (if exists) from the voters
+	const newVoters = roomData.voters.filter(
+		(voter) =>
+			voter.id !== data.newModeratorId &&
+			voter.id !== `voter-${roomData.moderator!.id}`,
 	);
 
 	// validated by validateModerator function
@@ -306,10 +309,10 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 		confidence: null,
 		selection: null,
 	};
-	const updatedVoters = [...votersWithoutNewModerator, newVoter];
+	const updatedVoters = [...newVoters, newVoter];
 
 	const newModerator = roomData.voters.find(
-		(voter) => voter.id === data?.newModeratorId,
+		(voter) => voter.id === data.newModeratorId,
 	);
 
 	if (!newModerator) {

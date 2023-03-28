@@ -6,7 +6,8 @@ type IconName =
 	| "save"
 	| "caret-down"
 	| "refresh"
-	| "github";
+	| "github"
+	| "arrow-top-right-on-square";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;

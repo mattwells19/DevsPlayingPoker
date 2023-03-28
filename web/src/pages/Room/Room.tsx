@@ -73,84 +73,6 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 		onNewUserId: (newUserId) => sessionStorage.setItem("userId", newUserId),
 	});
 
-	const isModerator = createSelector(() => roomDetails.roomData.moderator?.id);
-	let broadcaster: BroadcastChannel | null = null;
-	const broadcastCleanup = () => {
-		broadcaster?.postMessage("close");
-		broadcaster?.close();
-	};
-	createEffect(() => {
-		if (isModerator(roomDetails.currentUserId) && !broadcaster) {
-			broadcaster = new BroadcastChannel("VotingModerator");
-
-			broadcaster.addEventListener("message", (e) => {
-				if (e.data === "sync") {
-					broadcaster?.postMessage({
-						roomCode: props.roomCode,
-						userName: props.userName,
-						userId: roomDetails.currentUserId,
-					});
-				}
-			});
-		}
-		if (!isModerator(roomDetails.currentUserId) && broadcaster) {
-			broadcastCleanup();
-			window.addEventListener("beforeunload", broadcastCleanup);
-		}
-	});
-	onCleanup(broadcastCleanup);
-
-	// const broadcaster = createMemo<BroadcastChannel | null>(
-	// 	(prevBroadcastChannel) => {
-	// 		if (roomDetails.roomData.moderator?.id !== roomDetails.currentUserId) {
-	// 			if (prevBroadcastChannel) {
-	// 				cleanup();
-	// 				window.removeEventListener("beforeunload", cleanup);
-	// 			}
-	// 			return null;
-	// 		}
-
-	// 		if (prevBroadcastChannel) return prevBroadcastChannel;
-
-	// 		const broadcastChannel = new BroadcastChannel("VotingModerator");
-
-	// 		broadcastChannel.addEventListener("message", (e) => {
-	// 			if (e.data === "sync") {
-	// 				broadcastChannel.postMessage({
-	// 					roomCode: props.roomCode,
-	// 					userName: props.userName,
-	// 					userId: roomDetails.currentUserId,
-	// 				});
-	// 			}
-	// 		});
-
-	// 		cleanup = () => {
-	// 			broadcastChannel.postMessage("close");
-	// 			broadcastChannel.close();
-	// 		};
-
-	// 		return broadcastChannel;
-	// 	},
-	// 	null,
-	// );
-
-	// createEffect((prevConnStatus) => {
-	// 	if (
-	// 		broadcaster() &&
-	// 		prevConnStatus !== "connected" &&
-	// 		connStatus() === "connected"
-	// 	) {
-	// 		broadcaster()?.postMessage({
-	// 			roomCode: props.roomCode,
-	// 			userName: props.userName,
-	// 			userId: roomDetails.currentUserId,
-	// 		});
-	// 	}
-	// 	return connStatus();
-	// }, connStatus());
-
-	// onCleanup(cleanup);
-
 	setUpdateNameFn(() => (new_name) => {
 		roomDetails.dispatchEvent({
 			event: "ChangeName",
@@ -178,20 +100,6 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			</button>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
-				<button
-					type="button"
-					aria-haspopup="true"
-					class="btn"
-					onClick={() =>
-						window.open(
-							"/voting-moderator",
-							"DPP-Voting-Moderator",
-							"popup,width=618,height=1000",
-						)
-					}
-				>
-					Vote
-				</button>
 				<Show
 					// is the current user the moderator?
 					when={

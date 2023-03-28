@@ -14,12 +14,15 @@ const VotingModerator: Component = () => {
 
 	const broadcastChannel = new BroadcastChannel("VotingModerator");
 
+	// ask the moderator window for the room data
 	broadcastChannel.postMessage("sync");
 	broadcastChannel.addEventListener("message", (e) => {
 		if (e.data === "sync") {
+			// ignore our own sync command
 			return;
 		} else if (e.data === "close") {
-			setDetails(null);
+			// if moderator window is dipping it's time for us to go 💀
+			window.close();
 		} else if ("roomCode" in e.data) {
 			setDetails(e.data);
 		}
