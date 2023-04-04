@@ -38,6 +38,7 @@ const Room: Component = () => {
 		<>
 			<Header onSaveName={updateNameFn()}>
 				<Tooltip
+					arrow
 					tip={intl.t("copyCode") as string}
 					positioning={{ placement: "right" }}
 				>

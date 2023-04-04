@@ -13,15 +13,14 @@ import { Portal } from "solid-js/web";
 
 type TooltipProps = Omit<tooltip.Context, "id"> & {
 	tip: JSXElement;
-	// arrow styles are currently broken 😕
-	// arrow?: boolean;
+	arrow?: boolean;
 };
 
 export const Tooltip: ParentComponent<TooltipProps> = (props) => {
 	const [customProps, machineParts] = splitProps(props, [
 		"children",
 		"tip",
-		// "arrow",
+		"arrow",
 	]);
 	const tooltipProps = mergeProps(
 		{
@@ -43,16 +42,24 @@ export const Tooltip: ParentComponent<TooltipProps> = (props) => {
 			</button>
 			<Show when={api().isOpen}>
 				<Portal>
-					<div {...api().positionerProps}>
-						{/* <Show when={customProps.arrow}>
+					<div
+						{...api().positionerProps}
+						class="animate-[fadeIn_200ms_ease-in-out]"
+						style={{
+							"--arrow-size": "10px",
+							"--arrow-background": "hsl(var(--bc))",
+						}}
+					>
+						<Show when={customProps.arrow}>
 							<div {...api().arrowProps}>
 								<div {...api().arrowTipProps} />
 							</div>
-						</Show> */}
-						<div class="bg-base-content text-base-100 px-4 py-2 rounded-lg transition-opacity animate-[fadeIn_200ms_ease-in-out]">
-							<div {...api().contentProps} class="text-sm">
-								{customProps.tip}
-							</div>
+						</Show>
+						<div
+							{...api().contentProps}
+							class="bg-base-content text-base-100 text-sm px-4 py-2 rounded-lg transition-opacity"
+						>
+							{customProps.tip}
 						</div>
 					</div>
 				</Portal>
