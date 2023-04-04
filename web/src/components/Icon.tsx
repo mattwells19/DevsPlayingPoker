@@ -8,7 +8,8 @@ type IconName =
 	| "refresh"
 	| "github"
 	| "ellipsis-vertical"
-	| "user-solid";
+	| "user-solid"
+	| "pencil";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;

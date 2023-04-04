@@ -205,7 +205,6 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 				onReset={() => ws().close(3003, "Manual reset.")}
 			/>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
-				<ModeratorStatus class="absolute right-0 top-0" />
 				<VotingDescription />
 				<Show fallback={<VoterView />} when={roomDetails.userIsModerator}>
 					<ModeratorView />

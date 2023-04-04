@@ -1,6 +1,3 @@
-import { Component, For, Show } from "solid-js";
-import { useIntl } from "@/i18n";
-import { useRoom } from "../RoomContext";
 import {
 	Dialog,
 	DialogCloseTrigger,
@@ -9,8 +6,14 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/Dialog";
+import Icon from "@/components/Icon";
+import { useIntl } from "@/i18n";
+import { useRoom } from "../../../RoomContext";
+import { Component, For } from "solid-js";
 
-const ModeratorStatusAsModerator: Component = () => {
+interface TransferModeratorButtonProps {}
+
+const TransferModeratorButton: Component<TransferModeratorButtonProps> = () => {
 	const intl = useIntl();
 	const room = useRoom();
 
@@ -27,12 +30,15 @@ const ModeratorStatusAsModerator: Component = () => {
 		<Dialog>
 			<DialogTrigger
 				type="button"
-				class="btn btn-ghost btn-sm normal-case font-normal whitespace-nowrap overflow-hidden text-ellipsis gap-1 ml-auto"
+				class="btn btn-ghost btn-sm btn-circle bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent"
+				title={intl.t("transferModerator") as string}
 			>
-				<span aria-hidden="true" class="mr-1">
-					👑
-				</span>
-				{intl.t("youAreTheModerator")}
+				<Icon
+					name="pencil"
+					aria-label={intl.t("transferModerator") as string}
+					fill="currentColor"
+					boxSize="18"
+				/>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogTitle as="h2" class="font-bold text-lg">
@@ -81,33 +87,4 @@ const ModeratorStatusAsModerator: Component = () => {
 	);
 };
 
-interface ModeratorStatusProps {
-	class?: string;
-}
-
-const ModeratorStatus: Component<ModeratorStatusProps> = (props) => {
-	const intl = useIntl();
-	const room = useRoom();
-
-	return (
-		<div class={props.class}>
-			<Show
-				when={!room.userIsModerator}
-				fallback={<ModeratorStatusAsModerator />}
-			>
-				<p
-					class={`whitespace-nowrap overflow-hidden text-ellipsis bg-inherit ${props.class}`}
-				>
-					<span aria-hidden="true" class="mr-1">
-						👑
-					</span>
-					{intl.t("xIsTheModerator", {
-						moderatorName: room.roomData.moderator?.name,
-					})}
-				</p>
-			</Show>
-		</div>
-	);
-};
-
-export default ModeratorStatus;
+export default TransferModeratorButton;

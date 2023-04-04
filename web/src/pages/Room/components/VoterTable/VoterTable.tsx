@@ -5,6 +5,7 @@ import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
 import { IntlKey, useIntl } from "@/i18n";
 import KickVoterButton from "./components/KickVoterButton";
+import TransferModeratorButton from "./components/TransferModeratorButton";
 
 interface VoterTableProps {}
 
@@ -37,6 +38,23 @@ const VoterTable: Component<VoterTableProps> = () => {
 	return (
 		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 ">
 			<table class="table w-full bg-slate-50 dark:bg-base-300">
+				<caption class="bg-slate-50 dark:bg-base-300 p-4">
+					<div class="flex justify-between items-center">
+						<span class="before:content-['👑'] before:mr-1">
+							<Show
+								fallback={intl.t("youAreTheModerator")}
+								when={!room.userIsModerator}
+							>
+								{intl.t("xIsTheModerator", {
+									moderatorName: room.roomData.moderator?.name,
+								})}
+							</Show>
+						</span>
+						<Show when={room.userIsModerator}>
+							<TransferModeratorButton />
+						</Show>
+					</div>
+				</caption>
 				<thead class="border-b border-base-content border-opacity-20">
 					<tr>
 						<th colspan="2">{intl.t("voters")}</th>

@@ -66,6 +66,7 @@
 	"voterActions": "Voter actions",
 
 	"_ROOM_VOTER_TABLE_MODERATOR_OPTIONS": "",
+	"transferModerator": "Transfer moderator.",
 	"makeModerator": "Make moderator",
 	"kickVoter": "Kick voter",
 	"kickVoterDesc": "Are you sure you want to remove <b>{name}</b> from the room?",
