@@ -2,21 +2,25 @@ import { useMachine, normalizeProps } from "@zag-js/solid";
 import {
 	createUniqueId,
 	createMemo,
-	ParentComponent,
+	createEffect,
 	Show,
 	splitProps,
 	mergeProps,
-	JSXElement,
+	children,
+	type JSXElement,
+	type Component,
+	type JSX,
 } from "solid-js";
 import * as tooltip from "@zag-js/tooltip";
-import { Portal } from "solid-js/web";
+import { Portal, spread } from "solid-js/web";
 
 type TooltipProps = Omit<tooltip.Context, "id"> & {
 	tip: JSXElement;
 	arrow?: boolean;
+	children: JSX.Element;
 };
 
-export const Tooltip: ParentComponent<TooltipProps> = (props) => {
+export const Tooltip: Component<TooltipProps> = (props) => {
 	const [customProps, machineParts] = splitProps(props, [
 		"children",
 		"tip",
@@ -35,11 +39,17 @@ export const Tooltip: ParentComponent<TooltipProps> = (props) => {
 
 	const api = createMemo(() => tooltip.connect(state, send, normalizeProps));
 
+	const resolvedChildren = children(() => props.children);
+	createEffect(() => {
+		const children = resolvedChildren();
+		if (children instanceof HTMLElement) {
+			spread(children, api().triggerProps);
+		}
+	});
+
 	return (
 		<>
-			<button tabIndex="-1" {...api().triggerProps}>
-				{customProps.children}
-			</button>
+			{resolvedChildren()}
 			<Show when={api().isOpen}>
 				<Portal>
 					<div
@@ -67,3 +77,5 @@ export const Tooltip: ParentComponent<TooltipProps> = (props) => {
 		</>
 	);
 };
+
+export const TooltipTrigger = () => {};
