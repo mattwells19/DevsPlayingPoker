@@ -1,28 +1,18 @@
-import { Component, createMemo, createUniqueId, For, Show } from "solid-js";
+import { Component, For, Show } from "solid-js";
 import { useIntl } from "@/i18n";
 import { useRoom } from "../RoomContext";
-import { useMachine, normalizeProps } from "@zag-js/solid";
-import * as dialog from "@zag-js/dialog";
-import { Portal } from "solid-js/web";
+import {
+	Dialog,
+	DialogCloseTrigger,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/Dialog";
 
-interface ModeratorStatusProps {
-	class?: string;
-}
-
-const ModeratorStatusAsModerator: Component<ModeratorStatusProps> = (props) => {
+const ModeratorStatusAsModerator: Component = () => {
 	const intl = useIntl();
 	const room = useRoom();
-
-	const [state, send] = useMachine(
-		dialog.machine({
-			id: createUniqueId(),
-			role: "alertdialog",
-			// needed to avoid body.style.paddingRight content shift
-			preventScroll: false,
-		}),
-	);
-
-	const api = createMemo(() => dialog.connect(state, send, normalizeProps));
 
 	const handleChangeModerator = (form: EventTarget & HTMLFormElement) => {
 		const newModeratorId = new FormData(form).get("new-moderator")?.toString();
@@ -31,94 +21,79 @@ const ModeratorStatusAsModerator: Component<ModeratorStatusProps> = (props) => {
 			event: "ModeratorChange",
 			newModeratorId,
 		});
-		api().close();
 	};
 
 	return (
-		<>
-			<button
-				class={`btn btn-ghost btn-sm normal-case font-normal whitespace-nowrap overflow-hidden text-ellipsis gap-1 ${props.class}`}
-				{...api().triggerProps}
+		<Dialog>
+			<DialogTrigger
+				type="button"
+				class="btn btn-ghost btn-sm normal-case font-normal whitespace-nowrap overflow-hidden text-ellipsis gap-1 ml-auto"
 			>
 				<span aria-hidden="true" class="mr-1">
 					👑
 				</span>
 				{intl.t("youAreTheModerator")}
-			</button>
-			<Show when={api().isOpen}>
-				<Portal>
-					<div {...api().backdropProps} class="fixed inset-0 bg-black/40" />
-					<div
-						{...api().containerProps}
-						class="fixed inset-0 w-full h-full grid place-items-center"
+			</DialogTrigger>
+			<DialogContent>
+				<DialogTitle as="h2" class="font-bold text-lg">
+					<span aria-hidden="true" class="mr-1">
+						👑
+					</span>
+					Change moderator
+				</DialogTitle>
+				<DialogCloseTrigger
+					class="btn btn-ghost btn-circle absolute top-1 right-1"
+					aria-label={intl.t("cancel") as string}
+					type="button"
+				>
+					&#10005;
+				</DialogCloseTrigger>
+				<form
+					class="form-control mt-4"
+					onSubmit={(e) => {
+						e.preventDefault();
+						handleChangeModerator(e.currentTarget);
+					}}
+				>
+					<DialogDescription as="label" for="new-moderator" class="label">
+						Select a new moderator
+					</DialogDescription>
+					<select
+						id="new-moderator"
+						name="new-moderator"
+						class="select select-bordered"
 					>
-						<div {...api().contentProps} class="modal-box">
-							<h2 {...api().titleProps} class="font-bold text-lg">
-								<span aria-hidden="true" class="mr-1">
-									👑
-								</span>
-								Change moderator
-							</h2>
-							<button
-								{...api().closeTriggerProps}
-								class="btn btn-ghost btn-circle absolute top-1 right-1"
-								aria-label={intl.t("cancel") as string}
-							>
-								&#10005;
-							</button>
-							<form
-								class="form-control mt-4"
-								onSubmit={(e) => {
-									e.preventDefault();
-									handleChangeModerator(e.currentTarget);
-								}}
-							>
-								<label
-									{...api().descriptionProps}
-									for="new-moderator"
-									class="label"
-								>
-									Select a new moderator
-								</label>
-								<select
-									id="new-moderator"
-									name="new-moderator"
-									class="select select-bordered"
-								>
-									<For each={room.roomData.voters}>
-										{(voter) => <option value={voter.id}>{voter.name}</option>}
-									</For>
-								</select>
-								<div role="group" class="modal-action mt-10">
-									<button type="submit" class="btn btn-primary btn-sm">
-										{intl.t("confirm")}
-									</button>
-									<button
-										{...api().closeTriggerProps}
-										type="button"
-										class="btn btn-outline btn-sm"
-									>
-										{intl.t("cancel")}
-									</button>
-								</div>
-							</form>
-						</div>
+						<For each={room.roomData.voters}>
+							{(voter) => <option value={voter.id}>{voter.name}</option>}
+						</For>
+					</select>
+					<div role="group" class="modal-action mt-10">
+						<button type="submit" class="btn btn-primary btn-sm">
+							{intl.t("confirm")}
+						</button>
+						<DialogCloseTrigger type="button" class="btn btn-outline btn-sm">
+							{intl.t("cancel")}
+						</DialogCloseTrigger>
 					</div>
-				</Portal>
-			</Show>
-		</>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 };
+
+interface ModeratorStatusProps {
+	class?: string;
+}
 
 const ModeratorStatus: Component<ModeratorStatusProps> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
 
 	return (
-		<>
+		<div class={props.class}>
 			<Show
 				when={!room.userIsModerator}
-				fallback={<ModeratorStatusAsModerator {...props} />}
+				fallback={<ModeratorStatusAsModerator />}
 			>
 				<p
 					class={`whitespace-nowrap overflow-hidden text-ellipsis bg-inherit ${props.class}`}
@@ -131,7 +106,7 @@ const ModeratorStatus: Component<ModeratorStatusProps> = (props) => {
 					})}
 				</p>
 			</Show>
-		</>
+		</div>
 	);
 };
 

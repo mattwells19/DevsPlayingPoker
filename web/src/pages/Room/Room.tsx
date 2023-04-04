@@ -22,6 +22,7 @@ import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
 import ConnectionStatusBadge from "./components/ConnectionStatusBadge";
 import ModeratorStatus from "./components/ModeratorStatus";
+import { Tooltip } from "@/components/Tooltip";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -36,9 +37,9 @@ const Room: Component = () => {
 	return (
 		<>
 			<Header onSaveName={updateNameFn()}>
-				<span
-					class="tooltip tooltip-right"
-					data-tip={intl.t("copyCode") as string}
+				<Tooltip
+					tip={intl.t("copyCode") as string}
+					positioning={{ placement: "right" }}
 				>
 					<button
 						type="button"
@@ -48,7 +49,7 @@ const Room: Component = () => {
 					>
 						<h1 class="text-4xl font-bold">{params.roomCode}</h1>
 					</button>
-				</span>
+				</Tooltip>
 			</Header>
 			<Show
 				when={userName}
