@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "solid-app-router";
+import { Navigate, Route, Routes } from "@solidjs/router";
 import type { Component } from "solid-js";
 import Landing from "./pages/Landing";
 import CreateRoom from "./pages/CreateRoom";

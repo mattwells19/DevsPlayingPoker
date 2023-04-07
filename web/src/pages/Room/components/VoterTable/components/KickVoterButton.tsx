@@ -35,7 +35,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 				&#10005;
 			</DialogTrigger>
 			<DialogContent>
-				<DialogTitle as="h2" class="font-bold text-lg">
+				<DialogTitle as="h2" class="font-bold text-lg text-left">
 					<span aria-hidden="true" class="mr-1">
 						🥾
 					</span>

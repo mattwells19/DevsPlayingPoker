@@ -1,5 +1,5 @@
 import { Component, createSignal, For, JSX, Show } from "solid-js";
-import { useNavigate } from "solid-app-router";
+import { useNavigate, Link } from "@solidjs/router";
 import Header from "@/components/Header";
 import { IntlKey, useIntl } from "@/i18n";
 
@@ -128,9 +128,9 @@ const Landing: Component = () => {
 						<div class="divider flex-grow" />
 					</div>
 					<section class="flex justify-center">
-						<a href="/create-room" class="btn btn-primary">
+						<Link href="/create-room" class="btn btn-primary">
 							{intl.t("newRoom")}
-						</a>
+						</Link>
 					</section>
 				</div>
 			</main>

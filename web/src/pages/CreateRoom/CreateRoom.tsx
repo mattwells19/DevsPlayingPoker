@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal, Show } from "solid-js";
-import { useNavigate } from "solid-app-router";
+import { useNavigate } from "@solidjs/router";
 import NumberOfOptionsSlider from "./components/NumberOfOptionsSlider";
 import post from "@/utils/post";
 import Header from "@/components/Header";
@@ -188,7 +188,7 @@ const CreateRoom: Component = () => {
 
 					<dl class="form-control">
 						<dt class="label">{intl.t("finalPreview")}</dt>
-						<dd class="pl-3">{list}</dd>
+						<dd class="pl-3">{list()}</dd>
 					</dl>
 
 					<div class="divider after:display-none" />

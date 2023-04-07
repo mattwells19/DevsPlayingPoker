@@ -1,6 +1,6 @@
 import { useIntl } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
-import { Link, useLocation } from "solid-app-router";
+import { Link, useLocation } from "@solidjs/router";
 import { createSignal, ParentComponent, Show, splitProps } from "solid-js";
 import Icon from "../Icon";
 import SettingsDrawer, { SettingsDrawerActions } from "../SettingsDrawer";

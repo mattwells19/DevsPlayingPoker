@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import { IntlKey, useIntl } from "@/i18n";
-import { useNavigate, useParams } from "solid-app-router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { Component, createSignal, Show } from "solid-js";
 
 const JoinRoom: Component = () => {

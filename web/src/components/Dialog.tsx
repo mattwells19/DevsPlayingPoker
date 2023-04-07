@@ -10,9 +10,15 @@ import {
 	Accessor,
 	splitProps,
 	mergeProps,
+	createEffect,
 } from "solid-js";
 import * as dialog from "@zag-js/dialog";
 import { Dynamic, Portal } from "solid-js/web";
+import { Transition } from "solid-transition-group";
+
+interface DialogProps extends Partial<dialog.Context> {
+	isOpen?: boolean;
+}
 
 const DialogContext =
 	createContext<Accessor<ReturnType<typeof dialog.connect>>>();
@@ -25,12 +31,21 @@ const dialogDefaults: dialog.Context = {
 	preventScroll: false,
 };
 
-export const Dialog: ParentComponent<Partial<dialog.Context>> = (props) => {
+export const Dialog: ParentComponent<DialogProps> = (props) => {
 	const [peeps, customDialogProps] = splitProps(props, ["children"]);
 	const dialogProps = mergeProps(dialogDefaults, customDialogProps);
 	const [state, send] = useMachine(dialog.machine(dialogProps));
 
 	const api = createMemo(() => dialog.connect(state, send, normalizeProps));
+
+	createEffect(() => {
+		if (props.isOpen === undefined) return;
+		if (props.isOpen && !api().isOpen) {
+			api().open();
+		} else if (!props.isOpen && api().isOpen) {
+			api().close();
+		}
+	});
 
 	return (
 		<DialogContext.Provider value={api}>
@@ -51,22 +66,76 @@ export const DialogTrigger: ParentComponent<
 	);
 };
 
+export const DrawerContent: ParentComponent = (props) => {
+	const api = useDialogContext();
+
+	return (
+		<Portal>
+			<Transition
+				enterActiveClass="transition-opacity"
+				exitActiveClass="transition-opacity"
+				enterClass="opacity-0"
+				exitToClass="opacity-0"
+			>
+				<Show when={api().isOpen}>
+					<div
+						{...api().backdropProps}
+						class="fixed inset-0 bg-black/40 translate-x-f"
+					/>
+				</Show>
+			</Transition>
+			<Transition
+				enterActiveClass="transition-transform"
+				exitActiveClass="transition-transform"
+				enterClass="translate-x-full"
+				exitToClass="translate-x-full"
+			>
+				<Show when={api().isOpen}>
+					<aside
+						{...api().containerProps}
+						class="w-full max-w-xs p-4 fixed top-0 right-0 h-full bg-base-100"
+					>
+						<div {...api().contentProps}>{props.children}</div>
+					</aside>
+				</Show>
+			</Transition>
+		</Portal>
+	);
+};
+
 export const DialogContent: ParentComponent = (props) => {
 	const api = useDialogContext();
+
 	return (
-		<Show when={api().isOpen}>
-			<Portal>
-				<div {...api().backdropProps} class="fixed inset-0 bg-black/40" />
-				<div
-					{...api().containerProps}
-					class="fixed inset-0 w-full h-full grid place-items-center"
-				>
-					<div {...api().contentProps} class="modal-box">
-						{props.children}
+		<Portal>
+			<Transition
+				enterActiveClass="transition-opacity"
+				exitActiveClass="transition-opacity"
+				enterClass="opacity-0"
+				exitToClass="opacity-0"
+			>
+				<Show when={api().isOpen}>
+					<div {...api().backdropProps} class="fixed inset-0 bg-black/40" />
+				</Show>
+			</Transition>
+			<Transition
+				enterActiveClass="transition-all"
+				exitActiveClass="transition-all"
+				enterClass="scale-95 opacity-0"
+				exitToClass="scale-95 opacity-0"
+			>
+				<Show when={api().isOpen}>
+					<div
+						{...api().containerProps}
+						class="fixed inset-0 w-full h-full grid place-items-center"
+					>
+						<div {...api().contentProps} class="modal-box">
+							{props.children}
+						</div>
 					</div>
-				</div>
-			</Portal>
-		</Show>
+				</Show>
+			</Transition>
+		</Portal>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "solid-app-router";
+import { Navigate, useNavigate, useParams } from "@solidjs/router";
 import {
 	batch,
 	Component,
@@ -21,7 +21,6 @@ import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
 import ConnectionStatusBadge from "./components/ConnectionStatusBadge";
-import ModeratorStatus from "./components/ModeratorStatus";
 import { Tooltip } from "@/components/Tooltip";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
