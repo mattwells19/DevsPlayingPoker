@@ -30,7 +30,10 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 		<Dialog>
 			<DialogTrigger
 				class="btn btn-ghost btn-sm btn-circle opacity-0 group-hover:opacity-100 focus:opacity-100 dark:focus:opacity-100 bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent"
-				aria-label={`Kick ${props.voter.name}`}
+				aria-label={
+					intl.t("kickVoter", { voterName: props.voter.name }) as string
+				}
+				title={intl.t("kickVoter", { voterName: props.voter.name }) as string}
 			>
 				&#10005;
 			</DialogTrigger>
@@ -39,7 +42,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 					<span aria-hidden="true" class="mr-1">
 						🥾
 					</span>
-					{intl.t("kickVoter")}
+					{intl.t("kickVoter", { voterName: props.voter.name })}
 				</DialogTitle>
 				<DialogCloseTrigger
 					class="btn btn-ghost btn-circle absolute top-1 right-1"

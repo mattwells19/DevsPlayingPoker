@@ -34,7 +34,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = () => {
 				title={intl.t("transferModerator") as string}
 			>
 				<Icon
-					name="pencil"
+					name="arrows-right-left"
 					aria-label={intl.t("transferModerator") as string}
 					fill="currentColor"
 					boxSize="18"

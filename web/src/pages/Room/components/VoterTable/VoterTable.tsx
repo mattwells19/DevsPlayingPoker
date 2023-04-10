@@ -36,7 +36,7 @@ const VoterTable: Component<VoterTableProps> = () => {
 	const stats = () => getStats(room.roomData.voters);
 
 	return (
-		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 ">
+		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20">
 			<table class="table w-full bg-slate-50 dark:bg-base-300">
 				<caption class="bg-slate-50 dark:bg-base-300 p-4">
 					<div class="flex justify-between items-center">
@@ -50,7 +50,9 @@ const VoterTable: Component<VoterTableProps> = () => {
 								})}
 							</Show>
 						</span>
-						<Show when={room.userIsModerator}>
+						<Show
+							when={room.userIsModerator && room.roomData.voters.length > 0}
+						>
 							<TransferModeratorButton />
 						</Show>
 					</div>
