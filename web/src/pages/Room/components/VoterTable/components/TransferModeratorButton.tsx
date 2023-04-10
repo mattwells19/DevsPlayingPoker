@@ -26,6 +26,19 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = () => {
 		});
 	};
 
+	const voters = () => {
+		const votingModerator = room.roomData.voters.find(
+			(voter) => voter.id === `voter-${room.roomData.moderator?.id}`,
+		);
+
+		if (!votingModerator) {
+			return room.roomData.voters;
+		}
+		return room.roomData.voters.filter(
+			(voter) => voter.id !== votingModerator.id,
+		);
+	};
+
 	return (
 		<Dialog>
 			<DialogTrigger
@@ -69,7 +82,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = () => {
 						name="new-moderator"
 						class="select select-bordered"
 					>
-						<For each={room.roomData.voters}>
+						<For each={voters()}>
 							{(voter) => <option value={voter.id}>{voter.name}</option>}
 						</For>
 					</select>

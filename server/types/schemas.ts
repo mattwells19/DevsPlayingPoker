@@ -30,6 +30,9 @@ export interface RoomSchema {
 	votingDescription: string;
 	moderator: User | null;
 	options: string[];
+	/**
+	 * Be careful as this may include a voting moderator
+	 */
 	voters: Voter[];
 	votingStartedAt: Date | null;
 	lastUpdated: Date;
