@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal, Show } from "solid-js";
-import { useNavigate } from "solid-app-router";
-import RangeSlider from "./components/RangeSlider";
+import { useNavigate } from "@solidjs/router";
+import NumberOfOptionsSlider from "./components/NumberOfOptionsSlider";
 import post from "@/utils/post";
 import Header from "@/components/Header";
 import {
@@ -147,8 +147,7 @@ const CreateRoom: Component = () => {
 					</div>
 
 					<Show when={optionsSelect() !== "yesNo"}>
-						<RangeSlider
-							id="numberOfOptions"
+						<NumberOfOptionsSlider
 							name="numberOfOptions"
 							label={intl.t("numberOfOptions", {
 								min: availableOptions[optionsSelect()][0],
@@ -189,7 +188,7 @@ const CreateRoom: Component = () => {
 
 					<dl class="form-control">
 						<dt class="label">{intl.t("finalPreview")}</dt>
-						<dd class="pl-3">{list}</dd>
+						<dd class="pl-3">{list()}</dd>
 					</dl>
 
 					<div class="divider after:display-none" />

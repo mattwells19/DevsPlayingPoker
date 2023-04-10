@@ -1,16 +1,21 @@
 import { Component, JSX, splitProps } from "solid-js";
 
 type IconName =
-	| "settings-cog"
+	| "settings-cog" // not used
 	| "no-vote"
 	| "save"
 	| "caret-down"
-	| "refresh"
+	| "refresh" // not used
 	| "github"
+	| "ellipsis-vertical" // not used
+	| "user-solid"
+	| "pencil" // not used
+	| "arrows-right-left"
 	| "arrow-top-right-on-square";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;
+	"aria-label": string;
 	boxSize?: JSX.SvgSVGAttributes<SVGSVGElement>["width"];
 }
 

@@ -1,6 +1,6 @@
 import { useIntl } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
-import { Link, useLocation } from "solid-app-router";
+import { Link, useLocation } from "@solidjs/router";
 import { createSignal, ParentComponent, Show, splitProps } from "solid-js";
 import Icon from "../Icon";
 import SettingsDrawer, { SettingsDrawerActions } from "../SettingsDrawer";
@@ -34,9 +34,14 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						href="https://github.com/lvl-mattwells/DevsPlayingPoker"
 						target="_blank"
 						class="btn btn-ghost btn-square"
-						title="View the source code on Github."
+						title={intl.t("viewGithub") as string}
 					>
-						<Icon name="github" boxSize="24" fill="currentColor" />
+						<Icon
+							name="github"
+							boxSize="24"
+							fill="currentColor"
+							aria-label={intl.t("viewGithub") as string}
+						/>
 					</a>
 					<button
 						type="button"
@@ -45,11 +50,9 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						class="btn btn-ghost btn-square"
 					>
 						<Icon
-							name="settings-cog"
+							name="user-solid"
+							aria-label={intl.t("openSettingsDrawer") as string}
 							boxSize="24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.5"
 						/>
 					</button>
 				</div>

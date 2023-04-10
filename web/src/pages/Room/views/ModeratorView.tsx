@@ -1,11 +1,5 @@
-import { Component, Match, onCleanup, Switch } from "solid-js";
-import type {
-	KickVoterEvent,
-	ModeratorChangeEvent,
-	Voter,
-} from "@/shared-types";
+import { Component, Match, Switch, onCleanup } from "solid-js";
 import VoterTable from "../components/VoterTable";
-import type { VoterClickAction } from "../components/VoterTable";
 import { useRoom } from "../RoomContext";
 import { useIntl } from "@/i18n";
 import Icon from "@/components/Icon";
@@ -47,27 +41,6 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 		window.removeEventListener("beforeunload", cleanup);
 	});
 
-	function handleVoterAction(action: VoterClickAction, voter: Voter) {
-		const event = (() => {
-			switch (action) {
-				case "kickVoter":
-					return {
-						event: "KickVoter",
-						voterId: voter.id,
-					} as KickVoterEvent;
-				case "makeModerator":
-					return {
-						event: "ModeratorChange",
-						newModeratorId: voter.id,
-					} as ModeratorChangeEvent;
-			}
-		})();
-
-		if (event) {
-			room.dispatchEvent(event);
-		}
-	}
-
 	return (
 		<>
 			<Switch>
@@ -93,7 +66,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 					</button>
 				</Match>
 			</Switch>
-			<VoterTable onVoterAction={handleVoterAction} />
+			<VoterTable />
 			<button
 				type="button"
 				aria-haspopup="true"

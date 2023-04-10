@@ -84,6 +84,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 					>
 						<Icon
 							name="no-vote"
+							aria-label="No-vote"
 							width="80"
 							height="80"
 							x="39"
