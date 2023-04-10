@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "solid-app-router";
+import { Navigate, useNavigate, useParams } from "@solidjs/router";
 import {
 	batch,
 	Component,
@@ -8,11 +8,7 @@ import {
 	Show,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import type {
-	JoinEvent,
-	RoomSchema,
-	WebSocketTriggeredEvent,
-} from "@/shared-types";
+import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
@@ -24,7 +20,8 @@ import {
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
-import Icon from "@/components/Icon";
+import ConnectionStatusBadge from "./components/ConnectionStatusBadge";
+import { Tooltip } from "@/components/Tooltip";
 
 const [updateNameFn, setUpdateNameFn] = createSignal<
 	((name: string) => void) | undefined
@@ -39,9 +36,10 @@ const Room: Component = () => {
 	return (
 		<>
 			<Header onSaveName={updateNameFn()}>
-				<span
-					class="tooltip tooltip-right"
-					data-tip={intl.t("copyCode") as string}
+				<Tooltip
+					arrow
+					tip={intl.t("copyCode")}
+					positioning={{ placement: "right" }}
 				>
 					<button
 						type="button"
@@ -51,7 +49,7 @@ const Room: Component = () => {
 					>
 						<h1 class="text-4xl font-bold">{params.roomCode}</h1>
 					</button>
-				</span>
+				</Tooltip>
 			</Header>
 			<Show
 				when={userName}
@@ -161,6 +159,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 				case "RoomUpdate": {
 					setRoomDetails({
 						roomData: data.roomData,
+						userIsModerator: data.roomData.moderator?.id === savedUserId(),
 						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;
@@ -199,30 +198,14 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	});
 
 	return (
-		<main class="max-w-[30rem] m-auto">
-			<button
-				type="button"
-				class="badge uppercase"
-				classList={{
-					"badge-success": connStatus() === "connected",
-					"badge-warning": connStatus() === "connecting",
-					"badge-error": connStatus() === "disconnected",
-				}}
-				onClick={() => ws().close(3003, "Manual reset.")}
-				title={intl.t("manualReset") as string}
-			>
-				{intl.t(connStatus())}
-				<Icon name="refresh" boxSize="14" class="ml-1" />
-			</button>
+		<main class="max-w-[30rem] m-auto relative mt-4">
+			<ConnectionStatusBadge
+				connStatus={connStatus()}
+				onReset={() => ws().close(3003, "Manual reset.")}
+			/>
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
-				<Show
-					// is the current user the moderator?
-					when={
-						roomDetails.roomData.moderator?.id === roomDetails.currentUserId
-					}
-					fallback={<VoterView />}
-				>
+				<Show fallback={<VoterView />} when={roomDetails.userIsModerator}>
 					<ModeratorView />
 				</Show>
 			</RoomContextProvider>

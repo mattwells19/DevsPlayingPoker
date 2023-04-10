@@ -15,11 +15,6 @@ const VoterView: Component<VoterViewProps> = () => {
 	return (
 		<Switch>
 			<Match when={room.roomData.state === "Results"}>
-				<p class="font-semibold mb-4 whitespace-nowrap overflow-hidden text-ellipsis">
-					{intl.t("waitingForModerator", {
-						moderatorName: room.roomData.moderator?.name,
-					})}
-				</p>
 				<VoterTable />
 			</Match>
 			<Match when={room.roomData.state === "Voting"}>

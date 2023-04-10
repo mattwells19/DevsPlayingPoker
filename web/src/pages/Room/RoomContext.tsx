@@ -1,9 +1,9 @@
 import { createContext, ParentComponent, Show, useContext } from "solid-js";
 import type { RoomSchema, WebScoketMessageEvent } from "@/shared-types";
-import { useIntl } from "@/i18n";
 
 export interface RoomDetails {
 	currentUserId: string;
+	userIsModerator: boolean;
 	roomData: RoomSchema;
 	dispatchEvent: (event: WebScoketMessageEvent) => void;
 }
@@ -11,6 +11,7 @@ export interface RoomDetails {
 export const defaultRoomDetails: RoomDetails = {
 	currentUserId: "",
 	dispatchEvent: () => null,
+	userIsModerator: false,
 	roomData: {} as RoomSchema,
 };
 
@@ -24,12 +25,9 @@ interface RoomContextProviderProps {
 export const RoomContextProvider: ParentComponent<RoomContextProviderProps> = (
 	props,
 ) => {
-	const intl = useIntl();
-
 	return (
 		<RoomContext.Provider value={props.roomDetails}>
 			<Show
-				fallback={<p>{intl.t("connectingToRoom")}</p>}
 				when={
 					props.roomDetails.currentUserId &&
 					props.roomDetails.roomData &&

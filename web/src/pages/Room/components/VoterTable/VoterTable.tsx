@@ -1,16 +1,13 @@
-import { Component, For, Match, Switch } from "solid-js";
-import { ConfidenceValue, Voter } from "@/shared-types";
+import { Component, For, Match, Show, Switch } from "solid-js";
+import { ConfidenceValue } from "@/shared-types";
 import Metric from "./components/Metric";
-import VoterOptionsMenu, {
-	VoterClickAction,
-} from "./components/VoterOptionsMenu";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
 import { IntlKey, useIntl } from "@/i18n";
+import KickVoterButton from "./components/KickVoterButton";
+import TransferModeratorButton from "./components/TransferModeratorButton";
 
-interface VoterTableProps {
-	onVoterAction?: (action: VoterClickAction, voter: Voter) => void;
-}
+interface VoterTableProps {}
 
 export const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
 	[ConfidenceValue.high]: "💪",
@@ -32,15 +29,34 @@ function formatSelection(selection: string | null): string {
 	return selection;
 }
 
-const VoterTable: Component<VoterTableProps> = (props) => {
+const VoterTable: Component<VoterTableProps> = () => {
 	const intl = useIntl();
 	const room = useRoom();
 
 	const stats = () => getStats(room.roomData.voters);
 
 	return (
-		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 ">
+		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20">
 			<table class="table w-full bg-slate-50 dark:bg-base-300">
+				<caption class="bg-slate-50 dark:bg-base-300 p-4">
+					<div class="flex justify-between items-center">
+						<span class="before:content-['👑'] before:mr-1">
+							<Show
+								fallback={intl.t("youAreTheModerator")}
+								when={!room.userIsModerator}
+							>
+								{intl.t("xIsTheModerator", {
+									moderatorName: room.roomData.moderator?.name,
+								})}
+							</Show>
+						</span>
+						<Show
+							when={room.userIsModerator && room.roomData.voters.length > 0}
+						>
+							<TransferModeratorButton />
+						</Show>
+					</div>
+				</caption>
 				<thead class="border-b border-base-content border-opacity-20">
 					<tr>
 						<th colspan="2">{intl.t("voters")}</th>
@@ -53,18 +69,12 @@ const VoterTable: Component<VoterTableProps> = (props) => {
 						{(voter) => (
 							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
 								<td colspan="2">
-									{props.onVoterAction ? (
-										<VoterOptionsMenu
-											voter={voter}
-											onOptionSelect={(action) => {
-												props.onVoterAction!(action, voter);
-											}}
-										/>
-									) : (
-										<p class="text-ellipsis overflow-hidden max-w-full">
-											{voter.name}
-										</p>
-									)}
+									<div class="flex items-center justify-between group">
+										{voter.name}
+										<Show when={room.userIsModerator}>
+											<KickVoterButton voter={voter} />
+										</Show>
+									</div>
 								</td>
 								<td class="text-center">
 									{room.roomData.state === "Results"
