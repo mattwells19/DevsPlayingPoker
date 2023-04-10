@@ -1,33 +1,14 @@
 import { Component, For, Match, Show, Switch } from "solid-js";
-import { ConfidenceValue } from "@/shared-types";
 import Metric from "./components/Metric";
 import { useRoom } from "../../RoomContext";
 import getStats from "./getStats";
-import { IntlKey, useIntl } from "@/i18n";
+import { useIntl } from "@/i18n";
 import KickVoterButton from "./components/KickVoterButton";
 import TransferModeratorButton from "./components/TransferModeratorButton";
+import { Tooltip } from "@/components/Tooltip";
+import VoterTableRow from "./components/VoterTableRow";
 
 interface VoterTableProps {}
-
-export const ConfidenceEmojiMap: Record<ConfidenceValue, string> = {
-	[ConfidenceValue.high]: "💪",
-	[ConfidenceValue.medium]: "😌",
-	[ConfidenceValue.low]: "😰",
-};
-
-export const ConfidenceTextMap: Record<ConfidenceValue, IntlKey> = {
-	[ConfidenceValue.high]: "highConfidence",
-	[ConfidenceValue.medium]: "mediumConfidence",
-	[ConfidenceValue.low]: "lowConfidence",
-};
-
-function formatSelection(selection: string | null): string {
-	if (selection === null || selection === "N/A") {
-		return "☕";
-	}
-
-	return selection;
-}
 
 const VoterTable: Component<VoterTableProps> = () => {
 	const intl = useIntl();
@@ -35,28 +16,44 @@ const VoterTable: Component<VoterTableProps> = () => {
 
 	const stats = () => getStats(room.roomData.voters);
 
+	const votingModerator = () =>
+		room.roomData.voters.find(
+			(voter) => voter.id === `voter-${room.roomData.moderator?.id}`,
+		);
+
+	const voters = () => {
+		if (!votingModerator()) {
+			return room.roomData.voters;
+		}
+		return room.roomData.voters.filter(
+			(voter) => voter.id !== votingModerator()!.id,
+		);
+	};
+
 	return (
 		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20">
 			<table class="table w-full bg-slate-50 dark:bg-base-300">
-				<caption class="bg-slate-50 dark:bg-base-300 p-4">
-					<div class="flex justify-between items-center">
-						<span class="before:content-['👑'] before:mr-1">
+				<Show when={!votingModerator()}>
+					<caption class="bg-slate-50 dark:bg-base-300 p-4">
+						<div class="flex justify-between items-center">
+							<span class="before:content-['👑'] before:mr-1">
+								<Show
+									fallback={intl.t("youAreTheModerator")}
+									when={!room.userIsModerator}
+								>
+									{intl.t("xIsTheModerator", {
+										moderatorName: room.roomData.moderator?.name,
+									})}
+								</Show>
+							</span>
 							<Show
-								fallback={intl.t("youAreTheModerator")}
-								when={!room.userIsModerator}
+								when={room.userIsModerator && room.roomData.voters.length > 0}
 							>
-								{intl.t("xIsTheModerator", {
-									moderatorName: room.roomData.moderator?.name,
-								})}
+								<TransferModeratorButton />
 							</Show>
-						</span>
-						<Show
-							when={room.userIsModerator && room.roomData.voters.length > 0}
-						>
-							<TransferModeratorButton />
-						</Show>
-					</div>
-				</caption>
+						</div>
+					</caption>
+				</Show>
 				<thead class="border-b border-base-content border-opacity-20">
 					<tr>
 						<th colspan="2">{intl.t("voters")}</th>
@@ -65,39 +62,36 @@ const VoterTable: Component<VoterTableProps> = () => {
 					</tr>
 				</thead>
 				<tbody>
-					<For each={room.roomData.voters}>
+					<Show when={votingModerator()} keyed>
+						{(votingModerator) => (
+							<VoterTableRow
+								name={
+									<Tooltip
+										arrow
+										tip={intl.t("xIsVotingModerator", {
+											moderatorName: room.roomData.moderator?.name,
+										})}
+										positioning={{ placement: "top-start" }}
+									>
+										<span class="before:content-['👑'] before:mr-1">
+											{room.roomData.moderator?.name}
+										</span>
+									</Tooltip>
+								}
+								confidence={votingModerator.confidence}
+								selection={votingModerator.selection}
+								hiddenAction={<TransferModeratorButton />}
+							/>
+						)}
+					</Show>
+					<For each={voters()}>
 						{(voter) => (
-							<tr class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300">
-								<td colspan="2">
-									<div class="flex items-center justify-between group">
-										{voter.name}
-										<Show when={room.userIsModerator}>
-											<KickVoterButton voter={voter} />
-										</Show>
-									</div>
-								</td>
-								<td class="text-center">
-									{room.roomData.state === "Results"
-										? formatSelection(voter.selection)
-										: voter.selection !== null
-										? "✅"
-										: "❌"}
-								</td>
-								<td
-									class="text-center"
-									title={
-										intl.t(
-											voter.confidence !== null
-												? ConfidenceTextMap[voter.confidence]
-												: "waitingForSelection",
-										) as string
-									}
-								>
-									{voter.confidence !== null
-										? ConfidenceEmojiMap[voter.confidence]
-										: "❓"}
-								</td>
-							</tr>
+							<VoterTableRow
+								name={voter.name}
+								confidence={voter.confidence}
+								selection={voter.selection}
+								hiddenAction={<KickVoterButton voter={voter} />}
+							/>
 						)}
 					</For>
 				</tbody>

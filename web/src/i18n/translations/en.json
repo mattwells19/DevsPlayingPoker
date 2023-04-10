@@ -78,6 +78,8 @@
 	"resetAndStartVoting": "Reset Votes & Start Voting",
 	"startVoting": "Start Voting",
 	"stopVoting": "Stop Voting",
+	"vote": "Vote",
+	"xIsVotingModerator": "{moderatorName} is the moderator while also voting.",
 
 	"_ROOM_VOTING_DESCRIPTION_": "",
 	"votingDesc": "Description of what the room is voting on.",

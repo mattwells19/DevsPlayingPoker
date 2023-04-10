@@ -30,7 +30,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = () => {
 		<Dialog>
 			<DialogTrigger
 				type="button"
-				class="btn btn-ghost btn-sm btn-circle bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent"
+				class="btn btn-ghost btn-sm btn-circle bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent group-hover:opacity-100 group-only:opacity-0"
 				title={intl.t("transferModerator") as string}
 			>
 				<Icon

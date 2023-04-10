@@ -1,6 +1,6 @@
 import { useIntl } from "@/i18n";
 import { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
-import { useNavigate } from "solid-app-router";
+import { useNavigate } from "@solidjs/router";
 import { batch, createEffect, createSignal, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
 import toast from "solid-toast";
@@ -104,6 +104,7 @@ export default function useWs(options: WsOptions) {
 				case "RoomUpdate": {
 					setRoomDetails({
 						roomData: data.roomData,
+						userIsModerator: data.roomData.moderator?.id === savedUserId(),
 						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
 					});
 					break;

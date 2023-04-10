@@ -1,9 +1,11 @@
-import Icon from "@/components/Icon";
 import { useIntl } from "@/i18n";
 import { Component, createSignal, Show } from "solid-js";
 import { RoomContextProvider } from "../Room/RoomContext";
 import VoterView from "../Room/views/VoterView";
 import useWs from "../Room/ws";
+import ConnectionStatusBadge from "../Room/components/ConnectionStatusBadge";
+import { Tooltip } from "@/components/Tooltip";
+import VotingDescription from "../Room/components/VotingDescription";
 
 const VotingModerator: Component = () => {
 	const [details, setDetails] = createSignal<{
@@ -17,13 +19,10 @@ const VotingModerator: Component = () => {
 	// ask the moderator window for the room data
 	broadcastChannel.postMessage("sync");
 	broadcastChannel.addEventListener("message", (e) => {
-		if (e.data === "sync") {
-			// ignore our own sync command
-			return;
-		} else if (e.data === "close") {
+		if (e.data === "close") {
 			// if moderator window is dipping it's time for us to go 💀
 			window.close();
-		} else if ("roomCode" in e.data) {
+		} else if (typeof e.data === "object" && "roomCode" in e.data) {
 			setDetails(e.data);
 		}
 	});
@@ -61,39 +60,33 @@ const VotingModeratorContent: Component<VotingModeratorContentProps> = (
 	return (
 		<>
 			<header class="flex justify-center">
-				<span
-					class="tooltip tooltip-right"
-					data-tip={intl.t("copyCode") as string}
+				<Tooltip
+					arrow
+					tip={intl.t("copyCode")}
+					positioning={{ placement: "right" }}
 				>
 					<button
 						type="button"
 						class="btn btn-ghost"
-						onClick={() => navigator.clipboard.writeText(props.roomCode)}
+						onClick={() =>
+							navigator.clipboard.writeText(roomDetails.roomData.roomCode)
+						}
 						aria-label={intl.t("copyCode") as string}
 					>
-						<h1 class="text-4xl font-bold">{props.roomCode}</h1>
+						<h1 class="text-4xl font-bold">{roomDetails.roomData.roomCode}</h1>
 					</button>
-				</span>
+				</Tooltip>
 			</header>
 			<main class="max-w-[30rem] m-auto">
-				<button
-					type="button"
-					class="badge uppercase"
-					classList={{
-						"badge-success": connStatus() === "connected",
-						"badge-warning": connStatus() === "connecting",
-						"badge-error": connStatus() === "disconnected",
-					}}
-					onClick={() => ws().close(3003, "Manual reset.")}
-					title={intl.t("manualReset") as string}
-				>
-					{intl.t(connStatus())}
-					<Icon name="refresh" boxSize="14" class="ml-1" />
-				</button>
+				<ConnectionStatusBadge
+					connStatus={connStatus()}
+					onReset={() => ws().close(3003, "Manual reset.")}
+				/>
 				<RoomContextProvider
 					roomDetails={roomDetails}
 					roomCode={props.roomCode}
 				>
+					<VotingDescription />
 					<VoterView />
 				</RoomContextProvider>
 			</main>

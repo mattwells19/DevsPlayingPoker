@@ -12,13 +12,6 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 
 	const broadcaster = new BroadcastChannel("VotingModerator");
 
-	// if voting window is already listening, push the updates so it will connect
-	broadcaster.postMessage({
-		roomCode: room.roomData.roomCode,
-		userName: room.roomData.moderator?.name,
-		userId: room.currentUserId,
-	});
-
 	// When the voting window is opened it will send a 'sync' command asking for connetion data
 	broadcaster.addEventListener("message", (e) => {
 		if (e.data === "sync") {
@@ -30,7 +23,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 		}
 	});
 
-	// need to let the voting window we're headed out so it can disconnect
+	// need to let the voting window know we're headed out so it can close
 	const cleanup = () => {
 		broadcaster.postMessage("close");
 		broadcaster.close();
@@ -88,7 +81,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 						stroke-width="2"
 					/>
 				</span>
-				Vote
+				{intl.t("vote")}
 			</button>
 		</>
 	);
