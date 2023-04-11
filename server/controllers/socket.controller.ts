@@ -302,13 +302,34 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 			voter.id !== `voter-${roomData.moderator!.id}`,
 	);
 
-	// validated by validateModerator function
-	const newVoter: Voter = {
-		id: roomData.moderator!.id,
-		name: roomData.moderator!.name,
-		confidence: null,
-		selection: null,
-	};
+	const newVoter: Voter = (() => {
+		const baseVoter = {
+			id: roomData.moderator!.id,
+			name: roomData.moderator!.name,
+			confidence: null,
+			selection: null,
+		};
+
+		// if there's a voting moderator, transfer their selection to the new voter entity
+		const votingModerator = roomData.voters.find(
+			(voter) => voter.id === `voter-${roomData.moderator!.id}`,
+		);
+
+		if (
+			votingModerator &&
+			votingModerator.confidence &&
+			votingModerator.selection
+		) {
+			return {
+				...baseVoter,
+				confidence: votingModerator.confidence,
+				selection: votingModerator.selection,
+			};
+		}
+
+		return baseVoter;
+	})();
+
 	const updatedVoters = [...newVoters, newVoter];
 
 	const newModerator = roomData.voters.find(

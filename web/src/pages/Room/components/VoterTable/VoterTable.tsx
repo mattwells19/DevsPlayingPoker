@@ -46,10 +46,8 @@ const VoterTable: Component<VoterTableProps> = () => {
 									})}
 								</Show>
 							</span>
-							<Show
-								when={room.userIsModerator && room.roomData.voters.length > 0}
-							>
-								<TransferModeratorButton />
+							<Show when={room.userIsModerator}>
+								<TransferModeratorButton options={voters()} />
 							</Show>
 						</div>
 					</caption>
@@ -80,7 +78,7 @@ const VoterTable: Component<VoterTableProps> = () => {
 								}
 								confidence={votingModerator.confidence}
 								selection={votingModerator.selection}
-								hiddenAction={<TransferModeratorButton />}
+								hiddenAction={<TransferModeratorButton options={voters()} />}
 							/>
 						)}
 					</Show>
