@@ -9,6 +9,7 @@ import VotingModerator from "./pages/VotingModerator";
 const App: Component = () => {
 	return (
 		<Routes>
+			{/* If you add a path, make sure to also add it to fe.routes.ts in the BE */}
 			<Route path="/" component={Landing} />
 			<Route path="/create-room" component={CreateRoom} />
 			<Route path="/join/:roomCode" component={JoinRoom} />

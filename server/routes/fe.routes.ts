@@ -3,7 +3,13 @@ import { Router } from "opine";
 const router = Router();
 
 router.get(
-	["/", "/create-room", "/join/:roomCode", "/room/:roomCode"],
+	[
+		"/",
+		"/create-room",
+		"/join/:roomCode",
+		"/room/:roomCode",
+		"/voting-moderator",
+	],
 	async (_, res) => {
 		const path = await Deno.realPath("./www/index.html");
 		return res.sendFile(path);
