@@ -1,25 +1,13 @@
-import { Navigate, useNavigate, useParams } from "@solidjs/router";
-import {
-	batch,
-	Component,
-	createEffect,
-	createSignal,
-	onCleanup,
-	Show,
-} from "solid-js";
-import { createStore } from "solid-js/store";
-import type { JoinEvent, WebSocketTriggeredEvent } from "@/shared-types";
+import { Navigate, useParams } from "@solidjs/router";
+import { Component, createSignal, Show } from "solid-js";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
 import Header from "@/components/Header";
-import {
-	defaultRoomDetails,
-	RoomContextProvider,
-	RoomDetails,
-} from "./RoomContext";
+import { RoomContextProvider } from "./RoomContext";
 import { useIntl } from "@/i18n";
 import VotingDescription from "./components/VotingDescription";
 import toast from "solid-toast";
+import useWs from "./ws";
 import ConnectionStatusBadge from "./components/ConnectionStatusBadge";
 import { Tooltip } from "@/components/Tooltip";
 
@@ -69,123 +57,13 @@ interface RoomContentProps {
 	userName: string;
 }
 
-const wsProtocol = window.location.protocol.includes("https") ? "wss" : "ws";
-const wsPath = `${wsProtocol}://${window.location.host}/ws`;
-
 const RoomContent: Component<RoomContentProps> = (props) => {
 	const intl = useIntl();
-	const navigate = useNavigate();
-	const [savedUserId, setSavedUserId] = createSignal<string | null>(
-		sessionStorage.getItem("userId"),
-	);
-	const [connStatus, setConnStatus] = createSignal<
-		"connecting" | "connected" | "disconnected"
-	>("connecting");
-
-	const wsUrl = () => {
-		const wsUrl = new URL(`${wsPath}/${props.roomCode}`);
-		if (savedUserId()) {
-			wsUrl.searchParams.set("userId", savedUserId()!);
-		}
-		return wsUrl;
-	};
-
-	const [roomDetails, setRoomDetails] =
-		createStore<RoomDetails>(defaultRoomDetails);
-	const [ws, setWs] = createSignal<WebSocket>(new WebSocket(wsUrl()));
-
-	createEffect(() => {
-		let lastResponseTimestamp: number | null = null;
-		let ponged = true;
-
-		const pingInterval = setInterval(() => {
-			if (
-				!lastResponseTimestamp ||
-				Date.now() - lastResponseTimestamp > 10000
-			) {
-				// if our last ping didn't get a pong then we must've disconnected
-				if (!ponged) {
-					ws().close(3002, "Ping didn't receive a pong.");
-				} else {
-					ponged = false;
-					ws().send("PING");
-				}
-			}
-		}, 10 * 1000);
-
-		onCleanup(() => {
-			clearInterval(pingInterval);
-		});
-
-		ws().addEventListener("open", () => {
-			setConnStatus("connecting");
-		});
-
-		ws().addEventListener("message", (messageEvent) => {
-			lastResponseTimestamp = Date.now();
-			if (messageEvent.data === "PONG") {
-				ponged = true;
-				return;
-			}
-
-			const data = JSON.parse(messageEvent.data) as WebSocketTriggeredEvent;
-
-			switch (data.event) {
-				case "Connected": {
-					if (!data.roomExists) {
-						toast.error(
-							intl.t("thatRoomDoesntExist", { roomCode: props.roomCode }),
-						);
-						return navigate("/");
-					}
-
-					if (data.userId !== savedUserId()) {
-						sessionStorage.setItem("userId", data.userId);
-					}
-
-					const joinEvent: JoinEvent = {
-						event: "Join",
-						name: props.userName,
-					};
-					ws().send(JSON.stringify(joinEvent));
-
-					batch(() => {
-						setConnStatus("connected");
-						setSavedUserId(data.userId);
-						setRoomDetails({ currentUserId: data.userId });
-					});
-					break;
-				}
-				case "RoomUpdate": {
-					setRoomDetails({
-						roomData: data.roomData,
-						userIsModerator: data.roomData.moderator?.id === savedUserId(),
-						dispatchEvent: (e) => ws().send(JSON.stringify(e)),
-					});
-					break;
-				}
-				case "Kicked":
-					toast(intl.t("youWereKicked"), { icon: "🥾" });
-					navigate("/");
-					break;
-				default:
-					return;
-			}
-		});
-
-		ws().addEventListener("close", (closeEvent) => {
-			setConnStatus("disconnected");
-			// 1000 means closed normally
-			if (closeEvent.code !== 1000) {
-				setWs(new WebSocket(wsUrl()));
-			}
-		});
-	});
-
-	onCleanup(() => {
-		if (ws().readyState === WebSocket.OPEN) {
-			ws().close(1000);
-		}
+	const { ws, connStatus, roomDetails } = useWs({
+		userName: props.userName,
+		roomCode: props.roomCode,
+		initialUserId: sessionStorage.getItem("userId"),
+		onNewUserId: (newUserId) => sessionStorage.setItem("userId", newUserId),
 	});
 
 	setUpdateNameFn(() => (new_name) => {
