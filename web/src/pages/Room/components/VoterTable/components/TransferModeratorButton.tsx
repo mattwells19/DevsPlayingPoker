@@ -51,7 +51,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 						<span aria-hidden="true" class="mr-1">
 							👑
 						</span>
-						Change moderator
+						{intl.t("transferModerator")}
 					</DialogTitle>
 					<DialogCloseTrigger
 						class="btn btn-ghost btn-circle absolute top-1 right-1"
@@ -68,7 +68,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 						}}
 					>
 						<DialogDescription as="label" for="new-moderator" class="label">
-							Select a new moderator
+							{intl.t("selectNewModerator")}
 						</DialogDescription>
 						<select
 							id="new-moderator"

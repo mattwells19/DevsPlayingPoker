@@ -67,10 +67,9 @@
 
 	"_ROOM_VOTER_TABLE_MODERATOR_OPTIONS": "",
 	"transferModerator": "Transfer moderator.",
-	"makeModerator": "Make moderator",
+	"selectNewModerator": "Select a new moderator",
 	"kickVoter": "Kick {voterName}",
 	"kickVoterDesc": "Are you sure you want to remove <b>{name}</b> from the room?",
-	"makeModeratorDesc": "Are you sure you want to make <b>{name}</b> the new moderator? This will turn you into a voter.",
 	"confirm": "Confirm",
 	"cancel": "Cancel",
 
