@@ -16,7 +16,7 @@ const NumberOfOptionsSlider: Component<
 		<RangeSlider
 			minStepsBetweenThumbs={1}
 			{...rangeSliderProps}
-			class="w-full flex flex-col mt-2"
+			class="w-full form-control mt-2"
 		>
 			<RangeSliderLabel class="label">{customProps.label}</RangeSliderLabel>
 			<RangeSliderControl>

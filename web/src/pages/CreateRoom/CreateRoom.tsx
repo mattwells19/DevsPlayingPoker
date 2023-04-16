@@ -109,9 +109,9 @@ const CreateRoom: Component = () => {
 					}}
 				>
 					<div class="form-control">
-						<label for="moderatorName" class="label justify-start">
+						<label for="moderatorName" class="justify-start">
 							{intl.t("yourName")}
-							<span class="text-error ml-1">*</span>
+							<span class="text-red ml-1">*</span>
 						</label>
 						<input
 							autofocus
@@ -122,7 +122,7 @@ const CreateRoom: Component = () => {
 							maxLength="10"
 							type="text"
 							value={defaults.name}
-							class="input input-bordered"
+							class="input"
 						/>
 					</div>
 
@@ -131,14 +131,14 @@ const CreateRoom: Component = () => {
 					<div class="form-control">
 						<label for="voterOptions" class="label justify-start">
 							{intl.t("voterOptions")}
-							<span class="text-error ml-1">*</span>
+							<span class="text-red ml-1">*</span>
 						</label>
 						<select
 							id="voterOptions"
 							name="voterOptions"
 							required
 							value={defaults.formValues.voterOptions}
-							class="select select-bordered"
+							class="select"
 						>
 							<option value="fibonacci">{intl.t("fibonacci")}</option>
 							<option value="linear">{intl.t("linear")}</option>
@@ -160,26 +160,26 @@ const CreateRoom: Component = () => {
 						/>
 
 						<fieldset class="form-control">
-							<legend class="label">{intl.t("includeNoVote")}</legend>
+							<legend class="pb-1">{intl.t("includeNoVote")}</legend>
 
-							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
+							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="yes"
 									checked={defaults.formValues.noVote}
-									class="radio radio-sm radio-primary"
+									class="radio"
 								/>
 								{intl.t("yes")}
 							</label>
 
-							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
+							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="no"
 									checked={!defaults.formValues.noVote}
-									class="radio radio-sm radio-primary"
+									class="radio"
 								/>
 								{intl.t("no")}
 							</label>
@@ -191,17 +191,17 @@ const CreateRoom: Component = () => {
 						<dd class="pl-3">{list()}</dd>
 					</dl>
 
-					<div class="divider after:display-none" />
+					<hr />
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (
-							<p class="text-error">
+							<p class="text-red">
 								{intl.t("errorWithMsg", { msg: errorMsg })}
 							</p>
 						)}
 					</Show>
 
-					<button class="btn btn-primary" type="submit">
+					<button class="btn" type="submit">
 						{intl.t("done")}
 					</button>
 				</form>

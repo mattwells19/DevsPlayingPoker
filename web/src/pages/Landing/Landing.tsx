@@ -83,7 +83,7 @@ const Landing: Component = () => {
 							<For each={[0, 1, 2, 3]}>
 								{(index) => (
 									<input
-										class="input input-bordered w-12 h-12 uppercase text-center"
+										class="input w-12 h-12 uppercase text-center"
 										id={`roomCode-${index + 1}`}
 										name="roomCode"
 										aria-label={`Room Code letter ${index + 1}`}
@@ -115,7 +115,7 @@ const Landing: Component = () => {
 						<div class="h-4 grid place-items-center">
 							<Show when={error()} keyed>
 								{(errorMsg) => (
-									<p aria-live="polite" class="my-4 mx-0 text-error">
+									<p aria-live="polite" class="my-4 mx-0 text-red">
 										{intl.t(errorMsg)}
 									</p>
 								)}
@@ -123,12 +123,12 @@ const Landing: Component = () => {
 						</div>
 					</section>
 					<div class="flex gap-4 items-center mt-8 mb-12 mx-0">
-						<div class="divider flex-grow" />
+						<hr class="divider flex-grow" />
 						<span>{intl.t("or")}</span>
-						<div class="divider flex-grow" />
+						<hr class="divider flex-grow" />
 					</div>
 					<section class="flex justify-center">
-						<Link href="/create-room" class="btn btn-primary">
+						<Link href="/create-room" class="btn">
 							{intl.t("newRoom")}
 						</Link>
 					</section>

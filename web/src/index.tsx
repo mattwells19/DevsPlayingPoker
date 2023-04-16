@@ -8,6 +8,8 @@ import App from "./App";
 
 import "./interpretTheme";
 import "./index.scss";
+import "virtual:uno.css";
+import "@unocss/reset/tailwind-compat.css";
 
 const Index: Component = () => {
 	return (
