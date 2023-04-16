@@ -1,19 +1,18 @@
-import { ObjectId, UpdateFilter } from "mongo";
-import type { RoomSchema } from "../types/schemas.ts";
 import db from "../utils/db.ts";
 import { SimpleCache } from "../utils/SimpleCache.ts";
+import { Room, Prisma } from "prisma-types";
 
-const roomDataCache = new SimpleCache<RoomSchema>();
+const roomDataCache = new SimpleCache<Room>();
 
 export const findByRoomCode = async (
 	roomCode: string,
-): ReturnType<typeof db.rooms.findOne> => {
+): Promise<Room | null> => {
 	const cacheHit = roomDataCache.get(roomCode);
 	if (cacheHit) {
 		return cacheHit;
 	}
 
-	const fetchedRoomData = await db.rooms.findOne({ roomCode });
+	const fetchedRoomData = await db.room.findUnique({ where: { roomCode } });
 	if (fetchedRoomData) {
 		roomDataCache.set(fetchedRoomData.roomCode, fetchedRoomData);
 	}
@@ -22,22 +21,16 @@ export const findByRoomCode = async (
 };
 
 export const updateById = async (
-	id: ObjectId,
-	updates: UpdateFilter<RoomSchema>,
-): ReturnType<typeof db.rooms.findAndModify> => {
-	const updatedData = await db.rooms.findAndModify(
-		{ _id: id },
-		{
-			update: {
-				...updates,
-				$set: {
-					...updates.$set,
-					lastUpdated: new Date(),
-				},
-			},
-			new: true,
+	id: string,
+	updates: Prisma.RoomUpdateInput,
+): Promise<Room> => {
+	const updatedData = await db.room.update({
+		where: { id: id.toString() },
+		data: {
+			...updates,
+			lastUpdated: new Date(),
 		},
-	);
+	});
 
 	if (updatedData) {
 		roomDataCache.set(updatedData.roomCode, updatedData);
@@ -48,18 +41,17 @@ export const updateById = async (
 
 export const deleteByRoomCode = (roomCode: string) => {
 	roomDataCache.delete(roomCode);
-	return db.rooms.deleteOne({ roomCode });
+	return db.room.delete({ where: { roomCode } });
 };
 
 export const insertRoom = async (
-	roomData: Omit<RoomSchema, "_id">,
-): ReturnType<typeof db.rooms.insertOne> => {
-	const roomId = await db.rooms.insertOne(roomData);
-
-	roomDataCache.set(roomData.roomCode, {
-		_id: roomId,
-		...roomData,
+	roomData: Omit<Room, "id">,
+): Promise<Room["id"]> => {
+	const createdRoom = await db.room.create({
+		data: roomData,
 	});
 
-	return roomId;
+	roomDataCache.set(roomData.roomCode, createdRoom);
+
+	return createdRoom.id;
 };

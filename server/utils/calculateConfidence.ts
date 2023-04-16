@@ -1,4 +1,4 @@
-import { ConfidenceValue } from "../types/schemas.ts";
+import { ConfidenceValue } from "prisma-types";
 
 const calculateConfidence = (timeStarted: Date | null): ConfidenceValue => {
 	if (!timeStarted) {

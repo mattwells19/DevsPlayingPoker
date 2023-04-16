@@ -1,4 +1,4 @@
-import type { RoomSchema } from "./schemas.ts";
+import { Room } from "prisma-types";
 
 export interface ConnectEvent {
 	event: "Connected";
@@ -8,7 +8,7 @@ export interface ConnectEvent {
 
 export interface RoomUpdateEvent {
 	event: "RoomUpdate";
-	roomData: RoomSchema;
+	roomData: Room;
 }
 
 export interface JoinEvent {
@@ -31,7 +31,7 @@ export interface StopVotingEvent {
 
 export interface OptionSelectedEvent {
 	event: "OptionSelected";
-	selection: RoomSchema["options"][0];
+	selection: Room["options"][0];
 }
 
 export interface KickVoterEvent {

@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["deno"]
+  output = "../generated/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+enum RoomState {
+  Voting
+  Results
+}
+
+enum ConfidenceValue {
+	low
+	medium
+	high
+}
+
+type User {
+  id String
+  name String
+}
+
+type Voter {
+  id String
+  name String
+  confidence ConfidenceValue?
+  selection String?
+}
+
+model Room {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  state RoomState
+  roomCode String @unique
+  votingDescription String @default("")
+  moderator User?
+  options String[]
+  voters Voter[]
+  votingStartedAt DateTime?
+  lastUpdated DateTime @default(now()) @db.Date
+}

@@ -1,5 +1,5 @@
 import { z as zod } from "zod";
-import type { RoomSchema, User, Voter } from "../types/schemas.ts";
+import { Prisma, Room, Voter, User } from "prisma-types";
 import type {
 	JoinEvent,
 	RoomUpdateEvent,
@@ -31,7 +31,7 @@ const getSocketId = (userId: string, roomCode: string) =>
  * @param roomData
  * @returns void
  */
-const sendRoomData = (roomData: RoomSchema | undefined): void => {
+const sendRoomData = (roomData: Room | undefined): void => {
 	if (!roomData) {
 		throw new Error(`Failed to send updatedRoomData. No roomData found.`);
 	}
@@ -67,7 +67,7 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
  * @param roomData The room data to check for duplicate names
  * @returns The cleansed name
  */
-const cleanseName = (origName: string, roomData: RoomSchema) => {
+const cleanseName = (origName: string, roomData: Room) => {
 	// max name length of 20 characters (not including potential name counter)
 	const trimmedName = origName.trim().substring(0, 20);
 
@@ -111,7 +111,7 @@ interface SocketContext {
 }
 
 type EventFunction<Event extends WebScoketMessageEvent> = (
-	roomData: RoomSchema,
+	roomData: Room,
 	context: SocketContext,
 	event: Event,
 ) => Promise<EventFunctionError | void> | (EventFunctionError | void);
@@ -153,31 +153,30 @@ const handleJoin: EventFunction<JoinEvent> = async (
 
 	const cleansedName = cleanseName(data.name, roomData);
 
-	const isModerator = !roomData.moderator;
+	const updates = ((): Prisma.RoomUpdateInput => {
+		if (!roomData.moderator) {
+			return {
+				moderator: {
+					id: userId,
+					name: cleansedName,
+				},
+			};
+		}
 
-	const updatedRoomData = await rooms.updateById(
-		roomData._id,
-		!isModerator
-			? {
-					$push: {
-						voters: {
-							$each: [
-								{
-									id: userId,
-									name: cleansedName,
-									confidence: null,
-									selection: null,
-								},
-							],
-						},
-					},
-			  }
-			: {
-					$set: {
-						moderator: { id: userId, name: cleansedName },
-					},
-			  },
-	);
+		return {
+			voters: [
+				...roomData.voters,
+				{
+					id: userId,
+					name: cleansedName,
+					confidence: null,
+					selection: null,
+				},
+			],
+		};
+	})();
+
+	const updatedRoomData = await rooms.updateById(roomData.id, updates);
 
 	sendRoomData(updatedRoomData);
 };
@@ -185,33 +184,34 @@ const handleJoin: EventFunction<JoinEvent> = async (
 /**
  * Removes the user from the room and performs moderator migration if necessary
  */
-const handleLeave = async (
-	roomData: RoomSchema,
-	userId: string,
-): Promise<void> => {
-	let updatedRoomData: RoomSchema | undefined;
+const handleLeave = async (roomData: Room, userId: string): Promise<void> => {
+	let updatedRoomData: Room | undefined;
 
 	if (roomData.moderator && roomData.moderator.id === userId) {
 		if (roomData.voters.length > 0) {
 			const newModerator = roomData.voters[0];
+			const updatedVoters = roomData.voters.filter(
+				(voter) => voter.id !== newModerator.id,
+			);
 
-			updatedRoomData = await rooms.updateById(roomData._id, {
-				$set: {
-					moderator: { id: newModerator.id, name: newModerator.name },
-				},
-				$pull: { voters: { id: newModerator.id } },
+			updatedRoomData = await rooms.updateById(roomData.id, {
+				moderator: { id: newModerator.id, name: newModerator.name },
+				voters: updatedVoters,
 			});
 		} else {
 			// if the moderator left and there's no one else in the room, delete the room
 			await rooms.deleteByRoomCode(roomData.roomCode);
 			console.debug(
-				`Deleted room with _id of ${roomData._id} and roomCode of ${roomData.roomCode}`,
+				`Deleted room with _id of ${roomData.id} and roomCode of ${roomData.roomCode}`,
 			);
 			return;
 		}
 	} else {
-		updatedRoomData = await rooms.updateById(roomData._id, {
-			$pull: { voters: { id: userId } },
+		const updatedVoters = roomData.voters.filter(
+			(voter) => voter.id !== userId,
+		);
+		updatedRoomData = await rooms.updateById(roomData.id, {
+			voters: updatedVoters,
 		});
 	}
 
@@ -229,12 +229,10 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 		confidence: null,
 	}));
 
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$set: {
-			state: "Voting",
-			voters: updatedVoters,
-			votingStartedAt: new Date(),
-		},
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		state: "Voting",
+		voters: updatedVoters,
+		votingStartedAt: new Date(),
 	});
 
 	sendRoomData(updatedRoomData);
@@ -244,10 +242,8 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
  * Ends voting, transitioning to "Results" state
  */
 const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$set: {
-			state: "Results",
-		},
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		state: "Results",
 	});
 
 	sendRoomData(updatedRoomData);
@@ -278,10 +274,8 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 		return voter;
 	});
 
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$set: {
-			voters: updatedVoters,
-		},
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		voters: updatedVoters,
 	});
 
 	sendRoomData(updatedRoomData);
@@ -347,11 +341,9 @@ const handleModeratorChange: EventFunction<ModeratorChangeEvent> = async (
 		name: newModerator.name,
 	};
 
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$set: {
-			voters: updatedVoters,
-			moderator: updatedModerator,
-		},
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		voters: updatedVoters,
+		moderator: updatedModerator,
 	});
 
 	sendRoomData(updatedRoomData);
@@ -362,12 +354,9 @@ const handleKickVoter: EventFunction<KickVoterEvent> = async (
 	_,
 	{ voterId },
 ) => {
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$pull: {
-			voters: {
-				id: voterId,
-			},
-		},
+	const updatedVoters = roomData.voters.filter((voter) => voter.id !== voterId);
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		voters: updatedVoters,
 	});
 
 	if (!updatedRoomData) return;
@@ -400,10 +389,8 @@ const handleVotingDescription: EventFunction<VotingDescriptionEvent> = async (
 	// will throw if parsing fails
 	votingDescSchema.parse(value);
 
-	const updatedRoomData = await rooms.updateById(roomData._id, {
-		$set: {
-			votingDescription: value,
-		},
+	const updatedRoomData = await rooms.updateById(roomData.id, {
+		votingDescription: value,
 	});
 
 	if (!updatedRoomData) return;
@@ -426,12 +413,10 @@ const handleChangeName: EventFunction<ChangeNameEvent> = async (
 
 	const updatedRoomData = await (() => {
 		if (roomData.moderator?.id === userId) {
-			return rooms.updateById(roomData._id, {
-				$set: {
-					moderator: {
-						...roomData.moderator,
-						name: cleansedName,
-					},
+			return rooms.updateById(roomData.id, {
+				moderator: {
+					...roomData.moderator,
+					name: cleansedName,
 				},
 			});
 		} else {
@@ -445,10 +430,8 @@ const handleChangeName: EventFunction<ChangeNameEvent> = async (
 				return voter;
 			});
 
-			return rooms.updateById(roomData._id, {
-				$set: {
-					voters: updatedVoters,
-				},
+			return rooms.updateById(roomData.id, {
+				voters: updatedVoters,
 			});
 		}
 	})();
