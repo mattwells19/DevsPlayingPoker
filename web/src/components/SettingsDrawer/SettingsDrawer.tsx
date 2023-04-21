@@ -44,7 +44,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 				<DialogCloseTrigger
 					onClick={props.onClose}
 					title={intl.t("closeSettingsDrawer") as string}
-					class="btn btn-square btn-ghost btn-primary block ml-auto"
+					class="btn-icon block ml-auto"
 				>
 					&#10005;
 				</DialogCloseTrigger>
@@ -58,7 +58,6 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						aria-describedby="theme-select-helptext"
 						value={localStorage.getItem("theme") ?? "system"}
 						onChange={handleThemeChange}
-						class="select select-bordered"
 					>
 						<option value="system">{intl.t("system")}</option>
 						<option value="light">{intl.t("light")}</option>
@@ -91,7 +90,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						<label for="name" class="label">
 							{intl.t("name")}
 						</label>
-						<div class="input-group w-full">
+						<div class="flex w-full">
 							<input
 								id="name"
 								name="name"
@@ -104,12 +103,12 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 								onInput={() => setErrorMsg(null)}
 								aria-describedby="name-error-msg"
 								aria-invalid={Boolean(errorMsg())}
-								class="input input-bordered w-full"
+								class="border-r-0 rounded-r-none flex-1"
 							/>
 							<button
 								type="submit"
 								title={intl.t("saveName") as string}
-								class="btn btn-primary btn-square"
+								class="rounded-l-none p-2.5"
 							>
 								<Icon
 									name="save"

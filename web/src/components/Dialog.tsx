@@ -93,9 +93,11 @@ export const DrawerContent: ParentComponent = (props) => {
 				<Show when={api().isOpen}>
 					<aside
 						{...api().containerProps}
-						class="w-full max-w-xs p-4 fixed top-0 right-0 h-full bg-base-100"
+						class="w-full max-w-xs p-4 fixed top-0 right-0 h-full bg-brand-whitish dark:bg-brand-navy"
 					>
-						<div {...api().contentProps}>{props.children}</div>
+						<div class="h-full" {...api().contentProps}>
+							{props.children}
+						</div>
 					</aside>
 				</Show>
 			</Transition>

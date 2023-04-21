@@ -76,7 +76,7 @@ export const RangeSliderTrack: Component = () => {
 	const api = useRangeSliderContext();
 	return (
 		<div
-			class="bg-brand-navy bg-opacity-10 h-2 w-full rounded-full"
+			class="bg-brand-navy bg-opacity-10 dark:(bg-brand-whitish bg-opacity-10) h-2 w-full rounded-full"
 			{...api().trackProps}
 		>
 			<div

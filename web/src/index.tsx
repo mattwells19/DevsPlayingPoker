@@ -7,9 +7,8 @@ import IntlProvider from "./i18n";
 import App from "./App";
 
 import "./interpretTheme";
-import "./index.scss";
 import "virtual:uno.css";
-import "@unocss/reset/tailwind-compat.css";
+import "./index.scss";
 
 const Index: Component = () => {
 	return (

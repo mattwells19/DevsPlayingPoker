@@ -123,9 +123,9 @@ const Landing: Component = () => {
 						</div>
 					</section>
 					<div class="flex gap-4 items-center mt-8 mb-12 mx-0">
-						<hr class="divider flex-grow" />
+						<hr class="flex-grow" />
 						<span>{intl.t("or")}</span>
-						<hr class="divider flex-grow" />
+						<hr class="flex-grow" />
 					</div>
 					<section class="flex justify-center">
 						<Link href="/create-room" class="btn">

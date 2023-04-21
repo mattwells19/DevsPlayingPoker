@@ -100,7 +100,7 @@ const CreateRoom: Component = () => {
 			<Header />
 			<main class="max-w-md m-auto">
 				<form
-					class="flex flex-col gap-4"
+					class="flex flex-col gap-7"
 					ref={(el) => (formRef = el)}
 					onInput={(e) => handleChange(e.currentTarget)}
 					onSubmit={(e) => {
@@ -126,7 +126,7 @@ const CreateRoom: Component = () => {
 						/>
 					</div>
 
-					<div class="divider" />
+					<hr class="my-4" />
 
 					<div class="form-control">
 						<label for="voterOptions" class="label justify-start">
@@ -138,7 +138,6 @@ const CreateRoom: Component = () => {
 							name="voterOptions"
 							required
 							value={defaults.formValues.voterOptions}
-							class="select"
 						>
 							<option value="fibonacci">{intl.t("fibonacci")}</option>
 							<option value="linear">{intl.t("linear")}</option>
@@ -168,7 +167,6 @@ const CreateRoom: Component = () => {
 									name="noVote"
 									value="yes"
 									checked={defaults.formValues.noVote}
-									class="radio"
 								/>
 								{intl.t("yes")}
 							</label>
@@ -191,7 +189,7 @@ const CreateRoom: Component = () => {
 						<dd class="pl-3">{list()}</dd>
 					</dl>
 
-					<hr />
+					<hr class="my-4" />
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (

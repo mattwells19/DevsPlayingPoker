@@ -1,36 +1,70 @@
-body {
-	&.dark {
-		color-scheme: dark;
+@use "sass:meta";
+@layer reset, base, rules, default;
+
+@layer reset {
+	// https://github.com/sass/sass/issues/3240
+	@include meta.load-css("@unocss/reset/tailwind-compat.css");
+}
+
+@layer base {
+	body {
+		--at-apply: "bg-brand-whitish text-brand-navy dark:(bg-brand-navy text-brand-whitish)";
+
+		&.dark {
+			color-scheme: dark;
+		}
+
+		padding: 1rem;
 	}
 
-	padding: 1rem;
-}
+	html {
+		font-family: "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont,
+			"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+			"Helvetica Neue", sans-serif;
+	}
 
-html {
-	font-family: "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont, "Oxygen",
-		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-		sans-serif;
-}
+	* {
+		margin: 0;
+		padding: 0;
+		font-size: 100%;
+	}
 
-* {
-	margin: 0;
-	padding: 0;
-	font-size: 100%;
-}
+	button:not(.btn-icon) {
+		--at-apply: "btn";
+	}
 
-button {
-	@apply btn;
-}
+	select {
+		--at-apply: "select";
+	}
 
-/** Component Overrides **/
+	input[type="text"],
+	input[type="date"],
+	input[type="number"] {
+		--at-apply: "input";
+	}
 
-// solid-toast uses inline styles 🙄
-.toast-overrides {
-	background-color: hsl(var(--bc)) !important;
-	color: hsl(var(--b1)) !important;
+	input[type="checkbox"] {
+		--at-apply: "checkbox";
+	}
 
-	& [role="status"] {
-		// the default is flex which removes spaces for formatted elements
-		display: block !important;
+	input[type="radio"] {
+		--at-apply: "radio";
+	}
+
+	hr {
+		--at-apply: "border-gray-300 dark:border-slate-600";
+	}
+
+	/** Component Overrides **/
+
+	// solid-toast uses inline styles 🙄
+	.toast-overrides {
+		background-color: hsl(var(--bc)) !important;
+		color: hsl(var(--b1)) !important;
+
+		& [role="status"] {
+			// the default is flex which removes spaces for formatted elements
+			display: block !important;
+		}
 	}
 }
