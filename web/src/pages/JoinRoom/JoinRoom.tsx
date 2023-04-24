@@ -39,17 +39,13 @@ const JoinRoom: Component = () => {
 					class="flex flex-col"
 				>
 					<div class="form-control">
-						<label
-							for="name"
-							class="label after:content-['*'] after:text-error justify-start gap-1"
-						>
+						<label for="name" class="label-required">
 							{intl.t("name")}
 						</label>
 						<input
 							id="name"
 							name="name"
 							type="text"
-							class="input input-bordered"
 							required
 							minLength="1"
 							maxLength="20"
@@ -61,13 +57,13 @@ const JoinRoom: Component = () => {
 						/>
 						<Show when={errorMsg()} keyed>
 							{(msg) => (
-								<p id="name-error-msg" class="text-error mt-1">
+								<p id="name-error-msg" class="text-red mt-1">
 									{intl.t(msg)}
 								</p>
 							)}
 						</Show>
 					</div>
-					<button type="submit" class="btn btn-primary mt-8">
+					<button type="submit" class="mt-8">
 						{intl.t("done")}
 					</button>
 				</form>

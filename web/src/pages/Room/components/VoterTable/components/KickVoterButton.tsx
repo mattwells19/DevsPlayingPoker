@@ -29,7 +29,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 	return (
 		<Dialog>
 			<DialogTrigger
-				class="btn btn-ghost btn-sm btn-circle opacity-0 group-hover:opacity-100 focus:opacity-100 dark:focus:opacity-100 bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent"
+				class="w-8 h-8 p-1 text-sm rounded-full transition-colors transition-opacity opacity-0 bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100"
 				aria-label={
 					intl.t("kickVoter", { voterName: props.voter.name }) as string
 				}
@@ -45,7 +45,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 					{intl.t("kickVoter", { voterName: props.voter.name })}
 				</DialogTitle>
 				<DialogCloseTrigger
-					class="btn btn-ghost btn-circle absolute top-1 right-1"
+					class="btn-ghost rounded-full absolute top-1 right-1"
 					aria-label={intl.t("cancel") as string}
 				>
 					&#10005;
@@ -56,14 +56,14 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 						handleKickVoter();
 					}}
 				>
-					<DialogDescription as="p" class="py-4">
+					<DialogDescription as="p" class="mt-6">
 						{intl.t("kickVoterDesc", { name: props.voter.name })}
 					</DialogDescription>
-					<div role="group" class="modal-action">
-						<button type="submit" class="btn btn-primary btn-sm">
+					<div role="group" class="flex justify-end gap-2 mt-10">
+						<button type="submit" class="btn btn-sm">
 							{intl.t("confirm")}
 						</button>
-						<DialogCloseTrigger type="button" class="btn btn-outline btn-sm">
+						<DialogCloseTrigger type="button" class="btn-ghost btn-sm">
 							{intl.t("cancel")}
 						</DialogCloseTrigger>
 					</div>

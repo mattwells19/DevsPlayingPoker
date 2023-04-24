@@ -60,7 +60,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 				<details
 					open
 					ref={(el) => (detailsRef = el)}
-					class="bg-slate-50 dark:bg-base-300 shadow-md dark:shadow-none dark:border border-base-content border-opacity-20 rounded-lg my-2 group"
+					class="bg-slate-50 dark:(bg-brand-navy shadow-none border border-slate-600) shadow-md rounded-lg my-2 group"
 				>
 					<summary
 						class={mergeClassNames(
@@ -91,7 +91,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 										props.onStartEditing();
 									}}
 								>
-									<button type="submit" class="btn btn-primary btn-sm">
+									<button type="submit" class="btn btn-sm">
 										{intl.t("edit")}
 									</button>
 								</form>
@@ -104,14 +104,14 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 										});
 									}}
 								>
-									<button type="submit" class="btn btn-ghost btn-sm">
+									<button type="submit" class="btn-ghost btn-sm">
 										{intl.t("clear")}
 									</button>
 								</form>
 							</div>
 						</Show>
 					</summary>
-					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-base-content border-opacity-20 font-sans">
+					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-gray-300 dark:border-slate-600 font-sans">
 						{formattedDescription()}
 					</pre>
 				</details>
@@ -130,7 +130,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 					}}
 					class="flex justify-center"
 				>
-					<button type="submit" class="btn btn-sm btn-outline">
+					<button type="submit" class="btn-outline btn-sm">
 						{intl.t("addVotingDesc")}
 					</button>
 				</form>

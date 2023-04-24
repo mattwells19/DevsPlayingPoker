@@ -45,13 +45,11 @@ const EditDescription: Component<EditDescriptionProps> = (props) => {
 				}
 			}}
 		>
-			<label for="votingDesc" class="label">
-				{intl.t("votingDesc")}
-			</label>
+			<label for="votingDesc">{intl.t("votingDesc")}</label>
 			<textarea
 				id="votingDesc"
 				name="votingDesc"
-				class="textarea textarea-bordered"
+				class="input"
 				rows="3"
 				maxLength="1000"
 				autofocus
@@ -60,16 +58,16 @@ const EditDescription: Component<EditDescriptionProps> = (props) => {
 			>
 				{room.roomData.votingDescription}
 			</textarea>
-			<p class="label label-text-alt" id="votingDesc-helper-text">
+			<p class="text-sm" id="votingDesc-helper-text">
 				{intl.t("votingDescHelperText")}
 			</p>
-			<div role="group" class="flex justify-end gap-2">
-				<button type="submit" class="btn btn-primary btn-sm">
+			<div role="group" class="flex justify-end gap-2 mt-3">
+				<button type="submit" class="btn btn-sm">
 					{intl.t("update")}
 				</button>
 				<button
 					type="button"
-					class="btn btn-ghost btn-sm"
+					class="btn-ghost btn-sm"
 					onClick={props.onStopEditing}
 				>
 					{intl.t("cancel")}

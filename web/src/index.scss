@@ -7,30 +7,34 @@
 }
 
 @layer base {
+	:root {
+		--orange: 22, 89%, 61%;
+		--orangeFocus: 22, 70%, 53%;
+		--reddish: 12, 78%, 49%;
+		--turquoise: 159, 99%, 73%;
+		--neutral: 0, 0%, 20%;
+		--whitish: 197, 24%, 94%;
+		--navy: 235, 21%, 21%;
+	}
+
 	body {
-		--at-apply: "bg-brand-whitish text-brand-navy dark:(bg-brand-navy text-brand-whitish)";
-
-		&.dark {
-			color-scheme: dark;
-		}
-
-		padding: 1rem;
+		--at-apply: "bg-brand-whitish text-brand-navy p-4 dark:(bg-brand-navy text-brand-whitish)";
 	}
 
 	html {
 		font-family: "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont,
 			"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
 			"Helvetica Neue", sans-serif;
+
+		&.dark {
+			color-scheme: dark;
+		}
 	}
 
 	* {
 		margin: 0;
 		padding: 0;
 		font-size: 100%;
-	}
-
-	button:not(.btn-icon) {
-		--at-apply: "btn";
 	}
 
 	select {
@@ -52,7 +56,7 @@
 	}
 
 	hr {
-		--at-apply: "border-gray-300 dark:border-slate-600";
+		--at-apply: "border-color";
 	}
 
 	/** Component Overrides **/

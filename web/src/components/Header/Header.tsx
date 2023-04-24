@@ -28,8 +28,10 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						</Link>
 					</Show>
 				</div>
-				<div class="flex-1">{componentProps.children}</div>
-				<div class="flex-1 flex justify-end">
+				<div class="flex-1 flex justify-center items-center">
+					{componentProps.children}
+				</div>
+				<div class="flex-1 flex justify-end items-center">
 					<a
 						href="https://github.com/lvl-mattwells/DevsPlayingPoker"
 						target="_blank"

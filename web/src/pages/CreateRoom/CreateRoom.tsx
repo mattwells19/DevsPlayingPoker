@@ -109,9 +109,8 @@ const CreateRoom: Component = () => {
 					}}
 				>
 					<div class="form-control">
-						<label for="moderatorName" class="justify-start">
+						<label for="moderatorName" class="label-required">
 							{intl.t("yourName")}
-							<span class="text-red ml-1">*</span>
 						</label>
 						<input
 							autofocus
@@ -119,19 +118,17 @@ const CreateRoom: Component = () => {
 							name="moderatorName"
 							required
 							minLength="1"
-							maxLength="10"
+							maxLength="20"
 							type="text"
 							value={defaults.name}
-							class="input"
 						/>
 					</div>
 
 					<hr class="my-4" />
 
 					<div class="form-control">
-						<label for="voterOptions" class="label justify-start">
+						<label for="voterOptions" class="label-required">
 							{intl.t("voterOptions")}
-							<span class="text-red ml-1">*</span>
 						</label>
 						<select
 							id="voterOptions"
@@ -185,7 +182,7 @@ const CreateRoom: Component = () => {
 					</Show>
 
 					<dl class="form-control">
-						<dt class="label">{intl.t("finalPreview")}</dt>
+						<dt>{intl.t("finalPreview")}</dt>
 						<dd class="pl-3">{list()}</dd>
 					</dl>
 

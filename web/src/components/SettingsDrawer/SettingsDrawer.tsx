@@ -49,9 +49,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 					&#10005;
 				</DialogCloseTrigger>
 				<div class="form-control my-8">
-					<label for="theme-select" class="label">
-						{intl.t("theme")}
-					</label>
+					<label for="theme-select">{intl.t("theme")}</label>
 					<select
 						id="theme-select"
 						name="theme-select"
@@ -63,7 +61,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						<option value="light">{intl.t("light")}</option>
 						<option value="dark">{intl.t("dark")}</option>
 					</select>
-					<p id="theme-select-helptext" class="label label-text-alt">
+					<p id="theme-select-helptext" class="text-sm">
 						{intl.t("savesAutomatically")}
 					</p>
 				</div>
@@ -108,7 +106,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 							<button
 								type="submit"
 								title={intl.t("saveName") as string}
-								class="rounded-l-none p-2.5"
+								class="btn rounded-l-none p-2.5"
 							>
 								<Icon
 									name="save"

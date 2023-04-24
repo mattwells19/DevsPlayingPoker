@@ -131,7 +131,10 @@ export const DialogContent: ParentComponent = (props) => {
 						{...api().containerProps}
 						class="fixed inset-0 w-full h-full grid place-items-center"
 					>
-						<div {...api().contentProps} class="modal-box">
+						<div
+							{...api().contentProps}
+							class="relative bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md min-w-md"
+						>
 							{props.children}
 						</div>
 					</div>

@@ -14,16 +14,16 @@ const ConnectionStatusBadge: Component<ConnectionStatusBadgeProps> = (
 	return (
 		<button
 			type="button"
-			class="btn btn-ghost btn-xs rounded-full pl-1"
+			class="btn-ghost text-xs rounded-full py-1.5 px-2 flex items-center gap-1.5"
 			onClick={props.onReset}
 			title={intl.t("manualReset") as string}
 		>
 			<span
-				class="badge p-0.5 h-3 w-3 mr-1"
+				class="inline-flex h-3 w-3 rounded-full"
 				classList={{
-					"badge-success": props.connStatus === "connected",
-					"badge-warning": props.connStatus === "connecting",
-					"badge-error": props.connStatus === "disconnected",
+					"bg-green": props.connStatus === "connected",
+					"bg-yellow": props.connStatus === "connecting",
+					"bg-red": props.connStatus === "disconnected",
 				}}
 			></span>
 			{intl.t(props.connStatus)}

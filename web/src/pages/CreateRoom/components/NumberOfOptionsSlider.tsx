@@ -18,7 +18,7 @@ const NumberOfOptionsSlider: Component<
 			{...rangeSliderProps}
 			class="w-full form-control mt-2"
 		>
-			<RangeSliderLabel class="label">{customProps.label}</RangeSliderLabel>
+			<RangeSliderLabel>{customProps.label}</RangeSliderLabel>
 			<RangeSliderControl>
 				<RangeSliderTrack />
 				<RangeSliderThumb index={0} />

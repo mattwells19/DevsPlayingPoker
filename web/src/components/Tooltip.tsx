@@ -39,17 +39,17 @@ export const Tooltip: Component<TooltipProps> = (props) => {
 
 	return (
 		<>
-			<button tabIndex="-1" {...api().triggerProps}>
+			<button tabIndex="-1" class="bg-transparent" {...api().triggerProps}>
 				{props.children}
 			</button>
-			<Show when={api().isOpen}>
+			<Show when={api().isOpen || true}>
 				<Portal>
 					<div
 						{...api().positionerProps}
 						class="animate-[fadeIn_200ms_ease-in-out]"
 						style={{
 							"--arrow-size": "10px",
-							"--arrow-background": "hsl(var(--bc))",
+							"--arrow-background": "inherit",
 						}}
 					>
 						<Show when={customProps.arrow}>
@@ -59,7 +59,7 @@ export const Tooltip: Component<TooltipProps> = (props) => {
 						</Show>
 						<div
 							{...api().contentProps}
-							class="bg-base-content text-base-100 text-sm px-4 py-2 rounded-lg transition-opacity"
+							class="bg-brand-navy text-brand-whitish dark:(bg-brand-whitish text-brand-navy) text-sm px-4 py-2 rounded-lg transition-opacity"
 						>
 							{customProps.tip}
 						</div>

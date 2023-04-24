@@ -39,7 +39,7 @@ const OptionCard: Component<OptionCardProps> = (props) => {
 						width="158"
 						height="221"
 						rx="8"
-						class="fill-slate-50 dark:fill-base-300"
+						class="fill-slate-50 dark:fill-brand-navy"
 					/>
 					<rect
 						x="1"
