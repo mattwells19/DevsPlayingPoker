@@ -2,6 +2,7 @@ import { Component, createSignal, For, JSX, Show } from "solid-js";
 import { useNavigate, Link } from "@solidjs/router";
 import Header from "@/components/Header";
 import { IntlKey, useIntl } from "@/i18n";
+import toast from "solid-toast";
 
 const Landing: Component = () => {
 	const intl = useIntl();
@@ -65,7 +66,10 @@ const Landing: Component = () => {
 	return (
 		<>
 			<Header
-				onSaveName={(new_name) => localStorage.setItem("name", new_name)}
+				onSaveName={(new_name) => {
+					toast.success(intl.t("nameUpdated"));
+					localStorage.setItem("name", new_name);
+				}}
 			/>
 			<main class="max-w-md m-auto flex flex-col">
 				<section class="text-center my-8 mx-0 py-0 px-2">

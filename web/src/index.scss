@@ -31,8 +31,25 @@
 			"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
 			"Helvetica Neue", sans-serif;
 
+		// solid-toast uses inline styles 🙄
+		.toast-overrides {
+			background-color: hsl(var(--navy)) !important;
+			color: hsl(var(--whitish)) !important;
+
+			& [role="status"] {
+				// the default is flex which removes spaces for formatted elements
+				display: block !important;
+			}
+		}
+
 		&.dark {
 			color-scheme: dark;
+
+			// solid-toast uses inline styles 🙄
+			.toast-overrides {
+				background-color: hsl(var(--whitish)) !important;
+				color: hsl(var(--navy)) !important;
+			}
 		}
 	}
 
@@ -62,18 +79,5 @@
 
 	hr {
 		--at-apply: "border-color";
-	}
-
-	/** Component Overrides **/
-
-	// solid-toast uses inline styles 🙄
-	.toast-overrides {
-		background-color: hsl(var(--bc)) !important;
-		color: hsl(var(--b1)) !important;
-
-		& [role="status"] {
-			// the default is flex which removes spaces for formatted elements
-			display: block !important;
-		}
 	}
 }
