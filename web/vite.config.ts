@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import path from "path";
@@ -27,5 +28,13 @@ export default defineConfig({
 		target: "esnext",
 		outDir: "../server/www",
 		emptyOutDir: true,
+	},
+	test: {
+		globals: true,
+		setupFiles: [
+			"node_modules/@testing-library/jest-dom/extend-expect",
+			"./setupVitest.ts",
+		],
+		transformMode: { web: [/\.[jt]sx?$/] },
 	},
 });
