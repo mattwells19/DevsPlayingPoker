@@ -32,9 +32,9 @@ const VoterTable: Component<VoterTableProps> = () => {
 
 	return (
 		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-color">
-			<table class="w-full bg-slate-50 dark:bg-brand-navy">
+			<table class="w-full bg-brand-whitish-lighter dark:bg-brand-navy-darker">
 				<Show when={!votingModerator()}>
-					<caption class="bg-slate-50 dark:bg-brand-navy p-4">
+					<caption class="bg-brand-whitish-lighter dark:bg-brand-navy-darker p-4">
 						<div class="flex justify-between items-center">
 							<span class="before:content-['👑'] before:mr-1">
 								<Show
@@ -80,7 +80,9 @@ const VoterTable: Component<VoterTableProps> = () => {
 								}
 								confidence={votingModerator.confidence}
 								selection={votingModerator.selection}
-								hiddenAction={<TransferModeratorButton options={voters()} />}
+								hiddenAction={
+									<TransferModeratorButton discreet options={voters()} />
+								}
 							/>
 						)}
 					</Show>

@@ -6,15 +6,20 @@
 	@include meta.load-css("@unocss/reset/tailwind-compat.css");
 }
 
+@mixin color-layers($name, $hue, $saturation, $lightness, $adjustment: 5) {
+	--#{$name}: #{$hue}, #{$saturation}, #{$lightness};
+	--#{$name}-lighter: #{$hue}, #{$saturation}, #{$lightness + $adjustment};
+	--#{$name}-darker: #{$hue}, #{$saturation}, #{$lightness - $adjustment};
+}
+
 @layer base {
 	:root {
-		--orange: 22, 89%, 61%;
-		--orangeFocus: 22, 70%, 53%;
+		@include color-layers("orange", 22, 89%, 61%, 10);
 		--reddish: 12, 78%, 49%;
 		--turquoise: 159, 99%, 73%;
 		--neutral: 0, 0%, 20%;
-		--whitish: 197, 24%, 94%;
-		--navy: 235, 21%, 21%;
+		@include color-layers("whitish", 197, 24%, 94%);
+		@include color-layers("navy", 235, 21%, 21%);
 	}
 
 	body {

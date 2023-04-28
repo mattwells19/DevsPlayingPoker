@@ -14,6 +14,7 @@ import type { Voter } from "@/shared-types";
 
 interface TransferModeratorButtonProps {
 	options: Array<Voter>;
+	discreet?: boolean;
 }
 
 const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
@@ -36,7 +37,8 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 			<Dialog>
 				<DialogTrigger
 					type="button"
-					class="p-2 rounded-full transition-colors bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 group-only:opacity-0"
+					class="p-2 rounded-full transition-all bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
+					classList={{ "opacity-0": props.discreet }}
 					title={intl.t("transferModerator") as string}
 				>
 					<Icon

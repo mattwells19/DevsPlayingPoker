@@ -29,7 +29,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 	return (
 		<Dialog>
 			<DialogTrigger
-				class="w-8 h-8 p-1 text-sm rounded-full transition-colors transition-opacity opacity-0 bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100"
+				class="w-8 h-8 p-1 text-sm rounded-full transition-colors transition-opacity opacity-0 bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
 				aria-label={
 					intl.t("kickVoter", { voterName: props.voter.name }) as string
 				}

@@ -60,7 +60,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 				<details
 					open
 					ref={(el) => (detailsRef = el)}
-					class="bg-slate-50 dark:(bg-brand-navy shadow-none border border-slate-600) shadow-md rounded-lg my-2 group"
+					class="bg-brand-whitish-lighter dark:(bg-brand-navy-darker shadow-none border border-slate-600) shadow-md rounded-lg my-2 group"
 				>
 					<summary
 						class={mergeClassNames(
@@ -111,7 +111,7 @@ const ShowDescription: Component<ShowDescriptionProps> = (props) => {
 							</div>
 						</Show>
 					</summary>
-					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-gray-300 dark:border-slate-600 font-sans">
+					<pre class="w-full overflow-hidden whitespace-pre-line p-4 h-auto border-t border-color font-sans">
 						{formattedDescription()}
 					</pre>
 				</details>

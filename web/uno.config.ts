@@ -19,12 +19,20 @@ export default defineConfig({
 		colors: {
 			brand: {
 				orange: "hsl(var(--orange))",
-				orangeFocus: "hsl(var(--orangeFocus))",
+				orangeLighter: "hsl(var(--orange-lighter))",
+				orangeDarker: "hsl(var(--orange-darker))",
+
 				reddish: "hsl(var(--reddish))",
 				turquoise: "hsl(var(--turquoise))",
 				neutral: "hsl(var(--neutral))",
+
 				whitish: "hsl(var(--whitish))",
+				whitishLighter: "hsl(var(--whitish-lighter))",
+				whitishDarker: "hsl(var(--whitish-darker))",
+
 				navy: "hsl(var(--navy))",
+				navyLighter: "hsl(var(--navy-lighter))",
+				navyDarker: "hsl(var(--navy-darker))",
 			},
 		},
 	},
@@ -48,13 +56,34 @@ export default defineConfig({
 				};
 			},
 		],
+		[
+			/^arrow-bg-(.*)$/,
+			([, c], { theme }) => {
+				const levels = c.split("-");
+				const color = levels.reduce(
+					(prev, curr) => prev[curr] as any,
+					theme.colors!,
+				);
+				return {
+					"--arrow-background": color.toString(),
+				};
+			},
+		],
+		[
+			/^arrow-w-(.*)$/,
+			([, size]) => {
+				return {
+					"--arrow-size": size,
+				};
+			},
+		],
 	],
 	shortcuts: {
 		input:
 			"bg-inherit border border-solid border-gray-300 dark:border-slate-600 rounded-lg px-4 py-2",
 		"btn-base":
 			"flex items-center justify-center rounded-lg font-medium px-4 py-3 uppercase transition-colors",
-		btn: "btn-base bg-brand-orange hover:bg-brand-orange-focus text-black",
+		btn: "btn-base bg-brand-orange hover:bg-brand-orange-darker active:bg-brand-orange-lighter text-black",
 		"btn-ghost":
 			"btn-base bg-transparent text-inherit hover:(bg-brand-navy bg-opacity-10) dark:hover:(bg-brand-whitish bg-opacity-10)",
 		"btn-outline": "btn-ghost border border-current",
@@ -63,9 +92,10 @@ export default defineConfig({
 		radio:
 			"appearance-none cursor-pointer rounded-full w-4 h-4 border border-brand-reddish dark:border-brand-turquoise checked:(radio-inset-whitish bg-brand-reddish dark:bg-brand-turquoise dark:radio-inset-navy)",
 		"btn-icon":
-			"p-3 bg-transparent hover:(bg-brand-navy text-brand-whitish) dark:hover:(bg-brand-whitish text-brand-navy) rounded-lg transition-colors",
+			"p-3 bg-transparent rounded-lg transition-colors hover:(bg-brand-navy bg-opacity-10) dark:hover:(bg-brand-whitish bg-opacity-10)",
 		"form-control": "flex flex-col gap-1",
-		"label-required": "after:(content-['*'] text-red ml-1)",
+		"label-required":
+			"after:(content-['*'] text-brand-reddish dark:text-red ml-1)",
 		"border-color": "border-gray-300 dark:border-slate-600",
 	},
 });
