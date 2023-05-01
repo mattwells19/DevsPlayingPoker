@@ -55,7 +55,10 @@ export function validateOrigin(
 
 		switch (env) {
 			case "dev":
-				return origin === "http://localhost:5000";
+				return (
+					origin === "http://localhost:5000" ||
+					origin === "http://localhost:5555"
+				);
 			case "staging": {
 				if (origin === "https://devs-playing-poker.deno.dev") {
 					return true;
