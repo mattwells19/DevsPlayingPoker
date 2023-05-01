@@ -63,7 +63,7 @@ const JoinRoom: Component = () => {
 							)}
 						</Show>
 					</div>
-					<button type="submit" class="mt-8">
+					<button type="submit" class="btn mt-8">
 						{intl.t("done")}
 					</button>
 				</form>

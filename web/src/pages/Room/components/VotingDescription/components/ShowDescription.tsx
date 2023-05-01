@@ -21,7 +21,7 @@ function formatStringWithUrl(str: string): JSXElement {
 				href={fullUrl}
 				target="_blank"
 				referrerPolicy="no-referrer"
-				class="link text-secondary dark:text-accent"
+				class="underline text-brand-reddish dark:text-brand-turquoise"
 			>
 				{fullUrl}
 			</a>

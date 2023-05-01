@@ -129,11 +129,11 @@ export const DialogContent: ParentComponent = (props) => {
 				<Show when={api().isOpen}>
 					<div
 						{...api().containerProps}
-						class="fixed inset-0 w-full h-full grid place-items-center"
+						class="fixed inset-0 w-full h-full grid place-items-center p-3"
 					>
 						<div
 							{...api().contentProps}
-							class="relative bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md min-w-md"
+							class="relative bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md w-full max-w-md"
 						>
 							{props.children}
 						</div>
