@@ -11,6 +11,7 @@ import {
 } from "solid-js";
 import * as tooltip from "@zag-js/tooltip";
 import { Portal } from "solid-js/web";
+import { Transition } from "solid-transition-group";
 
 type TooltipProps = Omit<tooltip.Context, "id"> & {
 	tip: JSXElement;
@@ -39,33 +40,36 @@ export const Tooltip: Component<TooltipProps> = (props) => {
 
 	return (
 		<>
-			<button tabIndex="-1" {...api().triggerProps}>
+			<button tabIndex="-1" class="bg-transparent" {...api().triggerProps}>
 				{props.children}
 			</button>
-			<Show when={api().isOpen}>
-				<Portal>
-					<div
-						{...api().positionerProps}
-						class="animate-[fadeIn_200ms_ease-in-out]"
-						style={{
-							"--arrow-size": "10px",
-							"--arrow-background": "hsl(var(--bc))",
-						}}
-					>
-						<Show when={customProps.arrow}>
-							<div {...api().arrowProps}>
-								<div {...api().arrowTipProps} />
-							</div>
-						</Show>
+			<Portal>
+				<Transition
+					enterActiveClass="transition-opacity"
+					exitActiveClass="transition-opacity"
+					enterClass="opacity-0"
+					exitToClass="opacity-0"
+				>
+					<Show when={api().isOpen}>
 						<div
-							{...api().contentProps}
-							class="bg-base-content text-base-100 text-sm px-4 py-2 rounded-lg transition-opacity"
+							{...api().positionerProps}
+							class="arrow-w-10px arrow-bg-brand-navy dark:arrow-bg-brand-whitish"
 						>
-							{customProps.tip}
+							<Show when={customProps.arrow}>
+								<div {...api().arrowProps}>
+									<div {...api().arrowTipProps} />
+								</div>
+							</Show>
+							<div
+								{...api().contentProps}
+								class="bg-brand-navy text-brand-whitish dark:(bg-brand-whitish text-brand-navy) text-sm px-4 py-2 rounded-lg transition-opacity"
+							>
+								{customProps.tip}
+							</div>
 						</div>
-					</div>
-				</Portal>
-			</Show>
+					</Show>
+				</Transition>
+			</Portal>
 		</>
 	);
 };

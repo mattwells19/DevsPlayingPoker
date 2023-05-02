@@ -1,80 +1,83 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@use "sass:meta";
+@layer reset, base, rules, default;
 
-body {
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
-	&.dark {
-		color-scheme: dark;
-	}
-
-	padding: 1rem;
+@layer reset {
+	// https://github.com/sass/sass/issues/3240
+	@include meta.load-css("@unocss/reset/tailwind-compat.css");
 }
 
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
-img,
-picture,
-svg,
-video {
-	display: block;
-	max-width: 100%;
+@mixin color-layers($name, $hue, $saturation, $lightness, $adjustment: 5) {
+	--#{$name}: #{$hue}, #{$saturation}, #{$lightness};
+	--#{$name}-lighter: #{$hue}, #{$saturation}, #{$lightness + $adjustment};
+	--#{$name}-darker: #{$hue}, #{$saturation}, #{$lightness - $adjustment};
 }
 
 @layer base {
+	:root {
+		@include color-layers("orange", 22, 89%, 61%, 10);
+		--reddish: 12, 78%, 49%;
+		--turquoise: 159, 99%, 73%;
+		--neutral: 0, 0%, 20%;
+		@include color-layers("whitish", 197, 24%, 94%);
+		@include color-layers("navy", 235, 21%, 21%);
+	}
+
+	body {
+		--at-apply: "bg-brand-whitish text-brand-navy p-4 dark:(bg-brand-navy text-brand-whitish)";
+	}
+
 	html {
 		font-family: "Segoe UI", "Roboto", -apple-system, BlinkMacSystemFont,
 			"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
 			"Helvetica Neue", sans-serif;
-	}
-}
 
-* {
-	margin: 0;
-	padding: 0;
-	font-size: 100%;
-}
+		// solid-toast uses inline styles 🙄
+		.toast-overrides {
+			background-color: hsl(var(--navy)) !important;
+			color: hsl(var(--whitish)) !important;
 
-/** Component Overrides **/
+			& [role="status"] {
+				// the default is flex which removes spaces for formatted elements
+				display: block !important;
+			}
+		}
 
-// solid-toast uses inline styles 🙄
-.toast-overrides {
-	background-color: hsl(var(--bc)) !important;
-	color: hsl(var(--b1)) !important;
+		&.dark {
+			color-scheme: dark;
 
-	& [role="status"] {
-		// the default is flex which removes spaces for formatted elements
-		display: block !important;
-	}
-}
-
-.btn {
-	animation: none;
-
-	&:active {
-		transform: scale(0.99);
-		transition: transform linear 50ms;
-	}
-}
-
-.table {
-	th:first-child {
-		position: relative;
-		z-index: 0;
+			// solid-toast uses inline styles 🙄
+			.toast-overrides {
+				background-color: hsl(var(--whitish)) !important;
+				color: hsl(var(--navy)) !important;
+			}
+		}
 	}
 
-	& :where(thead, tfoot) :where(th, td) {
-		background-color: transparent;
+	* {
+		margin: 0;
+		padding: 0;
+		font-size: 100%;
 	}
 
-	th,
-	td {
-		border: none;
+	select {
+		--at-apply: "select";
+	}
+
+	input[type="text"],
+	input[type="date"],
+	input[type="number"] {
+		--at-apply: "input";
+	}
+
+	input[type="checkbox"] {
+		--at-apply: "checkbox";
+	}
+
+	input[type="radio"] {
+		--at-apply: "radio";
+	}
+
+	hr {
+		--at-apply: "border-color";
 	}
 }

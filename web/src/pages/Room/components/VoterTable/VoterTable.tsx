@@ -31,10 +31,10 @@ const VoterTable: Component<VoterTableProps> = () => {
 	};
 
 	return (
-		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-base-content border-opacity-20">
-			<table class="table w-full bg-slate-50 dark:bg-base-300">
+		<div class="rounded-md overflow-hidden shadow-md dark:shadow-none dark:border border-color">
+			<table class="w-full bg-brand-whitish-lighter dark:bg-brand-navy-darker">
 				<Show when={!votingModerator()}>
-					<caption class="bg-slate-50 dark:bg-base-300 p-4">
+					<caption class="bg-brand-whitish-lighter dark:bg-brand-navy-darker p-4">
 						<div class="flex justify-between items-center">
 							<span class="before:content-['👑'] before:mr-1">
 								<Show
@@ -52,11 +52,13 @@ const VoterTable: Component<VoterTableProps> = () => {
 						</div>
 					</caption>
 				</Show>
-				<thead class="border-b border-base-content border-opacity-20">
+				<thead class="border-b border-color">
 					<tr>
-						<th colspan="2">{intl.t("voters")}</th>
-						<th class="text-center">{intl.t("voted")}</th>
-						<th class="text-center">{intl.t("confidence")}</th>
+						<th colspan="2" class="text-left px-4 py-2">
+							{intl.t("voters")}
+						</th>
+						<th class="px-4 py-2">{intl.t("voted")}</th>
+						<th class="px-4 py-2">{intl.t("confidence")}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -78,7 +80,9 @@ const VoterTable: Component<VoterTableProps> = () => {
 								}
 								confidence={votingModerator.confidence}
 								selection={votingModerator.selection}
-								hiddenAction={<TransferModeratorButton options={voters()} />}
+								hiddenAction={
+									<TransferModeratorButton discreet options={voters()} />
+								}
 							/>
 						)}
 					</Show>
@@ -93,11 +97,13 @@ const VoterTable: Component<VoterTableProps> = () => {
 						)}
 					</For>
 				</tbody>
-				<tfoot class="text-center border-t border-base-content border-opacity-20">
+				<tfoot class="text-center border-t border-color">
 					<tr>
 						<Switch>
 							<Match when={room.roomData.state === "Voting"}>
-								<td colspan="4">{intl.t("votingInProgress")}</td>
+								<td colspan="4" class="p-4">
+									{intl.t("votingInProgress")}
+								</td>
 							</Match>
 							<Match
 								when={
@@ -107,7 +113,7 @@ const VoterTable: Component<VoterTableProps> = () => {
 									)
 								}
 							>
-								<td colspan="4">
+								<td colspan="4" class="p-4">
 									{intl.t(
 										room.roomData.voters.length > 0
 											? "waitingToStartVoting"
@@ -123,10 +129,14 @@ const VoterTable: Component<VoterTableProps> = () => {
 									)
 								}
 							>
-								<td colspan="4">{intl.t("noVotes")}</td>
+								<td colspan="4" class="p-4">
+									{intl.t("noVotes")}
+								</td>
 							</Match>
 							<Match when={room.roomData.state === "Results"}>
-								<For each={stats()}>{(stat) => <Metric {...stat} />}</For>
+								<For each={stats()}>
+									{(stat) => <Metric class="p-4" {...stat} />}
+								</For>
 							</Match>
 						</Switch>
 					</tr>

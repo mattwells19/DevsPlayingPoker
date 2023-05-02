@@ -39,8 +39,9 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 			<Switch>
 				<Match when={room.roomData.state === "Results"}>
 					<button
-						class="btn btn-primary w-full mb-4"
+						class="btn w-full mb-4 disabled:(opacity-60 hover:bg-brand-orange)"
 						onClick={() => room.dispatchEvent({ event: "StartVoting" })}
+						type="button"
 						disabled={room.roomData.voters.length === 0}
 					>
 						{intl.t(
@@ -52,7 +53,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 				</Match>
 				<Match when={room.roomData.state === "Voting"}>
 					<button
-						class="btn btn-primary w-full mb-4"
+						class="btn w-full mb-4"
 						onClick={() => room.dispatchEvent({ event: "StopVoting" })}
 					>
 						{intl.t("stopVoting")}
@@ -63,7 +64,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 			<button
 				type="button"
 				aria-haspopup="true"
-				class="btn btn-outline btn-sm mt-4"
+				class="btn-outline btn-sm mt-4"
 				onClick={() =>
 					window.open(
 						"/voting-moderator",

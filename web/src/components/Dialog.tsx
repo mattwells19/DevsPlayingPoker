@@ -93,9 +93,11 @@ export const DrawerContent: ParentComponent = (props) => {
 				<Show when={api().isOpen}>
 					<aside
 						{...api().containerProps}
-						class="w-full max-w-xs p-4 fixed top-0 right-0 h-full bg-base-100"
+						class="w-full max-w-xs p-4 fixed top-0 right-0 h-full bg-brand-whitish dark:bg-brand-navy"
 					>
-						<div {...api().contentProps}>{props.children}</div>
+						<div class="h-full" {...api().contentProps}>
+							{props.children}
+						</div>
 					</aside>
 				</Show>
 			</Transition>
@@ -127,9 +129,12 @@ export const DialogContent: ParentComponent = (props) => {
 				<Show when={api().isOpen}>
 					<div
 						{...api().containerProps}
-						class="fixed inset-0 w-full h-full grid place-items-center"
+						class="fixed inset-0 w-full h-full grid place-items-center p-3"
 					>
-						<div {...api().contentProps} class="modal-box">
+						<div
+							{...api().contentProps}
+							class="relative bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md w-full max-w-md"
+						>
 							{props.children}
 						</div>
 					</div>

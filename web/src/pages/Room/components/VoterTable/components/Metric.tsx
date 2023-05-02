@@ -12,7 +12,7 @@ const Metric: Component<MetricProps> = (props) => {
 		<td class={customProps.class} {...tdProps}>
 			<dl>
 				<dt class="font-normal text-sm uppercase">{customProps.label}</dt>
-				<dd class="text-3xl">{customProps.value}</dd>
+				<dd class="text-3xl font-bold">{customProps.value}</dd>
 			</dl>
 		</td>
 	);

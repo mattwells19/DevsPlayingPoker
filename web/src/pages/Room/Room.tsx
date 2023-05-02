@@ -31,7 +31,7 @@ const Room: Component = () => {
 				>
 					<button
 						type="button"
-						class="btn btn-ghost"
+						class="btn-ghost py-2"
 						onClick={() => navigator.clipboard.writeText(params.roomCode)}
 						aria-label={intl.t("copyCode") as string}
 					>

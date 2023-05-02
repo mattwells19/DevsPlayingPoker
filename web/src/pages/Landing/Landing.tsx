@@ -2,6 +2,7 @@ import { Component, createSignal, For, JSX, Show } from "solid-js";
 import { useNavigate, Link } from "@solidjs/router";
 import Header from "@/components/Header";
 import { IntlKey, useIntl } from "@/i18n";
+import toast from "solid-toast";
 
 const Landing: Component = () => {
 	const intl = useIntl();
@@ -65,7 +66,10 @@ const Landing: Component = () => {
 	return (
 		<>
 			<Header
-				onSaveName={(new_name) => localStorage.setItem("name", new_name)}
+				onSaveName={(new_name) => {
+					toast.success(intl.t("nameUpdated"));
+					localStorage.setItem("name", new_name);
+				}}
 			/>
 			<main class="max-w-md m-auto flex flex-col">
 				<section class="text-center my-8 mx-0 py-0 px-2">
@@ -83,7 +87,7 @@ const Landing: Component = () => {
 							<For each={[0, 1, 2, 3]}>
 								{(index) => (
 									<input
-										class="input input-bordered w-12 h-12 uppercase text-center"
+										class="input w-12 h-12 uppercase text-center"
 										id={`roomCode-${index + 1}`}
 										name="roomCode"
 										aria-label={`Room Code letter ${index + 1}`}
@@ -115,7 +119,7 @@ const Landing: Component = () => {
 						<div class="h-4 grid place-items-center">
 							<Show when={error()} keyed>
 								{(errorMsg) => (
-									<p aria-live="polite" class="my-4 mx-0 text-error">
+									<p aria-live="polite" class="my-4 mx-0 text-red">
 										{intl.t(errorMsg)}
 									</p>
 								)}
@@ -123,12 +127,12 @@ const Landing: Component = () => {
 						</div>
 					</section>
 					<div class="flex gap-4 items-center mt-8 mb-12 mx-0">
-						<div class="divider flex-grow" />
+						<hr class="flex-grow" />
 						<span>{intl.t("or")}</span>
-						<div class="divider flex-grow" />
+						<hr class="flex-grow" />
 					</div>
 					<section class="flex justify-center">
-						<Link href="/create-room" class="btn btn-primary">
+						<Link href="/create-room" class="btn">
 							{intl.t("newRoom")}
 						</Link>
 					</section>

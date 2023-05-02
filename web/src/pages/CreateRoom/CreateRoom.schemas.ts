@@ -34,5 +34,5 @@ export const nameSchema = {
 	moderatorName: zod
 		.string()
 		.min(1, { message: "Must provide a value for name." })
-		.max(10, { message: "Name too long. Must be no more than 10 characters." }),
+		.max(20, { message: "Name too long. Must be no more than 20 characters." }),
 };

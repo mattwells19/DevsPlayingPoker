@@ -7,6 +7,7 @@ import IntlProvider from "./i18n";
 import App from "./App";
 
 import "./interpretTheme";
+import "virtual:uno.css";
 import "./index.scss";
 
 const Index: Component = () => {

@@ -14,6 +14,7 @@ import type { Voter } from "@/shared-types";
 
 interface TransferModeratorButtonProps {
 	options: Array<Voter>;
+	discreet?: boolean;
 }
 
 const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
@@ -36,14 +37,15 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 			<Dialog>
 				<DialogTrigger
 					type="button"
-					class="btn btn-ghost btn-sm btn-circle bg-opacity-10 text-secondary bg-secondary hover:bg-opacity-30 hover:bg-secondary dark:text-accent dark:bg-accent dark:bg-opacity-10 dark:hover:bg-opacity-30 dark:hover:bg-accent group-hover:opacity-100 group-only:opacity-0"
+					class="p-2 rounded-full transition-all bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
+					classList={{ "opacity-0": props.discreet }}
 					title={intl.t("transferModerator") as string}
 				>
 					<Icon
 						name="arrows-right-left"
 						aria-label={intl.t("transferModerator") as string}
 						fill="currentColor"
-						boxSize="18"
+						boxSize="16"
 					/>
 				</DialogTrigger>
 				<DialogContent>
@@ -54,36 +56,32 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 						{intl.t("transferModerator")}
 					</DialogTitle>
 					<DialogCloseTrigger
-						class="btn btn-ghost btn-circle absolute top-1 right-1"
+						class="btn-ghost rounded-full absolute top-1 right-1"
 						aria-label={intl.t("cancel") as string}
 						type="button"
 					>
 						&#10005;
 					</DialogCloseTrigger>
 					<form
-						class="form-control mt-4"
+						class="form-control mt-6"
 						onSubmit={(e) => {
 							e.preventDefault();
 							handleChangeModerator(e.currentTarget);
 						}}
 					>
-						<DialogDescription as="label" for="new-moderator" class="label">
+						<DialogDescription as="label" for="new-moderator">
 							{intl.t("selectNewModerator")}
 						</DialogDescription>
-						<select
-							id="new-moderator"
-							name="new-moderator"
-							class="select select-bordered"
-						>
+						<select id="new-moderator" name="new-moderator">
 							<For each={props.options}>
 								{(voter) => <option value={voter.id}>{voter.name}</option>}
 							</For>
 						</select>
-						<div role="group" class="modal-action mt-10">
-							<button type="submit" class="btn btn-primary btn-sm">
+						<div role="group" class="flex justify-end gap-2 mt-10">
+							<button type="submit" class="btn btn-sm">
 								{intl.t("confirm")}
 							</button>
-							<DialogCloseTrigger type="button" class="btn btn-outline btn-sm">
+							<DialogCloseTrigger type="button" class="btn-ghost btn-sm">
 								{intl.t("cancel")}
 							</DialogCloseTrigger>
 						</div>

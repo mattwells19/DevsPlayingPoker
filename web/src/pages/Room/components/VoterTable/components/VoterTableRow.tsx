@@ -35,12 +35,8 @@ const VoterTableRow: Component<VoterTableRowProps> = (props) => {
 	const intl = useIntl();
 
 	return (
-		<tr
-			class="[&>td]:bg-slate-50 [&>td]:dark:bg-base-300 [&>td]:px-4"
-			// cut down on padding to account for extra height from button
-			classList={{ "[&>td]:py-3": room.userIsModerator }}
-		>
-			<td colspan="2">
+		<tr>
+			<td colspan="2" class="p-4" classList={{ "py-3": room.userIsModerator }}>
 				<div class="flex items-center justify-between group">
 					{props.name}
 					<Show when={room.userIsModerator}>{props.hiddenAction}</Show>

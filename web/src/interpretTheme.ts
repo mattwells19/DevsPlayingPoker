@@ -2,17 +2,13 @@ window.onload = () => {
 	const savedPreference = localStorage.getItem("theme") ?? "system";
 
 	if (savedPreference === "dark") {
-		document.body.classList.add("dark");
-		document.documentElement.setAttribute("data-theme", "dark");
+		document.documentElement.classList.add("dark");
 	} else if (savedPreference === "light") {
-		document.body.classList.remove("dark");
-		document.documentElement.setAttribute("data-theme", "light");
+		document.documentElement.classList.remove("dark");
 	} else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-		document.body.classList.add("dark");
-		document.documentElement.setAttribute("data-theme", "dark");
+		document.documentElement.classList.add("dark");
 	} else {
-		document.body.classList.remove("dark");
-		document.documentElement.setAttribute("data-theme", "light");
+		document.documentElement.classList.remove("dark");
 	}
 };
 export {};

@@ -100,7 +100,7 @@ const CreateRoom: Component = () => {
 			<Header />
 			<main class="max-w-md m-auto">
 				<form
-					class="flex flex-col gap-4"
+					class="flex flex-col gap-7"
 					ref={(el) => (formRef = el)}
 					onInput={(e) => handleChange(e.currentTarget)}
 					onSubmit={(e) => {
@@ -109,9 +109,8 @@ const CreateRoom: Component = () => {
 					}}
 				>
 					<div class="form-control">
-						<label for="moderatorName" class="label justify-start">
+						<label for="moderatorName" class="label-required">
 							{intl.t("yourName")}
-							<span class="text-error ml-1">*</span>
 						</label>
 						<input
 							autofocus
@@ -119,26 +118,23 @@ const CreateRoom: Component = () => {
 							name="moderatorName"
 							required
 							minLength="1"
-							maxLength="10"
+							maxLength="20"
 							type="text"
 							value={defaults.name}
-							class="input input-bordered"
 						/>
 					</div>
 
-					<div class="divider" />
+					<hr class="my-4" />
 
 					<div class="form-control">
-						<label for="voterOptions" class="label justify-start">
+						<label for="voterOptions" class="label-required">
 							{intl.t("voterOptions")}
-							<span class="text-error ml-1">*</span>
 						</label>
 						<select
 							id="voterOptions"
 							name="voterOptions"
 							required
 							value={defaults.formValues.voterOptions}
-							class="select select-bordered"
 						>
 							<option value="fibonacci">{intl.t("fibonacci")}</option>
 							<option value="linear">{intl.t("linear")}</option>
@@ -160,26 +156,25 @@ const CreateRoom: Component = () => {
 						/>
 
 						<fieldset class="form-control">
-							<legend class="label">{intl.t("includeNoVote")}</legend>
+							<legend class="pb-1">{intl.t("includeNoVote")}</legend>
 
-							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
+							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="yes"
 									checked={defaults.formValues.noVote}
-									class="radio radio-sm radio-primary"
 								/>
 								{intl.t("yes")}
 							</label>
 
-							<label class="label cursor-pointer flex items-center justify-start gap-2 pl-3">
+							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
 								<input
 									type="radio"
 									name="noVote"
 									value="no"
 									checked={!defaults.formValues.noVote}
-									class="radio radio-sm radio-primary"
+									class="radio"
 								/>
 								{intl.t("no")}
 							</label>
@@ -187,21 +182,21 @@ const CreateRoom: Component = () => {
 					</Show>
 
 					<dl class="form-control">
-						<dt class="label">{intl.t("finalPreview")}</dt>
+						<dt>{intl.t("finalPreview")}</dt>
 						<dd class="pl-3">{list()}</dd>
 					</dl>
 
-					<div class="divider after:display-none" />
+					<hr class="my-4" />
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (
-							<p class="text-error">
+							<p class="text-red">
 								{intl.t("errorWithMsg", { msg: errorMsg })}
 							</p>
 						)}
 					</Show>
 
-					<button class="btn btn-primary" type="submit">
+					<button class="btn" type="submit">
 						{intl.t("done")}
 					</button>
 				</form>

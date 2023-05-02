@@ -2,26 +2,26 @@ label.option {
 	cursor: pointer;
 
 	&:hover rect.faceLayer {
-		stroke: hsl(var(--p));
+		stroke: hsl(var(--orange));
 		stroke-opacity: 1;
 	}
 
 	input:focus-visible + span rect.faceLayer {
-		stroke: hsl(var(--p));
+		stroke: hsl(var(--orange));
 		stroke-opacity: 1;
 		stroke-dasharray: 5;
 	}
 
 	rect.faceLayer {
-		stroke: hsl(var(--bc));
+		stroke: hsl(var(--whitish));
 		stroke-opacity: 0.1;
 		stroke-width: 3;
 	}
 
 	input:checked + span rect.faceLayer {
-		stroke: hsl(var(--p));
+		stroke: hsl(var(--orange));
 		stroke-opacity: 1;
-		fill: hsl(var(--p));
+		fill: hsl(var(--orange));
 		fill-opacity: 0.1;
 	}
 

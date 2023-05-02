@@ -25,20 +25,16 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 			localStorage.setItem("theme", "system");
 
 			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-				document.body.classList.add("dark");
-				document.documentElement.setAttribute("data-theme", "dark");
+				document.documentElement.classList.add("dark");
 			} else {
-				document.body.classList.remove("dark");
-				document.documentElement.setAttribute("data-theme", "light");
+				document.documentElement.classList.remove("dark");
 			}
 		} else if (selection === "light") {
 			localStorage.setItem("theme", "light");
-			document.body.classList.remove("dark");
-			document.documentElement.setAttribute("data-theme", "light");
+			document.documentElement.classList.remove("dark");
 		} else if (selection === "dark") {
 			localStorage.setItem("theme", "dark");
-			document.body.classList.add("dark");
-			document.documentElement.setAttribute("data-theme", "dark");
+			document.documentElement.classList.add("dark");
 		}
 	};
 
@@ -48,27 +44,24 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 				<DialogCloseTrigger
 					onClick={props.onClose}
 					title={intl.t("closeSettingsDrawer") as string}
-					class="btn btn-square btn-ghost btn-primary block ml-auto"
+					class="btn-icon block ml-auto"
 				>
 					&#10005;
 				</DialogCloseTrigger>
 				<div class="form-control my-8">
-					<label for="theme-select" class="label">
-						{intl.t("theme")}
-					</label>
+					<label for="theme-select">{intl.t("theme")}</label>
 					<select
 						id="theme-select"
 						name="theme-select"
 						aria-describedby="theme-select-helptext"
 						value={localStorage.getItem("theme") ?? "system"}
 						onChange={handleThemeChange}
-						class="select select-bordered"
 					>
 						<option value="system">{intl.t("system")}</option>
 						<option value="light">{intl.t("light")}</option>
 						<option value="dark">{intl.t("dark")}</option>
 					</select>
-					<p id="theme-select-helptext" class="label label-text-alt">
+					<p id="theme-select-helptext" class="text-sm">
 						{intl.t("savesAutomatically")}
 					</p>
 				</div>
@@ -95,7 +88,7 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						<label for="name" class="label">
 							{intl.t("name")}
 						</label>
-						<div class="input-group w-full">
+						<div class="flex w-full">
 							<input
 								id="name"
 								name="name"
@@ -108,12 +101,12 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 								onInput={() => setErrorMsg(null)}
 								aria-describedby="name-error-msg"
 								aria-invalid={Boolean(errorMsg())}
-								class="input input-bordered w-full"
+								class="border-r-0 rounded-r-none flex-1"
 							/>
 							<button
 								type="submit"
 								title={intl.t("saveName") as string}
-								class="btn btn-primary btn-square"
+								class="btn rounded-l-none p-2.5"
 							>
 								<Icon
 									name="save"

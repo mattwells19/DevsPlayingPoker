@@ -76,11 +76,11 @@ export const RangeSliderTrack: Component = () => {
 	const api = useRangeSliderContext();
 	return (
 		<div
-			class="bg-base-content bg-opacity-10 h-2 w-full rounded-full"
+			class="bg-brand-navy bg-opacity-10 dark:(bg-brand-whitish bg-opacity-10) h-2 w-full rounded-full"
 			{...api().trackProps}
 		>
 			<div
-				class="bg-primary rounded-full h-full disabled:bg-black disabled:bg-opacity-40"
+				class="bg-brand-reddish dark:(bg-brand-turquoise) rounded-full h-full disabled:(bg-black bg-opacity-40)"
 				{...api().rangeProps}
 			/>
 		</div>
@@ -91,7 +91,7 @@ export const RangeSliderThumb: Component<{ index: number }> = (props) => {
 	const api = useRangeSliderContext();
 	return (
 		<div
-			class="bg-white border-2 border-primary dark:bg-base-300 w-5 h-5 rounded-full"
+			class="bg-brand-reddish dark:(bg-brand-turquoise) w-5 h-5 rounded-full"
 			{...api().getThumbProps(props.index)}
 		>
 			<input {...api().getHiddenInputProps(props.index)} />

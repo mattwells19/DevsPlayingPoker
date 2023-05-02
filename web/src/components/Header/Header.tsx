@@ -17,8 +17,8 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 
 	return (
 		<>
-			<header class={mergeClassNames("navbar p-0 min-h-0", props.class)}>
-				<div class="navbar-start">
+			<header class={mergeClassNames("flex mb-4", props.class)}>
+				<div class="flex-1 flex flex-start items-center">
 					<Show when={location.pathname !== "/"}>
 						<Link href="/">
 							<span aria-hidden="true" class="mr-1">
@@ -28,12 +28,14 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						</Link>
 					</Show>
 				</div>
-				<div class="navbar-center">{componentProps.children}</div>
-				<div class="navbar-end">
+				<div class="flex-1 flex justify-center items-center">
+					{componentProps.children}
+				</div>
+				<div class="flex-1 flex justify-end items-center">
 					<a
 						href="https://github.com/lvl-mattwells/DevsPlayingPoker"
 						target="_blank"
-						class="btn btn-ghost btn-square"
+						class="btn-icon"
 						title={intl.t("viewGithub") as string}
 					>
 						<Icon
@@ -47,7 +49,7 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 						type="button"
 						onClick={[setDrawerOpen, true]}
 						title={intl.t("openSettingsDrawer") as string}
-						class="btn btn-ghost btn-square"
+						class="btn-icon"
 					>
 						<Icon
 							name="user-solid"
