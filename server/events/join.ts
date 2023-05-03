@@ -3,7 +3,7 @@ import rooms from "../models/rooms.ts";
 import type { JoinEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 import { cleanseName, sendRoomData } from "./utils/mod.ts";
-import { User } from "../types/schemas.ts";
+import type { User } from "../types/schemas.ts";
 
 /**
  * Adds a player to the room specified either as a moderator or voter.

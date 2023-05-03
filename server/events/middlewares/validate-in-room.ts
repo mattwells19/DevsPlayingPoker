@@ -1,7 +1,5 @@
-import type {
-	EventFunction,
-	WebScoketMessageEvent,
-} from "../../types/socket.ts";
+import type { WebScoketMessageEvent } from "../../types/socket.ts";
+import type { EventFunction } from "../types.ts";
 import validateModerator from "./validate-moderator.ts";
 import validateVoter from "./validate-voter.ts";
 
