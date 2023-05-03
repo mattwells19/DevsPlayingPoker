@@ -1,25 +1,17 @@
-import type { RoomSchema } from "../../types/schemas.ts";
-
 /**
  * Prevents duplicate names and enforces max name length
  * @param origName The name to be cleansed
  * @param roomData The room data to check for duplicate names
  * @returns The cleansed name
  */
-const cleanseName = (origName: string, roomData: RoomSchema) => {
+const cleanseName = (origName: string, allNamesInRoom: Array<string>) => {
 	// max name length of 20 characters (not including potential name counter)
 	const trimmedName = origName.trim().substring(0, 20);
 
-	const allPeopleInRoom = [
-		roomData.moderator?.name,
-		...roomData.voters.map((voter) => voter.name),
-	];
-
 	const isNameAlreadyUsed = (nameToCheck: string) =>
-		allPeopleInRoom.some(
-			(personInRoom) =>
-				personInRoom?.toLowerCase().localeCompare(nameToCheck.toLowerCase()) ===
-				0,
+		allNamesInRoom.some(
+			(nameInRoom) =>
+				nameInRoom.toLowerCase().localeCompare(nameToCheck.toLowerCase()) === 0,
 		);
 
 	let cnt = 1;

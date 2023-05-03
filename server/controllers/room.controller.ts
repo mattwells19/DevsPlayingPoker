@@ -15,22 +15,17 @@ const generateRoomCode = async (): Promise<string> => {
 
 		if (!duplicateCode) return roomCode;
 
-		console.debug(
-			`Duplicate room code found, generating again. Retried ${i + 1} times.`,
-		);
 		roomCode = getRandomCode();
 	}
 
 	throw new Error("Unable to generate unique room code");
 };
 
-const getRandomCode = () => {
-	let text = "";
-	const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	for (let i = 0; i < 4; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
-	}
-	return text;
+const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const getRandomCode = (): string => {
+	return Array.from({ length: 4 }, () => {
+		return possible.charAt(Math.floor(Math.random() * possible.length));
+	}).join("");
 };
 
 export interface CreateRoomRequest {

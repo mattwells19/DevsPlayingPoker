@@ -1,7 +1,9 @@
 import sockets from "../models/sockets.ts";
 import * as rooms from "../models/rooms.ts";
-import type { EventFunction, JoinEvent } from "../types/socket.ts";
+import type { JoinEvent } from "../types/socket.ts";
+import type { EventFunction } from "./types.ts";
 import { cleanseName, sendRoomData } from "./utils/mod.ts";
+import { User } from "../types/schemas.ts";
 
 /**
  * Adds a player to the room specified either as a moderator or voter.
@@ -33,7 +35,13 @@ const handleJoin: EventFunction<JoinEvent> = async (
 		};
 	}
 
-	const cleansedName = cleanseName(data.name, roomData);
+	const usersInRoom: Array<User> = [...roomData.voters];
+	if (roomData.moderator) {
+		usersInRoom.push(roomData.moderator);
+	}
+
+	const allNamesInRoom = usersInRoom.map((v) => v.name);
+	const cleansedName = cleanseName(data.name, allNamesInRoom);
 
 	const isModerator = !roomData.moderator;
 

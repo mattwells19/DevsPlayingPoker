@@ -1,23 +1,12 @@
 import sockets, { type UserSocket } from "../models/sockets.ts";
 import * as rooms from "../models/rooms.ts";
-import type { EventFunction, WebScoketMessageEvent } from "../types/socket.ts";
-import {
-	handleJoin,
-	handleLeave,
-	handleModeratorChanged,
-	handleNameChanged,
-	handleOptionSelected,
-	handleStartVoting,
-	handleStopVoting,
-	handleVoterKicked,
-	handleVotingDescriptionUpdated,
-} from "../events/mod.ts";
-import {
-	validateModerator,
-	validateVoter,
-	validateInRoom,
-} from "../events/middlewares/mod.ts";
+import type { WebScoketMessageEvent } from "../types/socket.ts";
+import eventHandlerMap from "../events/mod.ts";
+import handleLeave from "../events/leave.ts";
 
+/**
+ * WebSocket.onopen
+ */
 export const handleOpen = async (userSocket: UserSocket) => {
 	const roomExists = await rooms.findByRoomCode(userSocket.roomCode);
 	userSocket.send({
@@ -27,6 +16,9 @@ export const handleOpen = async (userSocket: UserSocket) => {
 	});
 };
 
+/**
+ * WebSocket.onclose
+ */
 export const handleClose = (userSocket: UserSocket) => {
 	const preSocket = sockets.get(userSocket.id);
 	setTimeout(async () => {
@@ -48,23 +40,9 @@ export const handleClose = (userSocket: UserSocket) => {
 	}, 3000);
 };
 
-const eventHandlerMap = new Map<
-	WebScoketMessageEvent["event"],
-	Array<EventFunction<any>>
->([
-	["Join", [handleJoin]],
-	["StartVoting", [validateModerator, handleStartVoting]],
-	["StopVoting", [validateModerator, handleStopVoting]],
-	["OptionSelected", [validateVoter, handleOptionSelected]],
-	["ModeratorChange", [validateModerator, handleModeratorChanged]],
-	["KickVoter", [validateModerator, handleVoterKicked]],
-	[
-		"UpdateVotingDescription",
-		[validateModerator, handleVotingDescriptionUpdated],
-	],
-	["ChangeName", [validateInRoom, handleNameChanged]],
-]);
-
+/**
+ * WebSocket.onmessage
+ */
 export const handleMessage = async (
 	userSocket: UserSocket,
 	event: MessageEvent<string>,

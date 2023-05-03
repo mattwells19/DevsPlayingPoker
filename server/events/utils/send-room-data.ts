@@ -9,8 +9,10 @@ import sockets from "../../models/sockets.ts";
  */
 const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	if (!roomData) {
-		throw new Error(`Failed to send updatedRoomData. No roomData found.`);
+		console.debug("Failed to send updatedRoomData. No roomData found.");
+		return;
 	}
+
 	const roomUpdateEvent: RoomUpdateEvent = {
 		event: "RoomUpdate",
 		roomData,
@@ -22,7 +24,7 @@ const sendRoomData = (roomData: RoomSchema | undefined): void => {
 	}
 
 	for (const voter of roomData.voters) {
-		const voterSock = sockets.get(voter.id.toString(), roomData.roomCode);
+		const voterSock = sockets.get(voter.id, roomData.roomCode);
 		voterSock?.send(roomUpdateEvent);
 	}
 };
