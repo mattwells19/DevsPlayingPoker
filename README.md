@@ -16,7 +16,7 @@ The backend is built using [Deno](https://deno.land) (with TypeScript of course)
 
 ### Frontend
 
-The frontend is built using [SolidJS](https://solidjs.com) and styled using [DaisyUI](https://daisyui.com/), [TailwindCSS](https://tailwindcss.com/), and [Sass](https://sass-lang.com/). We chose to go with SolidJS because of it's claims for incredible speed/performance, familiar JSX syntax, and again because none of us had used it before.
+The frontend is built using [SolidJS](https://solidjs.com) and styled using [UnoCSS](https://unocss.dev/) and [Sass](https://sass-lang.com/). We chose to go with SolidJS because of it's claims for incredible speed/performance, familiar JSX syntax, and again because none of us had used it before.
 
 ### Deployment
 
@@ -30,8 +30,15 @@ We originally had production deployments also going to Deno Deploy, but we notic
 
 1. Install Deno: https://deno.land/manual/getting_started/installation
 2. `cd` into the `server/` folder.
-3. Create a `.env` file in the `server/` directory with the contents: `export DB_URL=[mongo url here]`
-   - I recommend running a [MongoDb Docker container](https://hub.docker.com/_/mongo) locally and using that for development.
+3. Create a `.env` file in the `server/` directory with the contents:
+
+```
+export DB_URL=[mongo url here]
+export ENV=dev
+```
+
+**Note:** It's recommended to use a [MongoDb Docker container](https://hub.docker.com/_/mongo) locally for development.
+
 4. Run the app using: `deno task run`
 5. You should be up and running!
 
@@ -48,3 +55,16 @@ We originally had production deployments also going to Deno Deploy, but we notic
 - We're using Vite to proxy requests to your locally running BE. You can see this in `web/vite.config.ts`.
 - You probably want to install the Deno extension (assuming you're using VSCode): https://marketplace.visualstudio.com/items?itemName=denoland.vscode-deno
   - This will help for BE development, but will clash with the FE code. To scope the Deno extension to just the `server/` folder, open VSCode settings and add `./server` to the `Deno: Enable Paths` setting.
+- Highly recommend installing the UnoCSS extension: https://marketplace.visualstudio.com/items?itemName=antfu.unocss
+  - The extension looks for the `uno.config.ts` file in the root directory so you'll need to edit your VSCode settings for the UnoCSS root to look in the `/web` folder to get intellisense for styles.
+
+My `.vscode/settings.json` as of 5/3/2023:
+
+```json
+{
+	"deno.enablePaths": ["./server"],
+	"deno.config": "./server/deno.jsonc",
+	"files.eol": "\n",
+	"unocss.root": "web"
+}
+```
