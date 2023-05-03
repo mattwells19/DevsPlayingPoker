@@ -1,7 +1,8 @@
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import { sendRoomData } from "./utils/mod.ts";
-import type { Voter, User } from "../types/schemas.ts";
-import type { EventFunction, ModeratorChangeEvent } from "../types/socket.ts";
+import type { User, Voter } from "../types/schemas.ts";
+import type { EventFunction } from "./types.ts";
+import type { ModeratorChangeEvent } from "../types/socket.ts";
 
 /**
  * Updates moderator to existing voter.  Adds former moderator to list of voters.

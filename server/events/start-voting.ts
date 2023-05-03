@@ -1,5 +1,6 @@
-import * as rooms from "../models/rooms.ts";
-import type { EventFunction, StartVotingEvent } from "../types/socket.ts";
+import rooms from "../models/rooms.ts";
+import type { StartVotingEvent } from "../types/socket.ts";
+import type { EventFunction } from "./types.ts";
 import { sendRoomData } from "./utils/mod.ts";
 
 /**

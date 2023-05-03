@@ -1,8 +1,25 @@
+import type { NextFunction, OpineRequest, OpineResponse } from "opine";
 import sockets, { type UserSocket } from "../models/sockets.ts";
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import type { WebScoketMessageEvent } from "../types/socket.ts";
 import eventHandlerMap from "../events/mod.ts";
 import handleLeave from "../events/leave.ts";
+
+/**
+ * Handles upgrading the HTTP connection to a WS connection
+ */
+export const upgradeWSConnection = (
+	req: OpineRequest,
+	_: OpineResponse,
+	next: NextFunction,
+): void => {
+	if (req.headers.get("upgrade") === "websocket") {
+		const sock = req.upgrade();
+		sockets.add(sock, req.params.roomCode, req.query.userId);
+	}
+
+	next();
+};
 
 /**
  * WebSocket.onopen

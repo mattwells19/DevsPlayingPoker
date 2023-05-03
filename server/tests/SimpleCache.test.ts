@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertFalse } from "deno-asserts";
-import { SimpleCache } from "../utils/SimpleCache.ts";
+import SimpleCache from "../utils/SimpleCache.ts";
 
 Deno.test("LRU cache strategy works as expected", () => {
 	const cache = new SimpleCache<number>(3);

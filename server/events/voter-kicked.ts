@@ -1,6 +1,7 @@
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import sockets from "../models/sockets.ts";
-import type { EventFunction, KickVoterEvent } from "../types/socket.ts";
+import type { KickVoterEvent } from "../types/socket.ts";
+import type { EventFunction } from "./types.ts";
 import { sendRoomData } from "./utils/mod.ts";
 
 const handleVoterKicked: EventFunction<KickVoterEvent> = async (

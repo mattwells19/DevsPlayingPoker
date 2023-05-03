@@ -1,13 +1,9 @@
 // loads env variables
 import "https://deno.land/std@v0.168.0/dotenv/load.ts";
 
-import { opine, json, serveStatic } from "opine";
+import { json, opine, serveStatic } from "opine";
 import db from "./utils/db.ts";
-
-//Import routes
-import SocketRoutes from "./routes/socket.routes.ts";
-import RoomRoutes from "./routes/room.routes.ts";
-import FeRoutes from "./routes/fe.routes.ts";
+import { FeRoutes, RoomRoutes, SocketRoutes } from "./routes.ts";
 
 // Start Server
 const server = opine();

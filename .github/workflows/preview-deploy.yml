@@ -5,6 +5,20 @@ on:
     branches: [main]
 
 jobs:
+  test-deno:
+    name: Deno tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.32.1
+      - run: deno test -A
+
   format:
     name: Check formatting
     runs-on: ubuntu-latest

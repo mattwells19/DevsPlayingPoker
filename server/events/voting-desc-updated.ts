@@ -1,7 +1,8 @@
 import { z as zod } from "zod";
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import { sendRoomData } from "./utils/mod.ts";
-import type { EventFunction, VotingDescriptionEvent } from "../types/socket.ts";
+import type { VotingDescriptionEvent } from "../types/socket.ts";
+import type { EventFunction } from "./types.ts";
 
 // taken from EditDescription.tsx
 const votingDescSchema = zod

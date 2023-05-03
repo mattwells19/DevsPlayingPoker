@@ -1,6 +1,6 @@
 import type { OpineRequest, OpineResponse } from "opine";
 import type { RoomSchema } from "../types/schemas.ts";
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 
 type OpineController<ResBody = unknown> = (
 	req: OpineRequest,

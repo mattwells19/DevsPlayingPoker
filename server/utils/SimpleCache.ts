@@ -1,7 +1,7 @@
 /**
  * Simple cache that utilizes LRU strategy
  */
-export class SimpleCache<T> {
+export default class SimpleCache<T> {
 	#cacheMap: Map<string, T>;
 	#keySet: Set<string>;
 	#limit: number;

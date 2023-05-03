@@ -1,5 +1,5 @@
 import sockets from "../models/sockets.ts";
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import type { JoinEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 import { cleanseName, sendRoomData } from "./utils/mod.ts";

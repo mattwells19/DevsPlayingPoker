@@ -1,4 +1,4 @@
-import * as rooms from "../models/rooms.ts";
+import rooms from "../models/rooms.ts";
 import type { RoomSchema } from "../types/schemas.ts";
 import { sendRoomData } from "./utils/mod.ts";
 
