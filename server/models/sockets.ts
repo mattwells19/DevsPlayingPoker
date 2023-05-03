@@ -6,6 +6,9 @@ import {
 import type { WebSocketEvent } from "../types/socket.ts";
 import { RoomSchema } from "../types/schemas.ts";
 
+/**
+ * {userId}-{roomCode}
+ */
 type UserSocketId = `${string}-${string}`;
 
 export class UserSocket {

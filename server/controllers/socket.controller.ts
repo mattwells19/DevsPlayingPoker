@@ -37,12 +37,12 @@ export const handleOpen = async (userSocket: UserSocket) => {
  * WebSocket.onclose
  */
 export const handleClose = (userSocket: UserSocket) => {
-	const preSocket = sockets.get(userSocket.id);
+	const preSocket = userSocket;
 	setTimeout(async () => {
 		const postSocket = sockets.get(userSocket.id);
 
 		// same socketId but different socket object means they reconnected
-		if (preSocket !== postSocket) {
+		if (preSocket.socket !== postSocket?.socket) {
 			return;
 		}
 
