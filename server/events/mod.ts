@@ -14,21 +14,18 @@ import {
 import type { WebScoketMessageEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 
-const eventHandlerMap = new Map<
+const eventHandlers: Record<
 	WebScoketMessageEvent["event"],
 	Array<EventFunction<any>>
->([
-	["Join", [handleJoin]],
-	["StartVoting", [validateModerator, handleStartVoting]],
-	["StopVoting", [validateModerator, handleStopVoting]],
-	["OptionSelected", [validateVoter, handleOptionSelected]],
-	["ModeratorChange", [validateModerator, handleModeratorChanged]],
-	["KickVoter", [validateModerator, handleVoterKicked]],
-	[
-		"UpdateVotingDescription",
-		[validateModerator, handleVotingDescriptionUpdated],
-	],
-	["ChangeName", [validateInRoom, handleNameChanged]],
-]);
+> = {
+	Join: [handleJoin],
+	StartVoting: [validateModerator, handleStartVoting],
+	StopVoting: [validateModerator, handleStopVoting],
+	OptionSelected: [validateVoter, handleOptionSelected],
+	ModeratorChange: [validateModerator, handleModeratorChanged],
+	KickVoter: [validateModerator, handleVoterKicked],
+	UpdateVotingDescription: [validateModerator, handleVotingDescriptionUpdated],
+	ChangeName: [validateInRoom, handleNameChanged],
+};
 
-export default eventHandlerMap;
+export default eventHandlers;

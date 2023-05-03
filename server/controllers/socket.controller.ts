@@ -2,7 +2,7 @@ import type { NextFunction, OpineRequest, OpineResponse } from "opine";
 import sockets, { type UserSocket } from "../models/sockets.ts";
 import rooms from "../models/rooms.ts";
 import type { WebScoketMessageEvent } from "../types/socket.ts";
-import eventHandlerMap from "../events/mod.ts";
+import eventHandlers from "../events/mod.ts";
 import handleLeave from "../events/leave.ts";
 
 /**
@@ -16,9 +16,9 @@ export const upgradeWSConnection = (
 	if (req.headers.get("upgrade") === "websocket") {
 		const sock = req.upgrade();
 		sockets.add(sock, req.params.roomCode, req.query.userId);
+	} else {
+		next();
 	}
-
-	next();
 };
 
 /**
@@ -73,8 +73,8 @@ export const handleMessage = async (
 	const roomData = await rooms.findByRoomCode(userSocket.roomCode);
 	if (!roomData) return;
 
-	const eventFns = eventHandlerMap.get(data.event);
-	if (!eventFns) return;
+	if (data.event in eventHandlers === false) return;
+	const eventFns = eventHandlers[data.event];
 
 	try {
 		for (const eventFn of eventFns) {
