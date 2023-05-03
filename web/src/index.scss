@@ -80,4 +80,33 @@
 	hr {
 		--at-apply: "border-color";
 	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes pop-in {
+		from {
+			transform: scale(0.95);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slide-in {
+		from {
+			transform: translateX(100%);
+		}
+		to {
+			transform: translateX(0%);
+		}
+	}
 }

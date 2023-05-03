@@ -1,20 +1,23 @@
 import { IntlKey, useIntl } from "@/i18n";
-import { createSignal, JSX, ParentComponent, Show } from "solid-js";
+import { Component, createSignal, JSX, JSXElement, Show } from "solid-js";
 import Icon from "../Icon";
-import { Dialog, DialogCloseTrigger, DrawerContent } from "../Dialog";
+import useModal from "../useModal";
+import useDrawer from "../useDrawer";
 
 export interface SettingsDrawerActions {
 	onSaveName?: (name: string) => void;
 }
 
 type SettingsDrawerProps = {
-	isOpen: boolean;
-	onClose: () => void;
+	children: (
+		openProps: ReturnType<typeof useModal>["openModalProps"],
+	) => JSXElement;
 } & SettingsDrawerActions;
 
-const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
+const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 	const intl = useIntl();
 	const [errorMsg, setErrorMsg] = createSignal<IntlKey | null>(null);
+	const drawer = useDrawer();
 
 	const handleThemeChange: JSX.EventHandlerUnion<HTMLSelectElement, Event> = (
 		e,
@@ -39,20 +42,23 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 	};
 
 	return (
-		<Dialog isOpen={props.isOpen} onClose={props.onClose} role="dialog">
-			<DrawerContent>
-				<DialogCloseTrigger
-					onClick={props.onClose}
+		<>
+			{props.children(drawer.openDrawerProps)}
+			<dialog class="drawer" {...drawer.drawerDialogProps}>
+				<button
+					type="button"
 					title={intl.t("closeSettingsDrawer") as string}
 					class="btn-icon block ml-auto"
+					{...drawer.closeDrawerProps}
 				>
 					&#10005;
-				</DialogCloseTrigger>
+				</button>
 				<div class="form-control my-8">
 					<label for="theme-select">{intl.t("theme")}</label>
 					<select
 						id="theme-select"
 						name="theme-select"
+						autofocus
 						aria-describedby="theme-select-helptext"
 						value={localStorage.getItem("theme") ?? "system"}
 						onChange={handleThemeChange}
@@ -125,8 +131,8 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						</Show>
 					</form>
 				</Show>
-			</DrawerContent>
-		</Dialog>
+			</dialog>
+		</>
 	);
 };
 

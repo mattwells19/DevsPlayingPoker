@@ -20,6 +20,18 @@ const shortcuts: UserShortcuts<Theme> = {
 	"label-required":
 		"after:(content-['*'] text-brand-reddish dark:text-red ml-1)",
 	"border-color": "border-gray-300 dark:border-slate-600",
+	modal:
+		"fixed m-auto backdrop:bg-black/40 bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md w-full max-w-md",
+	"modal-opening":
+		"animate-[pop-in_100ms_ease-in-out] backdrop:animate-[fade-in_100ms_ease-in-out]",
+	"modal-closing":
+		"animate-[pop-in_100ms_ease-in-out_reverse] backdrop:animate-[fade-in_100ms_ease-in-out_reverse]",
+	drawer:
+		"fixed right-0 ml-auto w-xs h-screen p-4 backdrop:bg-black/40 bg-brand-whitish dark:bg-brand-navy max-h-none",
+	"drawer-opening":
+		"animate-[slide-in_100ms_ease-in-out] backdrop:animate-[fade-in_100ms_ease-in-out]",
+	"drawer-closing":
+		"animate-[slide-in_100ms_ease-in-out_reverse] backdrop:animate-[fade-in_100ms_ease-in-out_reverse]",
 };
 
 export default shortcuts;
