@@ -2,7 +2,7 @@ import rooms from "../models/rooms.ts";
 import sockets from "../models/sockets.ts";
 import type { KickVoterEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 const handleVoterKicked: EventFunction<KickVoterEvent> = async (
 	roomData,
@@ -19,7 +19,7 @@ const handleVoterKicked: EventFunction<KickVoterEvent> = async (
 
 	if (!updatedRoomData) return;
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 
 	const kickedVoterSocket = sockets.get(voterId, roomData.roomCode);
 	kickedVoterSocket?.send({ event: "Kicked" });

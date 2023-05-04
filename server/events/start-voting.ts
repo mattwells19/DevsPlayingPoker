@@ -1,7 +1,7 @@
 import rooms from "../models/rooms.ts";
 import type { StartVotingEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 /**
  * Begins voting, clearing previous votes
@@ -22,7 +22,7 @@ const handleStartVoting: EventFunction<StartVotingEvent> = async (roomData) => {
 		},
 	});
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleStartVoting;

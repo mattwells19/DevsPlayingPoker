@@ -1,6 +1,6 @@
 import rooms from "../models/rooms.ts";
 import type { RoomSchema } from "../types/schemas.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 /**
  * Removes the user from the room and performs moderator migration if necessary
@@ -35,7 +35,7 @@ const handleLeave = async (
 		});
 	}
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleLeave;

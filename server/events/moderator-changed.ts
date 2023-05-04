@@ -1,5 +1,5 @@
 import rooms from "../models/rooms.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 import type { User, Voter } from "../types/schemas.ts";
 import type { EventFunction } from "./types.ts";
 import type { ModeratorChangeEvent } from "../types/socket.ts";
@@ -71,7 +71,7 @@ const handleModeratorChanged: EventFunction<ModeratorChangeEvent> = async (
 		},
 	});
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleModeratorChanged;

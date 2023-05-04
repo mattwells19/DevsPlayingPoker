@@ -1,7 +1,7 @@
 import rooms from "../models/rooms.ts";
 import type { StopVotingEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 /**
  * Ends voting, transitioning to "Results" state
@@ -13,7 +13,7 @@ const handleStopVoting: EventFunction<StopVotingEvent> = async (roomData) => {
 		},
 	});
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleStopVoting;

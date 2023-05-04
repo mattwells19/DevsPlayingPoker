@@ -1,2 +1,3 @@
-export { default as cleanseName } from "./cleanse-name.ts";
-export { default as sendRoomData } from "./send-room-data.ts";
+import cleanseName from "./cleanse-name.ts";
+import sendRoomData from "./send-room-data.ts";
+export default { cleanseName, sendRoomData };

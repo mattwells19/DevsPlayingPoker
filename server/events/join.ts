@@ -2,7 +2,7 @@ import sockets from "../models/sockets.ts";
 import rooms from "../models/rooms.ts";
 import type { JoinEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
-import { cleanseName, sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 import type { User } from "../types/schemas.ts";
 
 /**
@@ -41,7 +41,7 @@ const handleJoin: EventFunction<JoinEvent> = async (
 	}
 
 	const allNamesInRoom = usersInRoom.map((v) => v.name);
-	const cleansedName = cleanseName(data.name, allNamesInRoom);
+	const cleansedName = utils.cleanseName(data.name, allNamesInRoom);
 
 	const isModerator = !roomData.moderator;
 
@@ -69,7 +69,7 @@ const handleJoin: EventFunction<JoinEvent> = async (
 			  },
 	);
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleJoin;

@@ -1,7 +1,7 @@
 import rooms from "../models/rooms.ts";
 import type { ChangeNameEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
-import { cleanseName, sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 const handleNameChanged: EventFunction<ChangeNameEvent> = async (
 	roomData,
@@ -17,7 +17,7 @@ const handleNameChanged: EventFunction<ChangeNameEvent> = async (
 	const allNamesInRoom = [roomData.moderator!, ...roomData.voters]
 		.filter((v) => v.id !== userId)
 		.map((v) => v.name);
-	const cleansedName = cleanseName(data.value, allNamesInRoom);
+	const cleansedName = utils.cleanseName(data.value, allNamesInRoom);
 
 	const updatedRoomData = await (() => {
 		if (roomData.moderator?.id === userId) {
@@ -50,7 +50,7 @@ const handleNameChanged: EventFunction<ChangeNameEvent> = async (
 
 	if (!updatedRoomData) return;
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleNameChanged;

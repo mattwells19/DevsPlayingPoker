@@ -1,6 +1,6 @@
 import { z as zod } from "zod";
 import rooms from "../models/rooms.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 import type { VotingDescriptionEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 
@@ -25,7 +25,7 @@ const handleVotingDescriptionUpdated: EventFunction<
 
 	if (!updatedRoomData) return;
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleVotingDescriptionUpdated;

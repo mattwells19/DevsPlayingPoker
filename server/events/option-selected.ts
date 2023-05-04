@@ -2,7 +2,7 @@ import rooms from "../models/rooms.ts";
 import type { OptionSelectedEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 import { ConfidenceValue } from "../types/schemas.ts";
-import { sendRoomData } from "./utils/mod.ts";
+import utils from "./utils/mod.ts";
 
 export const calculateConfidence = (
 	timeStarted: Date | null,
@@ -56,7 +56,7 @@ const handleOptionSelected: EventFunction<OptionSelectedEvent> = async (
 		},
 	});
 
-	sendRoomData(updatedRoomData);
+	utils.sendRoomData(updatedRoomData);
 };
 
 export default handleOptionSelected;
