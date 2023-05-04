@@ -2,10 +2,10 @@ import { assert, assertEquals } from "deno-asserts";
 import { describe, it, afterEach } from "deno-bdd";
 import sinon from "sinon";
 import { ObjectId } from "mongo";
-import eventHandlers from "../events/mod.ts";
-import { RoomSchema } from "../types/schemas.ts";
-import rooms from "../models/rooms.ts";
-import utils from "../events/utils/mod.ts";
+import eventHandlers from "../../events/mod.ts";
+import { RoomSchema } from "../../types/schemas.ts";
+import rooms from "../../models/rooms.ts";
+import utils from "../utils/mod.ts";
 
 const mockRoomData: RoomSchema = {
 	_id: new ObjectId(),

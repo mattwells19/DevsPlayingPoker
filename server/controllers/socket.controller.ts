@@ -42,7 +42,7 @@ export const handleClose = (userSocket: UserSocket) => {
 		const postSocket = sockets.get(userSocket.id);
 
 		// same socketId but different socket object means they reconnected
-		if (preSocket.socket !== postSocket?.socket) {
+		if (postSocket && preSocket.socket !== postSocket.socket) {
 			return;
 		}
 

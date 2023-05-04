@@ -9,7 +9,7 @@ import { RoomSchema } from "../types/schemas.ts";
 /**
  * {userId}-{roomCode}
  */
-type UserSocketId = `${string}-${string}`;
+export type UserSocketId = `${string}-${string}`;
 
 export class UserSocket {
 	#roomCode: string;
