@@ -1,4 +1,4 @@
-import { ObjectId } from "mongo";
+import type { ObjectId } from "mongo";
 
 export interface User {
 	id: string;

@@ -1,7 +1,7 @@
 import { ObjectId, UpdateFilter } from "mongo";
 import type { RoomSchema } from "../types/schemas.ts";
 import db from "../utils/db.ts";
-import { SimpleCache } from "../utils/SimpleCache.ts";
+import SimpleCache from "../utils/SimpleCache.ts";
 
 const roomDataCache = new SimpleCache<RoomSchema>();
 
@@ -46,7 +46,9 @@ export const updateById = async (
 	return updatedData;
 };
 
-export const deleteByRoomCode = (roomCode: string) => {
+export const deleteByRoomCode = (
+	roomCode: string,
+): ReturnType<typeof db.rooms.deleteOne> => {
 	roomDataCache.delete(roomCode);
 	return db.rooms.deleteOne({ roomCode });
 };
@@ -63,3 +65,12 @@ export const insertRoom = async (
 
 	return roomId;
 };
+
+const rooms = {
+	findByRoomCode,
+	updateById,
+	deleteByRoomCode,
+	insertRoom,
+};
+
+export default rooms;

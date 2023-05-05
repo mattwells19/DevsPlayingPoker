@@ -1,15 +1,10 @@
 // loads env variables
 import "https://deno.land/std@v0.168.0/dotenv/load.ts";
 
-import { opine, json, serveStatic } from "opine";
+import { json, opine, serveStatic } from "opine";
 import db from "./utils/db.ts";
+import { FeRoutes, RoomRoutes, SocketRoutes } from "./routes.ts";
 
-//Import routes
-import SocketRoutes from "./routes/socket.routes.ts";
-import RoomRoutes from "./routes/room.routes.ts";
-import FeRoutes from "./routes/fe.routes.ts";
-
-// Start Server
 const server = opine();
 server.use(json());
 
@@ -33,10 +28,13 @@ server.use((_, res, next) => {
 });
 
 // Use routes
-server.use("/", FeRoutes);
-server.use(serveStatic("www"));
 server.use("/ws", SocketRoutes);
 server.use("/api/v1", RoomRoutes);
+// for some reason Opine divides this number by 1000. 86400 = 24 hours
+// reference: https://github.com/cmorten/opine/blob/main/src/utils/send.ts#L389
+server.use(serveStatic("www", { maxage: 86400 * 1000 }));
+server.use("/", FeRoutes);
+server.use("*", (_, res) => res.setStatus(404).send("Resource not found."));
 
 db.connect()
 	.then(() => {

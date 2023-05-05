@@ -3,7 +3,9 @@
 		"opine": "https://deno.land/x/opine@2.2.0/mod.ts",
 		"mongo": "https://deno.land/x/mongo@v0.30.1/mod.ts",
 		"zod": "https://deno.land/x/zod@v3.20.2/mod.ts",
-		"deno-asserts": "https://deno.land/std@0.181.0/testing/asserts.ts"
+		"deno-asserts": "https://deno.land/std@0.181.0/testing/asserts.ts",
+		"deno-bdd": "https://deno.land/std@0.185.0/testing/bdd.ts",
+		"sinon": "https://cdn.skypack.dev/sinon@15.0.4?dts"
 	},
 	"lint": {
 		"files": {
