@@ -102,54 +102,13 @@ export function safeJSONParse<T>(value: string): T | undefined {
 
 export function getDefaultValues() {
 	const name = localStorage.getItem("name") ?? "";
-
-	const formValues = ((): Zod.infer<
-		typeof numberPatternSchema | typeof rightSizeSchema
-	> => {
-		const rawSavedFormValues = localStorage.getItem("newRoomFields");
-		const parsedSavedFormValues = rawSavedFormValues
-			? safeJSONParse(rawSavedFormValues)
-			: undefined;
-
-		const numPatternSchemaCheck = numberPatternSchema.safeParse(
-			parsedSavedFormValues,
-		);
-
-		if (numPatternSchemaCheck.success) {
-			return numPatternSchemaCheck.data;
-		}
-
-		const rightSizeSchemaCheck = rightSizeSchema.safeParse(
-			parsedSavedFormValues,
-		);
-		if (rightSizeSchemaCheck.success) {
-			return rightSizeSchemaCheck.data;
-		}
-
-		return {
-			voterOptions: "fibonacci",
-			numberOfOptions: defaultRangeSelect,
-			noVote: false,
-		};
-	})();
-
-	const list = (() => {
-		if (!formValues) return "";
-
-		const { voterOptions, numberOfOptions, noVote } = formValues;
-		const fieldOptions = getOptions(voterOptions, numberOfOptions);
-
-		const updatedList = fieldOptions.join(", ");
-		if (noVote) {
-			return updatedList + ", 🚫";
-		} else {
-			return updatedList;
-		}
-	})();
+	const savedOptions = localStorage.getItem("newRoomOptions");
+	const options = savedOptions
+		? (safeJSONParse(savedOptions) as Array<string>)
+		: ["1", "2", "3", "5", "8", "13"];
 
 	return {
 		name,
-		formValues,
-		list,
+		options,
 	};
 }

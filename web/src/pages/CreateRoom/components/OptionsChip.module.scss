@@ -1,0 +1,40 @@
+label.option {
+	cursor: pointer;
+
+	&:hover rect.faceLayer {
+		stroke: hsl(var(--orange));
+		stroke-opacity: 1;
+	}
+
+	input:focus-visible + span rect.faceLayer {
+		stroke: hsl(var(--orange));
+		stroke-opacity: 1;
+		stroke-dasharray: 5;
+	}
+
+	rect.faceLayer {
+		stroke: hsl(var(--whitish));
+		stroke-opacity: 0.1;
+		stroke-width: 5;
+	}
+
+	input:checked + span rect.faceLayer {
+		stroke: hsl(var(--orange));
+		stroke-opacity: 1;
+		fill: hsl(var(--orange));
+		fill-opacity: 0.1;
+	}
+
+	input {
+		appearance: none;
+		border: 0px;
+		clip: rect(0px, 0px, 0px, 0px);
+		height: 1px;
+		width: 1px;
+		margin: -1px;
+		padding: 0px;
+		overflow: hidden;
+		white-space: nowrap;
+		position: absolute;
+	}
+}

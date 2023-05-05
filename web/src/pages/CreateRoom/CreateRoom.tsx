@@ -1,21 +1,19 @@
-import { Component, createEffect, createSignal, Show } from "solid-js";
+import { Component, createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import NumberOfOptionsSlider from "./components/NumberOfOptionsSlider";
 import post from "@/utils/post";
 import Header from "@/components/Header";
-import {
-	getOptions,
-	getFormValues,
-	getDefaultValues,
-	availableOptions,
-	defaultRangeSelect,
-} from "./CreateRoom.utils";
-import {
-	nameSchema,
-	optionsSchemaMap,
-	CreateRoomFields,
-} from "./CreateRoom.schemas";
+import { getDefaultValues } from "./CreateRoom.utils";
 import { useIntl } from "@/i18n";
+import OptionsChip from "./components/OptionsChip";
+import zod from "zod";
+
+const createRoomSchema = zod.object({
+	moderatorName: zod
+		.string()
+		.min(1, { message: "Must provide a value for name." })
+		.max(20, { message: "Name too long. Must be no more than 20 characters." }),
+	options: zod.string().array().min(2),
+});
 
 const CreateRoom: Component = () => {
 	const intl = useIntl();
@@ -24,19 +22,25 @@ const CreateRoom: Component = () => {
 	const defaults = getDefaultValues();
 
 	const [error, setError] = createSignal<string | null>(null);
-	const [list, setList] = createSignal<string>(defaults.list);
-	const [optionsSelect, setOptionsSelect] = createSignal<
-		CreateRoomFields["voterOptions"]
-	>(defaults.formValues.voterOptions);
+	const [checkedOptions, setCheckedOptions] = createSignal<Array<string>>(
+		defaults.options,
+	);
 
-	let formRef: HTMLFormElement;
+	const allOptions: Array<string> = [
+		"0.5",
+		...Array.from({ length: 15 }, (_, index) => (index + 1).toString()),
+		"Yes",
+		"No",
+		"N/A",
+	];
 
 	const handleSubmit = (form: EventTarget & HTMLFormElement): void => {
-		const formData = getFormValues(form);
+		const formData = new FormData(form);
 
-		const schemaCheck = optionsSchemaMap[formData.voterOptions]
-			.extend(nameSchema)
-			.safeParse(formData);
+		const schemaCheck = createRoomSchema.safeParse({
+			moderatorName: formData.get("moderatorName"),
+			options: formData.getAll("options"),
+		});
 
 		if (!schemaCheck.success) {
 			const allErrorMessages = schemaCheck.error.flatten().fieldErrors;
@@ -49,60 +53,29 @@ const CreateRoom: Component = () => {
 			return;
 		}
 
-		const options = getOptions(formData.voterOptions, formData.numberOfOptions);
-
-		if (formData.noVote) {
-			options.unshift("N/A");
-		}
-
-		post("/api/v1/create", { options })
+		post("/api/v1/create", { options: schemaCheck.data.options })
 			.then((res) => {
-				localStorage.setItem("newRoomFields", JSON.stringify(formData));
-				localStorage.setItem("name", formData.moderatorName);
+				localStorage.setItem(
+					"newRoomOptions",
+					JSON.stringify(schemaCheck.data.options),
+				);
+				localStorage.setItem("name", schemaCheck.data.moderatorName);
 				navigate(`/room/${res.roomCode}`);
 			})
 			.catch((err) => setError(err));
 	};
-
-	const handleChange = (form: EventTarget & HTMLFormElement) => {
-		const formData = getFormValues(form);
-		setError(null);
-
-		if (optionsSelect() !== formData.voterOptions) {
-			// allow the effect to set the values since elements may need to be mounted
-			setOptionsSelect(formData.voterOptions);
-			return;
-		}
-
-		const options = getOptions(optionsSelect(), formData.numberOfOptions);
-
-		if (formData.noVote) {
-			options.push("🚫");
-		}
-
-		setList(options.join(", "));
-	};
-
-	createEffect(() => {
-		const formData = getFormValues(formRef);
-
-		const options = getOptions(optionsSelect(), formData.numberOfOptions);
-
-		if (formData.noVote) {
-			options.push("🚫");
-		}
-
-		setList(options.join(", "));
-	});
 
 	return (
 		<>
 			<Header />
 			<main class="max-w-md m-auto">
 				<form
-					class="flex flex-col gap-7"
-					ref={(el) => (formRef = el)}
-					onInput={(e) => handleChange(e.currentTarget)}
+					class="flex flex-col gap-10"
+					onInput={(e) => {
+						const formData = new FormData(e.currentTarget);
+						const checkedOptions = formData.getAll("options") as Array<string>;
+						setCheckedOptions(checkedOptions);
+					}}
 					onSubmit={(e) => {
 						e.preventDefault();
 						handleSubmit(e.currentTarget);
@@ -124,69 +97,42 @@ const CreateRoom: Component = () => {
 						/>
 					</div>
 
-					<hr class="my-4" />
-
-					<div class="form-control">
-						<label for="voterOptions" class="label-required">
-							{intl.t("voterOptions")}
-						</label>
-						<select
-							id="voterOptions"
-							name="voterOptions"
-							required
-							value={defaults.formValues.voterOptions}
-						>
-							<option value="fibonacci">{intl.t("fibonacci")}</option>
-							<option value="linear">{intl.t("linear")}</option>
-							<option value="yesNo">{intl.t("yesNo")}</option>
-						</select>
-					</div>
-
-					<Show when={optionsSelect() !== "yesNo"}>
-						<NumberOfOptionsSlider
-							name="numberOfOptions"
-							label={intl.t("numberOfOptions", {
-								min: availableOptions[optionsSelect()][0],
-								max: availableOptions[optionsSelect()].slice(-1),
-							})}
-							min={0}
-							max={14}
-							step={1}
-							value={defaults.formValues.numberOfOptions ?? defaultRangeSelect}
-						/>
-
-						<fieldset class="form-control">
-							<legend class="pb-1">{intl.t("includeNoVote")}</legend>
-
-							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
-								<input
-									type="radio"
-									name="noVote"
-									value="yes"
-									checked={defaults.formValues.noVote}
-								/>
-								{intl.t("yes")}
-							</label>
-
-							<label class="cursor-pointer flex items-center justify-start gap-2 pl-3">
-								<input
-									type="radio"
-									name="noVote"
-									value="no"
-									checked={!defaults.formValues.noVote}
-									class="radio"
-								/>
-								{intl.t("no")}
-							</label>
-						</fieldset>
-					</Show>
-
-					<dl class="form-control">
-						<dt>{intl.t("finalPreview")}</dt>
-						<dd class="pl-3">{list()}</dd>
-					</dl>
-
-					<hr class="my-4" />
+					<fieldset>
+						<legend class="label-required">Options</legend>
+						<div role="group" class="flex my-2">
+							<button
+								type="button"
+								class="btn-outline btn-sm border-gray rounded-r-none"
+								onClick={[setCheckedOptions, ["1", "2", "3", "5", "8", "13"]]}
+							>
+								Fibonacci
+							</button>
+							<button
+								type="button"
+								class="btn-outline btn-sm border-gray rounded-none"
+								onClick={[setCheckedOptions, []]}
+							>
+								Uncheck all
+							</button>
+							<button
+								type="button"
+								class="btn-outline btn-sm border-gray rounded-l-none"
+								onClick={[setCheckedOptions, allOptions]}
+							>
+								Check all
+							</button>
+						</div>
+						<div class="flex flex-wrap justify-center gap-2">
+							<For each={allOptions}>
+								{(option) => (
+									<OptionsChip
+										value={option}
+										checked={checkedOptions().includes(option)}
+									/>
+								)}
+							</For>
+						</div>
+					</fieldset>
 
 					<Show when={error()} keyed>
 						{(errorMsg) => (
