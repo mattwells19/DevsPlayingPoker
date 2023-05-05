@@ -14,10 +14,11 @@ import {
 import type { WebScoketMessageEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 
-const eventHandlers: Record<
-	WebScoketMessageEvent["event"],
-	Array<EventFunction<any>>
-> = {
+const eventHandlers: {
+	[key in WebScoketMessageEvent["event"]]: Array<
+		EventFunction<Extract<WebScoketMessageEvent, { event: key }>>
+	>;
+} = {
 	Join: [handleJoin],
 	StartVoting: [validateModerator, handleStartVoting],
 	StopVoting: [validateModerator, handleStopVoting],

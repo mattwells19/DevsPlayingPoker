@@ -20,7 +20,7 @@ The frontend is built using [SolidJS](https://solidjs.com) and styled using [Uno
 
 ### Deployment
 
-PRs are deployed as preview builds to [Deno Deploy](https://deno.com/deploy) and production builds are deployed to [fly.io](https://fly.io).
+We deploy to [Fly.io](https://fly.io) using a Dockerfile. PRs are deployed to the staging environment (https://dpp-staging.fly.io) and, once merged into main, get deployed to production (https://devsplayingpoker.com).
 
 We originally had production deployments also going to Deno Deploy, but we noticed some sync issues within the rooms for some users. We discovered that Deno Deploy's edge deployment strategy was causing issues with how we track WebSocket connections for users in the rooms. To solve this issue, we decided to move to fly.io where we could control which regions our app was deployed to. We've limited deployments to a single region to ensure that all WebSocket connections are tracked on the same server allowing for much more stable updates to all users in the rooms.
 
