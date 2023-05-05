@@ -1,7 +1,8 @@
 import type { NextFunction, OpineRequest, OpineResponse } from "opine";
+import type { WebScoketMessageEvent } from "../types/socket.ts";
+import type { EventFunction } from "../events/types.ts";
 import sockets, { type UserSocket } from "../models/sockets.ts";
 import rooms from "../models/rooms.ts";
-import type { WebScoketMessageEvent } from "../types/socket.ts";
 import eventHandlers from "../events/mod.ts";
 import handleLeave from "../events/leave.ts";
 
@@ -74,7 +75,9 @@ export const handleMessage = async (
 	if (!roomData) return;
 
 	if (data.event in eventHandlers === false) return;
-	const eventFns = eventHandlers[data.event];
+	const eventFns = eventHandlers[data.event] as Array<
+		EventFunction<WebScoketMessageEvent>
+	>;
 
 	try {
 		for (const eventFn of eventFns) {
