@@ -1,4 +1,10 @@
-import { Collection, Database, IndexOptions, MongoClient } from "mongo";
+import {
+	Collection,
+	Database,
+	Document,
+	IndexOptions,
+	MongoClient,
+} from "mongo";
 import type { RoomSchema } from "../types/schemas.ts";
 
 const RoomCodeIndex: IndexOptions = {
@@ -32,7 +38,7 @@ class MongoDb {
 
 	constructor() {}
 
-	async #initCollection<T>(
+	async #initCollection<T extends Document>(
 		collectionName: string,
 		indexMap?: Map<string, IndexOptions>,
 	): Promise<Collection<T>> {
