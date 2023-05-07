@@ -1,8 +1,7 @@
 import { IntlKey, useIntl } from "@/i18n";
 import { Component, createSignal, JSX, JSXElement, Show } from "solid-js";
-import Icon from "../Icon";
-import useModal from "../useModal";
-import useDrawer from "../useDrawer";
+import Icon from "./Icon";
+import useDrawer from "./useDrawer";
 
 export interface SettingsDrawerActions {
 	onSaveName?: (name: string) => void;
@@ -10,7 +9,7 @@ export interface SettingsDrawerActions {
 
 type SettingsDrawerProps = {
 	children: (
-		openProps: ReturnType<typeof useModal>["openModalProps"],
+		openProps: ReturnType<typeof useDrawer>["openDrawerProps"],
 	) => JSXElement;
 } & SettingsDrawerActions;
 

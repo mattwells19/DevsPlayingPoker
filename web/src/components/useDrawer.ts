@@ -22,6 +22,17 @@ export default function useDrawer(): UseDrawerResult {
 					drawerRef()?.close();
 				}
 			},
+			onClick: (e) => {
+				const dialogDimensions = e.currentTarget.getBoundingClientRect();
+				if (
+					e.clientX < dialogDimensions.left ||
+					e.clientX > dialogDimensions.right ||
+					e.clientY < dialogDimensions.top ||
+					e.clientY > dialogDimensions.bottom
+				) {
+					drawerRef()?.classList.add("drawer-closing");
+				}
+			},
 		},
 		closeDrawerProps: {
 			onClick: () => drawerRef()?.classList.add("drawer-closing"),

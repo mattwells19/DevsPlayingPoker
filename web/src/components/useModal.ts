@@ -22,6 +22,17 @@ export default function useModal(): UseModalResult {
 					modalRef()?.close();
 				}
 			},
+			onClick: (e) => {
+				const dialogDimensions = e.currentTarget.getBoundingClientRect();
+				if (
+					e.clientX < dialogDimensions.left ||
+					e.clientX > dialogDimensions.right ||
+					e.clientY < dialogDimensions.top ||
+					e.clientY > dialogDimensions.bottom
+				) {
+					modalRef()?.classList.add("modal-closing");
+				}
+			},
 		},
 		closeModalProps: {
 			onClick: () => modalRef()?.classList.add("modal-closing"),

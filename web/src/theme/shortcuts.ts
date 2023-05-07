@@ -23,15 +23,15 @@ const shortcuts: UserShortcuts<Theme> = {
 	modal:
 		"fixed m-auto backdrop:bg-black/40 bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md w-full max-w-md",
 	"modal-opening":
-		"animate-[pop-in_100ms_ease-in-out] backdrop:animate-[fade-in_100ms_ease-in-out]",
+		"animate-[pop-in_150ms_ease-in-out] backdrop:animate-[fade-in_150ms_ease-in-out]",
 	"modal-closing":
-		"animate-[pop-in_100ms_ease-in-out_reverse] backdrop:animate-[fade-in_100ms_ease-in-out_reverse]",
+		"animate-[pop-in_150ms_ease-in-out_reverse] backdrop:animate-[fade-in_150ms_ease-in-out_reverse]",
 	drawer:
 		"fixed right-0 ml-auto w-xs h-screen p-4 backdrop:bg-black/40 bg-brand-whitish dark:bg-brand-navy max-h-none",
 	"drawer-opening":
-		"animate-[slide-in_100ms_ease-in-out] backdrop:animate-[fade-in_100ms_ease-in-out]",
+		"animate-[slide-in_150ms_ease-in-out] backdrop:animate-[fade-in_150ms_ease-in-out]",
 	"drawer-closing":
-		"animate-[slide-in_100ms_ease-in-out_reverse] backdrop:animate-[fade-in_100ms_ease-in-out_reverse]",
+		"animate-[slide-in_150ms_ease-in-out_reverse] backdrop:animate-[fade-in_150ms_ease-in-out_reverse]",
 };
 
 export default shortcuts;
