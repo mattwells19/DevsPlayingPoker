@@ -188,10 +188,10 @@ const CreateRoom: Component = () => {
 
 					<hr class="my-4" />
 
-					<Show when={error()} keyed>
+					<Show when={error()}>
 						{(errorMsg) => (
 							<p class="text-red">
-								{intl.t("errorWithMsg", { msg: errorMsg })}
+								{intl.t("errorWithMsg", { msg: errorMsg() })}
 							</p>
 						)}
 					</Show>

@@ -28,12 +28,12 @@ const VotingModerator: Component = () => {
 	});
 
 	return (
-		<Show when={details()} keyed fallback={"Waiting for room"}>
+		<Show when={details()} fallback={"Waiting for room"}>
 			{(d) => (
 				<VotingModeratorContent
-					userName={d.userName}
-					roomCode={d.roomCode}
-					userId={d.userId}
+					userName={d().userName}
+					roomCode={d().roomCode}
+					userId={d().userId}
 				/>
 			)}
 		</Show>
