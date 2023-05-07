@@ -23,7 +23,7 @@ const Landing: Component = () => {
 			.toUpperCase();
 
 		if (roomCode.length === 4) {
-			fetch(`/api/v1/rooms/${roomCode}/checkRoomExists`).then(({ status }) => {
+			fetch(`/api/v1/rooms/${roomCode}/exists`).then(({ status }) => {
 				switch (status) {
 					case 200:
 						navigate(`/room/${roomCode}`);

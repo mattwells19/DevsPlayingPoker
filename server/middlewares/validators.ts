@@ -60,16 +60,7 @@ export function validateOrigin(
 					origin === "http://localhost:5555"
 				);
 			case "staging": {
-				if (origin === "https://devs-playing-poker.deno.dev") {
-					return true;
-				}
-
-				const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID");
-				if (!deploymentId) {
-					return false;
-				}
-
-				return origin === `https://devs-playing-poker-${deploymentId}.deno.dev`;
+				return origin === "https://dpp-staging.fly.dev";
 			}
 			case "prod":
 				return origin === "https://devsplayingpoker.com";
