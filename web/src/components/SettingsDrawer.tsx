@@ -1,7 +1,7 @@
 import { IntlKey, useIntl } from "@/i18n";
 import { Component, createSignal, JSX, JSXElement, Show } from "solid-js";
 import Icon from "./Icon";
-import useDrawer from "./useDrawer";
+import useOverlay from "./useOverlay";
 
 export interface SettingsDrawerActions {
 	onSaveName?: (name: string) => void;
@@ -9,14 +9,14 @@ export interface SettingsDrawerActions {
 
 type SettingsDrawerProps = {
 	children: (
-		openProps: ReturnType<typeof useDrawer>["openDrawerProps"],
+		openProps: ReturnType<typeof useOverlay>["openProps"],
 	) => JSXElement;
 } & SettingsDrawerActions;
 
 const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 	const intl = useIntl();
 	const [errorMsg, setErrorMsg] = createSignal<IntlKey | null>(null);
-	const drawer = useDrawer();
+	const drawer = useOverlay("drawer");
 
 	const handleThemeChange: JSX.EventHandlerUnion<HTMLSelectElement, Event> = (
 		e,
@@ -42,13 +42,13 @@ const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 
 	return (
 		<>
-			{props.children(drawer.openDrawerProps)}
-			<dialog class="drawer" {...drawer.drawerDialogProps}>
+			{props.children(drawer.openProps)}
+			<dialog class="drawer" {...drawer.dialogProps}>
 				<button
 					type="button"
 					title={intl.t("closeSettingsDrawer") as string}
 					class="btn-icon block ml-auto"
-					{...drawer.closeDrawerProps}
+					{...drawer.closeProps}
 				>
 					&#10005;
 				</button>

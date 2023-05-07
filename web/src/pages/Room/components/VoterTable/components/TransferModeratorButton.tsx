@@ -3,7 +3,7 @@ import { useIntl } from "@/i18n";
 import { useRoom } from "../../../RoomContext";
 import { Component, For, Show } from "solid-js";
 import type { Voter } from "@/shared-types";
-import useModal from "@/components/useModal";
+import useOverlay from "@/components/useOverlay";
 
 interface TransferModeratorButtonProps {
 	options: Array<Voter>;
@@ -15,7 +15,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 ) => {
 	const intl = useIntl();
 	const room = useRoom();
-	const modal = useModal();
+	const modal = useOverlay("modal");
 
 	const handleChangeModerator = (form: EventTarget & HTMLFormElement) => {
 		const newModeratorId = new FormData(form).get("new-moderator")?.toString();
@@ -33,7 +33,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 				class="p-2 rounded-full transition-all bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
 				classList={{ "opacity-0": props.discreet }}
 				title={intl.t("transferModerator") as string}
-				{...modal.openModalProps}
+				{...modal.openProps}
 			>
 				<Icon
 					name="arrows-right-left"
@@ -46,7 +46,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 				aria-labelledby="transfer-moderator-title"
 				aria-describedby="new-moderator-label"
 				class="modal"
-				{...modal.modalDialogProps}
+				{...modal.dialogProps}
 			>
 				<h2 id="transfer-moderator-title" class="font-bold text-lg text-left">
 					<span aria-hidden="true" class="mr-1">
@@ -58,7 +58,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 					type="button"
 					class="btn-ghost rounded-full absolute top-1 right-1"
 					aria-label={intl.t("cancel") as string}
-					{...modal.closeModalProps}
+					{...modal.closeProps}
 				>
 					&#10005;
 				</button>
@@ -84,7 +84,7 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 						<button
 							type="button"
 							class="btn-ghost btn-sm"
-							{...modal.closeModalProps}
+							{...modal.closeProps}
 						>
 							{intl.t("cancel")}
 						</button>

@@ -2,7 +2,7 @@ import { useIntl } from "@/i18n";
 import { Component } from "solid-js";
 import { useRoom } from "@/pages/Room/RoomContext";
 import type { Voter } from "@/shared-types";
-import useModal from "@/components/useModal";
+import useOverlay from "@/components/useOverlay";
 
 interface KickVoterButtonProps {
 	voter: Voter;
@@ -11,7 +11,7 @@ interface KickVoterButtonProps {
 const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
-	const modal = useModal();
+	const modal = useOverlay("modal");
 
 	const handleKickVoter = () => {
 		room.dispatchEvent({
@@ -29,7 +29,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 					intl.t("kickVoter", { voterName: props.voter.name }) as string
 				}
 				title={intl.t("kickVoter", { voterName: props.voter.name }) as string}
-				{...modal.openModalProps}
+				{...modal.openProps}
 			>
 				&#10005;
 			</button>
@@ -37,7 +37,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 				aria-labelledby="kick-voter-title"
 				aria-describedby="kick-voter-desc"
 				class="modal"
-				{...modal.modalDialogProps}
+				{...modal.dialogProps}
 			>
 				<h2 id="kick-voter-title" class="font-bold text-lg text-left">
 					<span aria-hidden="true" class="mr-1">
@@ -49,7 +49,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 					type="button"
 					class="btn-ghost rounded-full absolute top-1 right-1"
 					aria-label={intl.t("cancel") as string}
-					{...modal.closeModalProps}
+					{...modal.closeProps}
 				>
 					&#10005;
 				</button>
@@ -69,7 +69,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 						<button
 							type="button"
 							class="btn-ghost btn-sm"
-							{...modal.closeModalProps}
+							{...modal.closeProps}
 						>
 							{intl.t("cancel")}
 						</button>
