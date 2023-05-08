@@ -121,10 +121,10 @@ const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 								/>
 							</button>
 						</div>
-						<Show when={errorMsg()} keyed>
+						<Show when={errorMsg()}>
 							{(msg) => (
-								<p id="name-error-msg" class="text-error">
-									{intl.t(msg)}
+								<p id="name-error-msg" class="text-red">
+									{intl.t(msg())}
 								</p>
 							)}
 						</Show>

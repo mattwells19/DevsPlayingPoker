@@ -13,23 +13,23 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@formatjs/cli": "^5.1.12",
-		"prettier": "^2.8.4",
-		"sass": "^1.57.0",
-		"typescript": "^4.9.4",
-		"unocss": "^0.51.4",
-		"vite": "^4.0.2",
-		"vite-plugin-solid": "^2.5.0"
+		"@formatjs/cli": "^6.1.1",
+		"prettier": "^2.8.8",
+		"sass": "^1.62.1",
+		"typescript": "^5.0.4",
+		"unocss": "^0.51.12",
+		"vite": "^4.3.5",
+		"vite-plugin-solid": "^2.7.0"
 	},
 	"dependencies": {
-		"@formatjs/intl": "^2.6.3",
+		"@formatjs/intl": "^2.7.2",
 		"@solidjs/router": "^0.8.2",
 		"@zag-js/range-slider": "^0.2.15",
 		"@zag-js/solid": "^0.3.1",
 		"@zag-js/tooltip": "^0.3.0",
-		"solid-js": "^1.6.8",
+		"solid-js": "^1.7.5",
 		"solid-toast": "^0.4.0",
 		"solid-transition-group": "^0.2.2",
-		"zod": "^3.20.2"
+		"zod": "^3.21.4"
 	}
 }
