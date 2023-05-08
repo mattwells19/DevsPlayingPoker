@@ -55,10 +55,10 @@ const JoinRoom: Component = () => {
 							aria-describedby="name-error-msg"
 							aria-invalid={Boolean(errorMsg())}
 						/>
-						<Show when={errorMsg()} keyed>
+						<Show when={errorMsg()}>
 							{(msg) => (
 								<p id="name-error-msg" class="text-red mt-1">
-									{intl.t(msg)}
+									{intl.t(msg())}
 								</p>
 							)}
 						</Show>

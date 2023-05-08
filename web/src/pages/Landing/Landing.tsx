@@ -117,10 +117,10 @@ const Landing: Component = () => {
 							</For>
 						</form>
 						<div class="h-4 grid place-items-center">
-							<Show when={error()} keyed>
+							<Show when={error()}>
 								{(errorMsg) => (
 									<p aria-live="polite" class="my-4 mx-0 text-red">
-										{intl.t(errorMsg)}
+										{intl.t(errorMsg())}
 									</p>
 								)}
 							</Show>

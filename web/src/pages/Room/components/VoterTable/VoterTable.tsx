@@ -62,7 +62,7 @@ const VoterTable: Component<VoterTableProps> = () => {
 					</tr>
 				</thead>
 				<tbody>
-					<Show when={votingModerator()} keyed>
+					<Show when={votingModerator()}>
 						{(votingModerator) => (
 							<VoterTableRow
 								name={
@@ -78,8 +78,8 @@ const VoterTable: Component<VoterTableProps> = () => {
 										</span>
 									</Tooltip>
 								}
-								confidence={votingModerator.confidence}
-								selection={votingModerator.selection}
+								confidence={votingModerator().confidence}
+								selection={votingModerator().selection}
 								hiddenAction={
 									<TransferModeratorButton discreet options={voters()} />
 								}

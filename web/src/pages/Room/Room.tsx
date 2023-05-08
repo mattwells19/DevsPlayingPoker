@@ -42,10 +42,9 @@ const Room: Component = () => {
 			<Show
 				when={userName}
 				fallback={<Navigate href={`/join/${params.roomCode}`} />}
-				keyed
 			>
 				{(userName) => (
-					<RoomContent roomCode={params.roomCode} userName={userName} />
+					<RoomContent roomCode={params.roomCode} userName={userName()} />
 				)}
 			</Show>
 		</>
