@@ -50,7 +50,7 @@ const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 					class="btn-icon block ml-auto"
 					{...drawer.closeProps}
 				>
-					&#10005;
+					<Icon name="close" aria-label="Close drawer." class="w-6 h-6" />
 				</button>
 				<div class="form-control my-8">
 					<label for="theme-select">{intl.t("theme")}</label>

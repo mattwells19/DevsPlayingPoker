@@ -81,32 +81,107 @@
 		--at-apply: "border-color";
 	}
 
-	@keyframes fade-in {
-		from {
-			opacity: 0;
+	/**
+   * Creates two keyframes that are reciprocals of one another.
+   * Example: prefix: slide, from: (opacity: 0), to: (opacity: 1)
+   *   @keyframes slide-in { from: { opacity: 0; } to: { opacity: 1 } }
+   *   @keyframes slide-out { from: { opacity: 1; } to: { opacity: 0 } }
+   */
+	@mixin in-and-out($prefix, $from, $to) {
+		@keyframes #{$prefix}-in {
+			from {
+				@each $property, $value in $from {
+					#{$property}: $value;
+				}
+			}
+			to {
+				@each $property, $value in $to {
+					#{$property}: $value;
+				}
+			}
 		}
-		to {
-			opacity: 1;
+
+		@keyframes #{$prefix}-out {
+			from {
+				@each $property, $value in $to {
+					#{$property}: $value;
+				}
+			}
+			to {
+				@each $property, $value in $from {
+					#{$property}: $value;
+				}
+			}
 		}
 	}
 
-	@keyframes pop-in {
-		from {
-			transform: scale(0.95);
-			opacity: 0;
-		}
-		to {
-			transform: scale(1);
-			opacity: 1;
-		}
-	}
+	@include in-and-out(
+		"fade",
+		(
+			opacity: 0,
+		),
+		(
+			opacity: 1,
+		)
+	);
 
-	@keyframes slide-in {
-		from {
-			transform: translateX(100%);
+	@include in-and-out(
+		"pop",
+		(
+			transform: scale(0.95),
+			opacity: 0,
+			display: none,
+		),
+		(
+			transform: scale(1),
+			opacity: 1,
+			display: block,
+		)
+	);
+
+	@include in-and-out(
+		"slide",
+		(
+			transform: translateX(100%),
+			display: none,
+		),
+		(
+			transform: translateX(0%),
+			display: block,
+		)
+	);
+
+	dialog {
+		&.drawer {
+			animation: slide-out 150ms ease-in-out;
+
+			&::backdrop {
+				animation: fade-out 150ms ease-in-out;
+			}
+
+			&[open] {
+				animation: slide-in 150ms ease-in-out;
+
+				&::backdrop {
+					animation: fade-in 150ms ease-in-out;
+				}
+			}
 		}
-		to {
-			transform: translateX(0%);
+
+		&.modal {
+			animation: pop-out 150ms ease-in-out;
+
+			&::backdrop {
+				animation: fade-out 150ms ease-in-out;
+			}
+
+			&[open] {
+				animation: pop-in 150ms ease-in-out;
+
+				&::backdrop {
+					animation: fade-in 150ms ease-in-out;
+				}
+			}
 		}
 	}
 }

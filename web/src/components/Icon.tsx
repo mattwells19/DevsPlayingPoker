@@ -11,7 +11,8 @@ type IconName =
 	| "user-solid"
 	| "pencil" // not used
 	| "arrows-right-left"
-	| "arrow-top-right-on-square";
+	| "arrow-top-right-on-square"
+	| "close";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
 	name: IconName;

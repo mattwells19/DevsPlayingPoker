@@ -56,11 +56,11 @@ const TransferModeratorButton: Component<TransferModeratorButtonProps> = (
 				</h2>
 				<button
 					type="button"
-					class="btn-ghost rounded-full absolute top-1 right-1"
+					class="btn-icon rounded-full absolute top-1 right-1"
 					aria-label={intl.t("cancel") as string}
 					{...modal.closeProps}
 				>
-					&#10005;
+					<Icon name="close" class="w-6 h-6" aria-label="Close modal." />
 				</button>
 				<form
 					class="form-control mt-6"

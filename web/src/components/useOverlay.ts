@@ -11,22 +11,9 @@ export default function useOverlay(
 ): UseOverlayResult {
 	const [overlayRef, setOverlayRef] = createSignal<HTMLDialogElement>();
 
-	const openingClass = () => `${overlayType}-opening`;
-	const closingClass = () => `${overlayType}-closing`;
-
 	return {
 		dialogProps: {
 			ref: setOverlayRef,
-			onAnimationEnd: () => {
-				if (overlayRef()?.classList.contains(openingClass())) {
-					overlayRef()?.classList.remove(openingClass());
-				}
-
-				if (overlayRef()?.classList.contains(closingClass())) {
-					overlayRef()?.classList.remove(closingClass());
-					overlayRef()?.close();
-				}
-			},
 			onClick: (e) => {
 				const dialogDimensions = e.currentTarget.getBoundingClientRect();
 				if (
@@ -35,24 +22,15 @@ export default function useOverlay(
 					e.clientY < dialogDimensions.top ||
 					e.clientY > dialogDimensions.bottom
 				) {
-					overlayRef()?.classList.add(closingClass());
-				}
-			},
-			onKeyDown: (e) => {
-				if (e.key === "Escape") {
-					e.preventDefault();
-					overlayRef()?.classList.add(closingClass());
+					overlayRef()?.close();
 				}
 			},
 		},
 		closeProps: {
-			onClick: () => overlayRef()?.classList.add(closingClass()),
+			onClick: () => overlayRef()?.close(),
 		},
 		openProps: {
-			onClick: () => {
-				overlayRef()?.classList.add(openingClass());
-				overlayRef()?.showModal();
-			},
+			onClick: () => overlayRef()?.showModal(),
 		},
 	};
 }

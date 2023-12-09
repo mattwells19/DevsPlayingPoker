@@ -3,6 +3,7 @@ import { Component } from "solid-js";
 import { useRoom } from "@/pages/Room/RoomContext";
 import type { Voter } from "@/shared-types";
 import useOverlay from "@/components/useOverlay";
+import Icon from "@/components/Icon";
 
 interface KickVoterButtonProps {
 	voter: Voter;
@@ -24,14 +25,14 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 		<>
 			<button
 				type="button"
-				class="w-8 h-8 p-1 text-sm rounded-full transition-colors transition-opacity opacity-0 bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
+				class="w-8 h-8 p-1 text-sm rounded-full grid place-items-center transition-colors transition-opacity opacity-0 bg-opacity-10 text-brand-reddish bg-brand-reddish hover:(bg-opacity-30 bg-brand-reddish) dark:(text-brand-turquoise bg-brand-turquoise bg-opacity-10 hover:bg-opacity-30) group-hover:opacity-100 focus:opacity-100"
 				aria-label={
 					intl.t("kickVoter", { voterName: props.voter.name }) as string
 				}
 				title={intl.t("kickVoter", { voterName: props.voter.name }) as string}
 				{...modal.openProps}
 			>
-				&#10005;
+				<Icon name="close" class="w-5 h-5" aria-label="Close modal." />
 			</button>
 			<dialog
 				aria-labelledby="kick-voter-title"
@@ -47,11 +48,11 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 				</h2>
 				<button
 					type="button"
-					class="btn-ghost rounded-full absolute top-1 right-1"
+					class="btn-icon rounded-full absolute top-1 right-1"
 					aria-label={intl.t("cancel") as string}
 					{...modal.closeProps}
 				>
-					&#10005;
+					<Icon name="close" class="w-6 h-6" aria-label="Close modal." />
 				</button>
 				<form
 					onSubmit={(e) => {
