@@ -1,6 +1,6 @@
 import { useIntl } from "@/i18n";
 import mergeClassNames from "@/utils/mergeClassNames";
-import { Link, useLocation } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import { ParentComponent, Show, splitProps } from "solid-js";
 import Icon from "./Icon";
 import SettingsDrawer, { SettingsDrawerActions } from "./SettingsDrawer";
@@ -19,12 +19,12 @@ const Header: ParentComponent<HeaderProps> = (props) => {
 			<header class={mergeClassNames("flex mb-4", props.class)}>
 				<div class="flex-1 flex flex-start items-center">
 					<Show when={location.pathname !== "/"}>
-						<Link href="/">
-							<span aria-hidden="true" class="mr-1">
+						<A href="/">
+							<span aria-hidden="true" class="mr-2">
 								🏠
 							</span>
 							{intl.t("home")}
-						</Link>
+						</A>
 					</Show>
 				</div>
 				<div class="flex-1 flex justify-center items-center">

@@ -41,7 +41,7 @@ const KickVoterButton: Component<KickVoterButtonProps> = (props) => {
 				{...modal.dialogProps}
 			>
 				<h2 id="kick-voter-title" class="font-bold text-lg text-left">
-					<span aria-hidden="true" class="mr-1">
+					<span aria-hidden="true" class="mr-2">
 						🥾
 					</span>
 					{intl.t("kickVoter", { voterName: props.voter.name })}

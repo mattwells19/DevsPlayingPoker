@@ -44,7 +44,7 @@ export ENV=dev
 
 ### Frontend
 
-1. Install Node (v16) if you haven't already: https://nodejs.org/en/
+1. Install Node (v20) if you haven't already: https://nodejs.org/en/
 2. `cd` into the `web/` directory
 3. Run `npm install`
 4. Run `npm start`

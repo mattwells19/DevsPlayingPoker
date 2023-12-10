@@ -40,7 +40,7 @@ export const Tooltip: Component<TooltipProps> = (props) => {
 
 	return (
 		<>
-			<button tabIndex="-1" class="bg-transparent" {...api().triggerProps}>
+			<button tabIndex="-1" {...api().triggerProps} class="bg-transparent">
 				{props.children}
 			</button>
 			<Portal>
