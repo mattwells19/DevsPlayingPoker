@@ -20,6 +20,10 @@ const shortcuts: UserShortcuts<Theme> = {
 	"label-required":
 		"after:(content-['*'] text-brand-reddish dark:text-red ml-1)",
 	"border-color": "border-gray-300 dark:border-slate-600",
+	modal:
+		"fixed m-auto backdrop:bg-black/40 bg-brand-whitish dark:(bg-brand-navy) py-4 px-6 rounded-md w-full max-w-md",
+	drawer:
+		"fixed right-0 ml-auto w-xs h-screen p-4 backdrop:bg-black/40 bg-brand-whitish dark:bg-brand-navy max-h-none",
 };
 
 export default shortcuts;

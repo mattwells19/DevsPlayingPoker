@@ -64,4 +64,9 @@
   <symbol id="arrows-right-left" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
   </symbol>
+
+  <symbol id="close" viewBox="0 0 80 80" fill="none">
+    <path d="M24.4437 24.5566L38.5858 38.6988L41.4142 41.5272L55.5564 55.6693" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M55.5563 24.5566L41.4142 38.6988L38.5858 41.5272L24.4436 55.6693" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  </symbol>
 </svg>

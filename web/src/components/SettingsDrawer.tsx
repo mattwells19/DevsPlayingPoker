@@ -1,20 +1,22 @@
 import { IntlKey, useIntl } from "@/i18n";
-import { createSignal, JSX, ParentComponent, Show } from "solid-js";
-import Icon from "../Icon";
-import { Dialog, DialogCloseTrigger, DrawerContent } from "../Dialog";
+import { Component, createSignal, JSX, JSXElement, Show } from "solid-js";
+import Icon from "./Icon";
+import useOverlay from "./useOverlay";
 
 export interface SettingsDrawerActions {
 	onSaveName?: (name: string) => void;
 }
 
 type SettingsDrawerProps = {
-	isOpen: boolean;
-	onClose: () => void;
+	children: (
+		openProps: ReturnType<typeof useOverlay>["openProps"],
+	) => JSXElement;
 } & SettingsDrawerActions;
 
-const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
+const SettingsDrawer: Component<SettingsDrawerProps> = (props) => {
 	const intl = useIntl();
 	const [errorMsg, setErrorMsg] = createSignal<IntlKey | null>(null);
+	const drawer = useOverlay("drawer");
 
 	const handleThemeChange: JSX.EventHandlerUnion<HTMLSelectElement, Event> = (
 		e,
@@ -39,20 +41,23 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 	};
 
 	return (
-		<Dialog isOpen={props.isOpen} onClose={props.onClose} role="dialog">
-			<DrawerContent>
-				<DialogCloseTrigger
-					onClick={props.onClose}
+		<>
+			{props.children(drawer.openProps)}
+			<dialog class="drawer" {...drawer.dialogProps}>
+				<button
+					type="button"
 					title={intl.t("closeSettingsDrawer") as string}
 					class="btn-icon block ml-auto"
+					{...drawer.closeProps}
 				>
-					&#10005;
-				</DialogCloseTrigger>
+					<Icon name="close" aria-label="Close drawer." class="w-6 h-6" />
+				</button>
 				<div class="form-control my-8">
 					<label for="theme-select">{intl.t("theme")}</label>
 					<select
 						id="theme-select"
 						name="theme-select"
+						autofocus
 						aria-describedby="theme-select-helptext"
 						value={localStorage.getItem("theme") ?? "system"}
 						onChange={handleThemeChange}
@@ -125,8 +130,8 @@ const SettingsDrawer: ParentComponent<SettingsDrawerProps> = (props) => {
 						</Show>
 					</form>
 				</Show>
-			</DrawerContent>
-		</Dialog>
+			</dialog>
+		</>
 	);
 };
 
