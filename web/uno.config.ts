@@ -19,12 +19,4 @@ export default defineConfig({
 	rules,
 	shortcuts,
 	shortcutsLayer: "rules",
-	// these rules get filtered out since they're not in a class
-	// but they're needed for the animations in useModal
-	safelist: [
-		"modal-opening",
-		"modal-closing",
-		"drawer-opening",
-		"drawer-closing",
-	],
 });
