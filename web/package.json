@@ -1,35 +1,35 @@
 {
-	"name": "devs-playing-poker-web",
-	"version": "0.0.0",
-	"description": "",
-	"scripts": {
-		"start": "vite",
-		"dev": "vite",
-		"build": "npm run i18n && vite build",
-		"serve": "vite preview",
-		"i18n": "formatjs compile-folder --ast --format src/i18n/formatjs-formatter.js src/i18n/translations public/translations",
-		"format": "prettier --check src --config ../.prettierrc",
-		"format:fix": "prettier --write src  --config ../.prettierrc"
-	},
-	"license": "MIT",
-	"devDependencies": {
-		"@formatjs/cli": "^6.1.1",
-		"prettier": "^2.8.8",
-		"sass": "^1.62.1",
-		"typescript": "^5.0.4",
-		"unocss": "^0.51.12",
-		"vite": "^4.3.5",
-		"vite-plugin-solid": "^2.7.0"
-	},
-	"dependencies": {
-		"@formatjs/intl": "^2.7.2",
-		"@solidjs/router": "^0.8.2",
-		"@zag-js/range-slider": "^0.2.15",
-		"@zag-js/solid": "^0.3.1",
-		"@zag-js/tooltip": "^0.3.0",
-		"solid-js": "^1.7.5",
-		"solid-toast": "^0.4.0",
-		"solid-transition-group": "^0.2.2",
-		"zod": "^3.21.4"
-	}
+  "name": "devs-playing-poker-web",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "npm run i18n && vite build",
+    "serve": "vite preview",
+    "i18n": "formatjs compile-folder --ast --format src/i18n/formatjs-formatter.js src/i18n/translations public/translations",
+    "format": "prettier --check src --config ../.prettierrc",
+    "format:fix": "prettier --write src  --config ../.prettierrc"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@formatjs/cli": "^6.2.4",
+    "prettier": "^2.8.8",
+    "sass": "^1.69.5",
+    "typescript": "^5.3.3",
+    "unocss": "^0.51.13",
+    "vite": "^4.5.1",
+    "vite-plugin-solid": "^2.8.0"
+  },
+  "dependencies": {
+    "@formatjs/intl": "^2.9.9",
+    "@solidjs/router": "^0.10.1",
+    "@zag-js/range-slider": "^0.2.15",
+    "@zag-js/solid": "^0.3.1",
+    "@zag-js/tooltip": "^0.3.0",
+    "solid-js": "^1.8.7",
+    "solid-toast": "^0.4.0",
+    "solid-transition-group": "^0.2.3",
+    "zod": "^3.22.4"
+  }
 }
