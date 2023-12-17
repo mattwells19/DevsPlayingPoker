@@ -7,6 +7,7 @@ export interface CreateRoomFields {
 	voterOptions: keyof typeof optionsSchemaMap;
 	numberOfOptions: NumberRange | null;
 	noVote: boolean;
+	roomPassword: string | null;
 }
 
 export const numberPatternSchema = zod.object({

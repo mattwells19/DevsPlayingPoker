@@ -29,6 +29,15 @@ const handleJoin: EventFunction<JoinEvent> = async (
 		return;
 	}
 
+	if (
+		roomData.roomPassword &&
+		(!data.roomPassword || roomData.roomPassword !== data.roomPassword)
+	) {
+		const socket = sockets.get(userId, roomData.roomCode);
+		socket?.send({ event: "IncorrectRoomPasswordEvent" });
+		return;
+	}
+
 	if (!data.name || data.name.length === 0) {
 		return {
 			message: `Invalid name. Expected a name with length between 1 and 20, but got: '${data.name}'.`,

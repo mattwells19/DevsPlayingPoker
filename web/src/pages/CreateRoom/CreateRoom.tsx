@@ -16,6 +16,7 @@ import {
 	CreateRoomFields,
 } from "./CreateRoom.schemas";
 import { useIntl } from "@/i18n";
+import Icon from "@/components/Icon";
 
 const CreateRoom: Component = () => {
 	const intl = useIntl();
@@ -23,6 +24,7 @@ const CreateRoom: Component = () => {
 
 	const defaults = getDefaultValues();
 
+	const [showPassword, setShowPassword] = createSignal<boolean>(false);
 	const [error, setError] = createSignal<string | null>(null);
 	const [list, setList] = createSignal<string>(defaults.list);
 	const [optionsSelect, setOptionsSelect] = createSignal<
@@ -55,11 +57,13 @@ const CreateRoom: Component = () => {
 			options.unshift("N/A");
 		}
 
-		post("/api/v1/create", { options })
-			.then((res) => {
+		post("/api/v1/create", { options, roomPassword: formData.roomPassword })
+			.then((res): void => {
 				localStorage.setItem("newRoomFields", JSON.stringify(formData));
 				localStorage.setItem("name", formData.moderatorName);
-				navigate(`/room/${res.roomCode}`);
+				navigate(`/room/${res.roomCode}`, {
+					state: { roomPassword: formData.roomPassword },
+				});
 			})
 			.catch((err) => setError(err));
 	};
@@ -185,6 +189,38 @@ const CreateRoom: Component = () => {
 						<dt>{intl.t("finalPreview")}</dt>
 						<dd class="pl-3">{list()}</dd>
 					</dl>
+
+					<div class="form-control">
+						<label for="roomPassword">{intl.t("passwordForRoom")}</label>
+						<div class="flex w-full">
+							<input
+								id="roomPassword"
+								name="roomPassword"
+								type={showPassword() ? "text" : "password"}
+								class="border-r-0 rounded-r-none flex-1"
+							/>
+							<button
+								type="button"
+								title={
+									intl.t(
+										showPassword() ? "concealPassword" : "showPassword",
+									) as string
+								}
+								onClick={() => setShowPassword((prev) => !prev)}
+								class="btn-ghost border-t border-r border-b border-color rounded-l-none p-2.5"
+							>
+								<Icon
+									name={showPassword() ? "eye-crossed" : "eye"}
+									aria-label={
+										intl.t(
+											showPassword() ? "concealPassword" : "showPassword",
+										) as string
+									}
+									class="w-6 h-6"
+								/>
+							</button>
+						</div>
+					</div>
 
 					<hr class="my-4" />
 

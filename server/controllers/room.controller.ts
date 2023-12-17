@@ -29,12 +29,12 @@ const getRandomCode = (): string => {
 };
 
 export interface CreateRoomRequest {
-	moderatorName: string;
 	options: RoomSchema["options"];
+	roomPassword: RoomSchema["roomPassword"];
 }
 
 export const createRoom: OpineController = async (req, res) => {
-	const { options }: CreateRoomRequest = req.body;
+	const { options, roomPassword }: CreateRoomRequest = req.body;
 
 	try {
 		const roomCode = await generateRoomCode();
@@ -43,6 +43,7 @@ export const createRoom: OpineController = async (req, res) => {
 			moderator: null,
 			state: "Results",
 			options,
+			roomPassword,
 			votingDescription: "",
 			voters: [],
 			votingStartedAt: null,
@@ -70,6 +71,7 @@ export const checkRoomExists: OpineController = async (req, res) => {
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
+			hasPassword: !!room.roomPassword,
 			message: `Room with roomCode of ${req.params.roomCode} exists.`,
 		});
 	}

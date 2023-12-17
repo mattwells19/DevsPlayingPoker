@@ -12,6 +12,7 @@ const wsPath = `${wsProtocol}://${window.location.host}/ws`;
 interface WsOptions {
 	userName: string;
 	roomCode: string;
+	roomPassword: string | null;
 	initialUserId: string | null;
 	onNewUserId: (newUserId: string) => void;
 }
@@ -91,6 +92,7 @@ export default function useWs(options: WsOptions) {
 					const joinEvent: JoinEvent = {
 						event: "Join",
 						name: options.userName,
+						roomPassword: options.roomPassword,
 					};
 					ws().send(JSON.stringify(joinEvent));
 
@@ -112,6 +114,10 @@ export default function useWs(options: WsOptions) {
 				case "Kicked":
 					toast(intl.t("youWereKicked"), { icon: "🥾" });
 					navigate("/");
+					break;
+				case "IncorrectRoomPasswordEvent":
+					toast.error(intl.t("passwordRequiredToJoin"));
+					navigate(`/join/${options.roomCode}?hasPassword=true`);
 					break;
 				default:
 					return;

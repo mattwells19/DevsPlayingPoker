@@ -14,6 +14,7 @@ export interface RoomUpdateEvent {
 export interface JoinEvent {
 	event: "Join";
 	name: string;
+	roomPassword: string | null;
 }
 
 export interface ModeratorChangeEvent {
@@ -46,6 +47,10 @@ export interface KickedEvent {
 	event: "Kicked";
 }
 
+export interface IncorrectRoomPasswordEvent {
+	event: "IncorrectRoomPasswordEvent";
+}
+
 export interface VotingDescriptionEvent {
 	event: "UpdateVotingDescription";
 	value: string;
@@ -62,7 +67,8 @@ export interface ChangeNameEvent {
 export type WebSocketTriggeredEvent =
 	| ConnectEvent
 	| RoomUpdateEvent
-	| KickedEvent;
+	| KickedEvent
+	| IncorrectRoomPasswordEvent;
 
 /**
  * Events triggered by the client
