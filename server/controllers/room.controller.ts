@@ -1,6 +1,7 @@
 import type { OpineRequest, OpineResponse } from "opine";
 import type { RoomSchema } from "../types/schemas.ts";
 import rooms from "../models/rooms.ts";
+import { hashWithSalt } from "../utils/hashWithSalt.ts";
 
 type OpineController<ResBody = unknown> = (
 	req: OpineRequest,
@@ -30,20 +31,29 @@ const getRandomCode = (): string => {
 
 export interface CreateRoomRequest {
 	options: RoomSchema["options"];
-	roomPassword: RoomSchema["roomPassword"];
+	roomPassword: string;
 }
 
 export const createRoom: OpineController = async (req, res) => {
 	const { options, roomPassword }: CreateRoomRequest = req.body;
 
+	const hashedRoomPassPromise = roomPassword
+		? hashWithSalt(roomPassword)
+		: Promise.resolve(null);
+
 	try {
-		const roomCode = await generateRoomCode();
+		const roomCodePromise = generateRoomCode();
+		const [hashedRoomPass, roomCode] = await Promise.all([
+			hashedRoomPassPromise,
+			roomCodePromise,
+		]);
+
 		const room = await rooms.insertRoom({
 			roomCode,
 			moderator: null,
 			state: "Results",
 			options,
-			roomPassword,
+			roomPassword: hashedRoomPass,
 			votingDescription: "",
 			voters: [],
 			votingStartedAt: null,

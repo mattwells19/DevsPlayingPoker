@@ -5,7 +5,8 @@
 		"zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
 		"deno-asserts": "https://deno.land/std@0.208.0/testing/asserts.ts",
 		"deno-bdd": "https://deno.land/std@0.208.0/testing/bdd.ts",
-		"sinon": "https://cdn.skypack.dev/sinon@15.0.4?dts"
+		"sinon": "https://cdn.skypack.dev/sinon@15.0.4?dts",
+		"encodig/base64": "https://deno.land/std@0.210.0/encoding/base64.ts"
 	},
 	"lint": {
 		"files": {
