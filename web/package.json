@@ -8,8 +8,8 @@
     "build": "npm run i18n && vite build",
     "serve": "vite preview",
     "i18n": "formatjs compile-folder --ast --format src/i18n/formatjs-formatter.js src/i18n/translations public/translations",
-    "format": "prettier --check src --config ../.prettierrc",
-    "format:fix": "prettier --write src  --config ../.prettierrc"
+    "format": "prettier --check src --config ../.prettierrc --ignore-path ../.prettierignore",
+    "format:fix": "prettier --write src  --config ../.prettierrc --ignore-path ../.prettierignore"
   },
   "license": "MIT",
   "devDependencies": {
