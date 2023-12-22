@@ -4,6 +4,7 @@ import type { JoinEvent } from "../types/socket.ts";
 import type { EventFunction } from "./types.ts";
 import utils from "./utils/mod.ts";
 import type { User } from "../types/schemas.ts";
+import { hashWithSalt } from "../utils/hashWithSalt.ts";
 
 /**
  * Adds a player to the room specified either as a moderator or voter.
@@ -26,6 +27,20 @@ const handleJoin: EventFunction<JoinEvent> = async (
 	if (userIdExists) {
 		const socket = sockets.get(userId, roomData.roomCode);
 		socket?.send({ event: "RoomUpdate", roomData });
+		return;
+	}
+
+	const allowedToJoin = await (async () => {
+		if (!roomData.roomPassword) return true;
+		if (!data.roomPassword) return false;
+
+		const hashedInput = await hashWithSalt(data.roomPassword);
+		return hashedInput === roomData.roomPassword;
+	})();
+
+	if (!allowedToJoin) {
+		const socket = sockets.get(userId, roomData.roomCode);
+		socket?.send({ event: "IncorrectRoomPasswordEvent" });
 		return;
 	}
 

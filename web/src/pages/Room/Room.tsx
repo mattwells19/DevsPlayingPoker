@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "@solidjs/router";
+import { Navigate, useLocation, useParams } from "@solidjs/router";
 import { Component, createSignal, Show } from "solid-js";
 import ModeratorView from "./views/ModeratorView";
 import VoterView from "./views/VoterView";
@@ -18,8 +18,10 @@ const [updateNameFn, setUpdateNameFn] = createSignal<
 const Room: Component = () => {
 	const intl = useIntl();
 	const params = useParams();
+	const location = useLocation<{ roomPassword: string | undefined }>();
 
 	const userName = localStorage.getItem("name");
+	const roomPassword = location.state?.roomPassword ?? null;
 
 	return (
 		<>
@@ -44,7 +46,11 @@ const Room: Component = () => {
 				fallback={<Navigate href={`/join/${params.roomCode}`} />}
 			>
 				{(userName) => (
-					<RoomContent roomCode={params.roomCode} userName={userName()} />
+					<RoomContent
+						roomCode={params.roomCode}
+						roomPassword={roomPassword}
+						userName={userName()}
+					/>
 				)}
 			</Show>
 		</>
@@ -54,6 +60,7 @@ const Room: Component = () => {
 interface RoomContentProps {
 	roomCode: string;
 	userName: string;
+	roomPassword: string | null;
 }
 
 const RoomContent: Component<RoomContentProps> = (props) => {
@@ -61,6 +68,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 	const { ws, connStatus, roomDetails } = useWs({
 		userName: props.userName,
 		roomCode: props.roomCode,
+		roomPassword: props.roomPassword,
 		initialUserId: sessionStorage.getItem("userId"),
 		onNewUserId: (newUserId) => sessionStorage.setItem("userId", newUserId),
 	});
@@ -83,7 +91,7 @@ const RoomContent: Component<RoomContentProps> = (props) => {
 			<RoomContextProvider roomDetails={roomDetails} roomCode={props.roomCode}>
 				<VotingDescription />
 				<Show fallback={<VoterView />} when={roomDetails.userIsModerator}>
-					<ModeratorView />
+					<ModeratorView roomPassword={props.roomPassword} />
 				</Show>
 			</RoomContextProvider>
 		</main>

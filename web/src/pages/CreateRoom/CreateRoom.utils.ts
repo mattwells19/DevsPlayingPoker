@@ -64,6 +64,7 @@ export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 	const formData = new FormData(form);
 
 	const moderatorName = formData.get("moderatorName") as string;
+	const roomPassword = formData.get("roomPassword") as string;
 	const voterOptions = formData.get(
 		"voterOptions",
 	) as CreateRoomFields["voterOptions"];
@@ -72,6 +73,7 @@ export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 		return {
 			moderatorName,
 			voterOptions,
+			roomPassword: roomPassword.length > 0 ? roomPassword : null,
 			numberOfOptions: null,
 			noVote: false,
 		};
@@ -83,6 +85,7 @@ export function getFormValues(form: HTMLFormElement): CreateRoomFields {
 		return {
 			moderatorName,
 			voterOptions,
+			roomPassword: roomPassword.length > 0 ? roomPassword : null,
 			numberOfOptions:
 				numberOfOptionsMin && numberOfOptionsMax
 					? [parseInt(numberOfOptionsMin), parseInt(numberOfOptionsMax)]

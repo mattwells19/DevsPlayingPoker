@@ -13,6 +13,7 @@ const mockRoomData: RoomSchema = {
 	moderator: null,
 	options: ["1", "2", "3"],
 	roomCode: "ABCD",
+	roomPassword: null,
 	state: "Results",
 	voters: [],
 	votingDescription: "",

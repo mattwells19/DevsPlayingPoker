@@ -13,6 +13,7 @@ const mockRoomData: RoomSchema = {
 	moderator: null,
 	options: ["1", "2", "3"],
 	roomCode: "ABCD",
+	roomPassword: null,
 	state: "Results",
 	voters: [],
 	votingDescription: "",
@@ -46,7 +47,7 @@ describe("Join Room Tests", () => {
 		const msg = await eventHandlers.Join[0](
 			mockRoomData,
 			{ userId: mockUserId },
-			{ event: "Join", name: "test" },
+			{ event: "Join", name: "test", roomPassword: null },
 		);
 
 		assertEquals(msg, undefined);
@@ -97,7 +98,7 @@ describe("Join Room Tests", () => {
 		const msg = await eventHandlers.Join[0](
 			initialMockRoomData,
 			{ userId: mockUserId },
-			{ event: "Join", name: "test" },
+			{ event: "Join", name: "test", roomPassword: null },
 		);
 
 		assertEquals(msg, undefined);
@@ -126,7 +127,7 @@ describe("Join Room Tests", () => {
 				],
 			},
 			{ userId: mockUserId },
-			{ event: "Join", name: "test" },
+			{ event: "Join", name: "test", roomPassword: null },
 		);
 
 		assertEquals(msg, undefined);
@@ -146,7 +147,7 @@ describe("Join Room Tests", () => {
 				},
 			},
 			{ userId: mockUserId },
-			{ event: "Join", name: "test-moderator" },
+			{ event: "Join", name: "test-moderator", roomPassword: null },
 		);
 
 		assertEquals(msg, undefined);
@@ -175,7 +176,11 @@ describe("Join Room Tests", () => {
 		const msg = await eventHandlers.Join[0](
 			mockRoomData,
 			{ userId: mockUserId },
-			{ event: "Join", name: "my name is longer than 20 characters" },
+			{
+				event: "Join",
+				name: "my name is longer than 20 characters",
+				roomPassword: null,
+			},
 		);
 
 		assertEquals(msg, undefined);
@@ -235,7 +240,7 @@ describe("Join Room Tests", () => {
 		const msg = await eventHandlers.Join[0](
 			initialMockRoomData,
 			{ userId: mockUserId },
-			{ event: "Join", name: "test" },
+			{ event: "Join", name: "test", roomPassword: null },
 		);
 
 		assertEquals(msg, undefined);

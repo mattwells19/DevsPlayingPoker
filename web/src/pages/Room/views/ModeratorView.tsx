@@ -4,9 +4,11 @@ import { useRoom } from "../RoomContext";
 import { useIntl } from "@/i18n";
 import Icon from "@/components/Icon";
 
-interface ModeratorViewProps {}
+interface ModeratorViewProps {
+	roomPassword: string | null;
+}
 
-const ModeratorView: Component<ModeratorViewProps> = () => {
+const ModeratorView: Component<ModeratorViewProps> = (props) => {
 	const intl = useIntl();
 	const room = useRoom();
 
@@ -17,6 +19,7 @@ const ModeratorView: Component<ModeratorViewProps> = () => {
 		if (e.data === "sync") {
 			broadcaster.postMessage({
 				roomCode: room.roomData.roomCode,
+				roomPassword: props.roomPassword,
 				userName: room.roomData.moderator?.name,
 				userId: room.currentUserId,
 			});

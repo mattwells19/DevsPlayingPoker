@@ -10,6 +10,7 @@ import VotingDescription from "../Room/components/VotingDescription";
 const VotingModerator: Component = () => {
 	const [details, setDetails] = createSignal<{
 		roomCode: string;
+		roomPassword: string | null;
 		userName: string;
 		userId: string;
 	} | null>(null);
@@ -33,6 +34,7 @@ const VotingModerator: Component = () => {
 				<VotingModeratorContent
 					userName={d().userName}
 					roomCode={d().roomCode}
+					roomPassword={d().roomPassword}
 					userId={d().userId}
 				/>
 			)}
@@ -43,6 +45,7 @@ const VotingModerator: Component = () => {
 interface VotingModeratorContentProps {
 	userName: string;
 	roomCode: string;
+	roomPassword: string | null;
 	userId: string;
 }
 
@@ -53,6 +56,7 @@ const VotingModeratorContent: Component<VotingModeratorContentProps> = (
 	const { ws, connStatus, roomDetails } = useWs({
 		userName: props.userName,
 		roomCode: props.roomCode,
+		roomPassword: props.roomPassword,
 		initialUserId: `voter-${props.userId}`,
 		onNewUserId: () => {},
 	});

@@ -1,6 +1,7 @@
 import type { OpineRequest, OpineResponse } from "opine";
 import type { RoomSchema } from "../types/schemas.ts";
 import rooms from "../models/rooms.ts";
+import { hashWithSalt } from "../utils/hashWithSalt.ts";
 
 type OpineController<ResBody = unknown> = (
 	req: OpineRequest,
@@ -29,20 +30,30 @@ const getRandomCode = (): string => {
 };
 
 export interface CreateRoomRequest {
-	moderatorName: string;
 	options: RoomSchema["options"];
+	roomPassword: string;
 }
 
 export const createRoom: OpineController = async (req, res) => {
-	const { options }: CreateRoomRequest = req.body;
+	const { options, roomPassword }: CreateRoomRequest = req.body;
+
+	const hashedRoomPassPromise = roomPassword
+		? hashWithSalt(roomPassword)
+		: Promise.resolve(null);
 
 	try {
-		const roomCode = await generateRoomCode();
+		const roomCodePromise = generateRoomCode();
+		const [hashedRoomPass, roomCode] = await Promise.all([
+			hashedRoomPassPromise,
+			roomCodePromise,
+		]);
+
 		const room = await rooms.insertRoom({
 			roomCode,
 			moderator: null,
 			state: "Results",
 			options,
+			roomPassword: hashedRoomPass,
 			votingDescription: "",
 			voters: [],
 			votingStartedAt: null,
@@ -70,6 +81,7 @@ export const checkRoomExists: OpineController = async (req, res) => {
 	if (room) {
 		return res.setStatus(200).json({
 			success: true,
+			hasPassword: !!room.roomPassword,
 			message: `Room with roomCode of ${req.params.roomCode} exists.`,
 		});
 	}

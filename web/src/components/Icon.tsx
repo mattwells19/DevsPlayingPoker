@@ -12,6 +12,8 @@ type IconName =
 	| "pencil" // not used
 	| "arrows-right-left"
 	| "arrow-top-right-on-square"
+	| "eye"
+	| "eye-crossed"
 	| "close";
 
 interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {

@@ -23,19 +23,26 @@ const Landing: Component = () => {
 			.toUpperCase();
 
 		if (roomCode.length === 4) {
-			fetch(`/api/v1/rooms/${roomCode}/exists`).then(({ status }) => {
-				switch (status) {
-					case 200:
+			fetch(`/api/v1/rooms/${roomCode}/exists`)
+				.then((res) => {
+					switch (res.status) {
+						case 200:
+							return res.json();
+						case 204:
+							setError("roomDoesNotExist");
+							break;
+						case 429:
+							setError("tooManyAttempts");
+							break;
+					}
+				})
+				.then(({ hasPassword }) => {
+					if (hasPassword) {
+						navigate(`/join/${roomCode}?hasPassword=true`);
+					} else {
 						navigate(`/room/${roomCode}`);
-						break;
-					case 204:
-						setError("roomDoesNotExist");
-						break;
-					case 429:
-						setError("tooManyAttempts");
-						break;
-				}
-			});
+					}
+				});
 		}
 	};
 
